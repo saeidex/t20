@@ -13,12 +13,12 @@ const objectNameSchema = v.pipe(
   v.minLength(1, "Object name cannot be empty"),
   v.maxLength(
     30,
-    "Object name cannot be longer than 50 characters",
-  ),
+    "Object name cannot be longer than 50 characters"
+  )
 );
 
 export async function sourcePathPrompt(
-  filePath: string,
+  filePath: string
 ): Promise<string> {
   if (filePath) {
     if (
@@ -27,8 +27,8 @@ export async function sourcePathPrompt(
     ) {
       console.error(
         pc.red(
-          "Please provide a valid TypeScript(.d.ts/.ts) file",
-        ),
+          "Please provide a valid TypeScript(.d.ts/.ts) file"
+        )
       );
       process.exit(1);
     }
@@ -48,17 +48,17 @@ export async function sourcePathPrompt(
       v.minLength(1, "File path cannot be empty"),
       v.maxLength(
         255,
-        "File path cannot be longer than 255 characters",
+        "File path cannot be longer than 255 characters"
       ),
       v.check(
         (value) =>
           value.endsWith(".ts") || value.endsWith(".d.ts"),
-        "Please provide a valid TypeScript(.d.ts/.ts) file",
+        "Please provide a valid TypeScript(.d.ts/.ts) file"
       ),
       v.check(
         (value) => fs.existsSync(value),
-        "File does not exist",
-      ),
+        "File does not exist"
+      )
     ),
   })) as string;
 
@@ -68,7 +68,7 @@ export async function sourcePathPrompt(
 }
 
 export async function selectedObjectPrompt(
-  objectOptions: Array<Option>,
+  objectOptions: Array<Option>
 ): Promise<string> {
   const selectedObject = (await prompts.autocomplete({
     message: pc.yellow("Select an Object/Interface"),
@@ -87,7 +87,7 @@ type ObjectName = {
 };
 
 export async function objectNamePrompts(
-  selectedObject: string,
+  selectedObject: string
 ): Promise<ObjectName> {
   const objectNameSingular = (await prompts.text({
     message: pc.yellow("(Singular) Object name"),
@@ -120,7 +120,7 @@ type OutputDir = {
 };
 
 export async function outputDirPrompt(
-  outputRootDir?: string,
+  outputRootDir?: string
 ): Promise<OutputDir> {
   let rootDir = outputRootDir;
 
@@ -134,15 +134,15 @@ export async function outputDirPrompt(
         v.minLength(1, "Output directory cannot be empty"),
         v.maxLength(
           255,
-          "Output directory cannot be longer than 255 characters",
-        ),
+          "Output directory cannot be longer than 255 characters"
+        )
       ),
     })) as string;
 
     handlePromptCancel(rootDir);
 
     console.log(
-      pc.blue(`objects output dir: ${rootDir}/objects`),
+      pc.blue(`objects output dir: ${rootDir}/objects`)
     );
     console.log(pc.blue(`views output dir: ${rootDir}/views`));
   }

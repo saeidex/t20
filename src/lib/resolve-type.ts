@@ -4,7 +4,7 @@ import type { IRField, FieldOption } from "./types.js";
 import { toTitleCase } from "./utils/case-transformation.js";
 
 function createOptions(
-  values: Array<string>,
+  values: Array<string>
 ): Array<FieldOption> {
   return values.map((value, position) => ({
     value,
@@ -16,14 +16,14 @@ function createOptions(
 
 function getArrayElementType(
   checker: ts.TypeChecker,
-  type: ts.Type,
+  type: ts.Type
 ): ts.Type | undefined {
   if (!checker.isArrayType(type) && !checker.isTupleType(type)) {
     return undefined;
   }
 
   const typeArgs = checker.getTypeArguments(
-    type as ts.TypeReference,
+    type as ts.TypeReference
   );
 
   return typeArgs[0];
@@ -32,7 +32,7 @@ function getArrayElementType(
 export function resolveType(
   checker: ts.TypeChecker,
   name: string,
-  type: ts.Type,
+  type: ts.Type
 ): IRField {
   if (name.toLowerCase().endsWith("at")) {
     return {
@@ -48,7 +48,7 @@ export function resolveType(
     const isUniversal = /universalidentifier/i.test(name);
     const isIdField =
       /(?:Id|ID|_[iI]d|-[iI]d|[uU][uU][iI]d)$|^[iI][dD]$/.test(
-        name,
+        name
       );
 
     if (isIdField || isUniversal) {
@@ -103,7 +103,7 @@ export function resolveType(
           }
 
           return member.name.getText();
-        }),
+        })
       );
 
       return {
@@ -117,7 +117,7 @@ export function resolveType(
   // "a" | "b" | "c"
   if (type.isUnion()) {
     const literalMembers = type.types.filter(
-      (t) => t.isStringLiteral() || t.isNumberLiteral(),
+      (t) => t.isStringLiteral() || t.isNumberLiteral()
     );
 
     if (literalMembers.length === type.types.length) {
@@ -126,8 +126,8 @@ export function resolveType(
         name,
         options: createOptions(
           literalMembers.map((t) =>
-            String((t as ts.LiteralType).value),
-          ),
+            String((t as ts.LiteralType).value)
+          )
         ),
       };
     }
@@ -138,7 +138,7 @@ export function resolveType(
 
   if (elementType && elementType.isUnion()) {
     const literalMembers = elementType.types.filter(
-      (t) => t.isStringLiteral() || t.isNumberLiteral(),
+      (t) => t.isStringLiteral() || t.isNumberLiteral()
     );
 
     if (literalMembers.length === elementType.types.length) {
@@ -147,8 +147,8 @@ export function resolveType(
         name,
         options: createOptions(
           literalMembers.map((t) =>
-            String((t as ts.LiteralType).value),
-          ),
+            String((t as ts.LiteralType).value)
+          )
         ),
       };
     }

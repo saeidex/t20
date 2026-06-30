@@ -7,18 +7,20 @@ import { toKebabCase } from "./utils/case-transformation.js";
 
 export function generateTwentyViewFields(
   objectName: string,
-  fields: Array<IRField>,
+  fields: Array<IRField>
 ): {
   fieldMetadataUidsImportStatement: string;
   viewFields: string;
 } {
-  const objectPath = `../objects/${toKebabCase(objectName)}.object`;
+  const objectPath = `../objects/${toKebabCase(
+    objectName
+  )}.object`;
 
   const fieldMetadataUidsImportStatement = dedent`
     import {
       ${toUidVarName(objectName, "OBJECT")},
 
-      ${fieldUidVarNames(fields).join(",\n")};
+      ${fieldUidVarNames(fields).join(",\n")},
     } from "${objectPath}";`;
 
   let viewFields: Array<string> = [];
@@ -27,11 +29,14 @@ export function generateTwentyViewFields(
     viewFields.push(
       dedent`{
         universalIdentifier: "${v4()}",
-        fieldMetadataUniversalIdentifier: ${toUidVarName(field.name, "FIELD")},
+        fieldMetadataUniversalIdentifier: ${toUidVarName(
+          field.name,
+          "FIELD"
+        )},
         position: ${idx},
         isVisible: true,
         size: 200,
-      }`,
+      }`
     );
   });
 

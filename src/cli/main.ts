@@ -32,14 +32,14 @@ async function main() {
 
   if (!sourceFile) {
     console.error(
-      pc.red(`Failed to read source file: ${sourcePath}`),
+      pc.red(`Failed to read source file: ${sourcePath}`)
     );
     process.exit(1);
   }
 
   const objectOptions = extractObjectSelectOptions(
     sourceFile,
-    checker,
+    checker
   );
 
   if (objectOptions.length === 0) {
@@ -47,8 +47,9 @@ async function main() {
     process.exit(1);
   }
 
-  const selectedObject =
-    await selectedObjectPrompt(objectOptions);
+  const selectedObject = await selectedObjectPrompt(
+    objectOptions
+  );
 
   if (!selectedObject) {
     console.error(pc.red("No object selected."));
@@ -62,7 +63,7 @@ async function main() {
   const objectFields = extractObjectFields(
     sourceFile,
     checker,
-    selectedObject,
+    selectedObject
   );
 
   const twentyObject = generateTwentyObject({
@@ -73,31 +74,39 @@ async function main() {
   const twentyObjectView = generateTwentyView(
     "default-view",
     selectedObject,
-    objectFields,
+    objectFields
   );
 
   if (cli.clipboard) {
     clipboard.copy(twentyObject);
   }
 
-  const outputObjectName = `${toKebabCase(objectName.singular)}.object.ts`;
-  const outputViewName = `${toKebabCase(objectName.singular)}-default-view.ts`;
+  const outputObjectName = `${toKebabCase(
+    objectName.singular
+  )}.object.ts`;
+  const outputViewName = `${toKebabCase(
+    objectName.singular
+  )}-default-view.ts`;
 
   const outputObjectFilePath = path.resolve(
     outputDir.objects,
-    outputObjectName,
+    outputObjectName
   );
   const outputViewFilePath = path.resolve(
     outputDir.views,
-    outputViewName,
+    outputViewName
   );
 
   fs.writeFileSync(outputObjectFilePath, twentyObject);
   fs.writeFileSync(outputViewFilePath, twentyObjectView);
 
   prompts.outro(dedent`\n
-    ✨ ${pc.yellow("Generated: [OBJECT]:")} ${pc.green(outputObjectFilePath)}
-    ✨ ${pc.yellow("Generated: [VIEW]:")} ${pc.green(outputViewFilePath)}`);
+    ✨ ${pc.yellow("Generated: [OBJECT]:")} ${pc.green(
+    outputObjectFilePath
+  )}
+    ✨ ${pc.yellow("Generated: [VIEW]:")} ${pc.green(
+    outputViewFilePath
+  )}`);
 
   if (cli.print) {
     setTimeout(() => {

@@ -32,7 +32,7 @@ await mkdir("dist", { recursive: true });
 
 await writeFile(
   join("dist", "package.json"),
-  JSON.stringify(pkg, null, 2),
+  JSON.stringify(pkg, null, 2)
 );
 
 console.log("[Build] Copying README.md ...");

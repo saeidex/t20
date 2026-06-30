@@ -5,7 +5,7 @@ import { resolveType } from "./resolve-type.js";
 export function extractObjectFields(
   sourceFile: ts.SourceFile,
   checker: ts.TypeChecker,
-  objectName: string,
+  objectName: string
 ): Array<IRField> {
   const fields: Array<IRField> = [];
 
@@ -41,12 +41,12 @@ export function extractObjectFields(
           if (declaration) {
             const propType = checker.getTypeOfSymbolAtLocation(
               property,
-              declaration,
+              declaration
             );
             const resolved = resolveType(
               checker,
               name,
-              propType,
+              propType
             );
             if (Array.isArray(resolved)) {
               fields.push(...resolved);

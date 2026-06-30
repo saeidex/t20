@@ -12,7 +12,7 @@ const indent = (lines: Array<string>, spaces: number) =>
     .join("\n");
 
 const serializeOptions = (
-  opts: Array<FieldOption> = [],
+  opts: Array<FieldOption> = []
 ): string => {
   if (!opts.length) return "";
 
@@ -27,8 +27,8 @@ const serializeOptions = (
           `  color: "${o.color}",`,
           `},`,
         ],
-        4,
-      ),
+        4
+      )
     )
     .join("\n");
 
@@ -36,21 +36,26 @@ const serializeOptions = (
 };
 
 export function generateTwentyObjectFields(
-  fields: Array<IRField>,
+  fields: Array<IRField>
 ) {
   const fieldObjects = fields
     .map((field) =>
       indent(
         [
           `{`,
-          `  universalIdentifier: ${toUidVarName(field.name, "FIELD")},`,
+          `  universalIdentifier: ${toUidVarName(
+            field.name,
+            "FIELD"
+          )},`,
           `  name: "${toCamelCase(field.name)}",`,
           `  label: "${toTitleCase(toTitleCase(field.name))}",`,
-          `  type: FieldType.${field.kind}${serializeOptions(field.options)},`,
+          `  type: FieldType.${field.kind}${serializeOptions(
+            field.options
+          )},`,
           `},`,
         ],
-        0,
-      ),
+        0
+      )
     )
     .join("\n");
 

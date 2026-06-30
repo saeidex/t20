@@ -8,7 +8,7 @@ import { toUidVarStatement } from "./utils/to-uid-var-statement.js";
 export function generateTwentyView(
   viewName: string,
   objectName: string,
-  fields: Array<IRField>,
+  fields: Array<IRField>
 ) {
   const viewUidVarName = toUidVarName(viewName, "VIEW");
   const viewUidVarStatement = toUidVarStatement(viewUidVarName);

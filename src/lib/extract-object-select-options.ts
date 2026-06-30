@@ -9,12 +9,15 @@ export type Option = {
 
 export function extractObjectSelectOptions(
   sourceFile: ts.SourceFile,
-  checker: ts.TypeChecker,
+  checker: ts.TypeChecker
 ): Array<Option> {
   const items: Array<Option> = [];
 
   sourceFile.forEachChild((node) => {
-    if (ts.isTypeAliasDeclaration(node) || ts.isInterfaceDeclaration(node)) {
+    if (
+      ts.isTypeAliasDeclaration(node) ||
+      ts.isInterfaceDeclaration(node)
+    ) {
       const type = checker.getTypeAtLocation(node.name);
 
       if (isTrueObject(type, checker)) {
@@ -30,11 +33,15 @@ export function extractObjectSelectOptions(
   return items.sort((a, b) => a.label.localeCompare(b.label));
 }
 
-function isTrueObject(type: ts.Type, checker: ts.TypeChecker): boolean {
+function isTrueObject(
+  type: ts.Type,
+  checker: ts.TypeChecker
+): boolean {
   const isObject = (type.flags & ts.TypeFlags.Object) !== 0;
   if (!isObject) return false;
 
-  const isArrayOrTuple = checker.isArrayType(type) || checker.isTupleType(type);
+  const isArrayOrTuple =
+    checker.isArrayType(type) || checker.isTupleType(type);
   if (isArrayOrTuple) return false;
 
   const signatures = type.getCallSignatures();

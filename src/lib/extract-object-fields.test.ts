@@ -6,7 +6,7 @@ import type { IRField } from "./types.js";
 const createCompilerHost = (
   fileName: string,
   source: string,
-  sourceFile: ts.SourceFile,
+  sourceFile: ts.SourceFile
 ): ts.CompilerHost => {
   const compilerHost: ts.CompilerHost = {
     getSourceFile: (name) =>
@@ -26,33 +26,33 @@ const createCompilerHost = (
 
 const createSourceFile = (
   fileName: string,
-  source: string,
+  source: string
 ): ts.SourceFile => {
   return ts.createSourceFile(
     fileName,
     source,
     ts.ScriptTarget.Latest,
-    true,
+    true
   );
 };
 
 const createTestProgram = (
   typeName: string,
   source: string,
-  fileName = "input.ts",
+  fileName = "input.ts"
 ): Array<IRField> => {
   const sourceFile = createSourceFile(fileName, source);
   const compilerHost = createCompilerHost(
     fileName,
     source,
-    sourceFile,
+    sourceFile
   );
   const program = ts.createProgram([fileName], {}, compilerHost);
   const checker = program.getTypeChecker();
   const actualFields = extractObjectFields(
     sourceFile,
     checker,
-    typeName,
+    typeName
   );
   return actualFields;
 };
@@ -63,7 +63,7 @@ test("empty object literal fields", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual([]);
 });
@@ -74,7 +74,7 @@ test("empty interface fields", () => {
 
   const actualFields = createTestProgram(
     targetInterfaceName,
-    targetInterface,
+    targetInterface
   );
   expect(actualFields).toEqual([]);
 });
@@ -86,7 +86,7 @@ test("extract fields :: string => TEXT", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual(expectedOutput);
 });
@@ -98,7 +98,7 @@ test("extract fields :: number => NUMBER", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual(expectedOutput);
 });
@@ -110,7 +110,7 @@ test("extract fields :: boolean => BOOLEAN", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual(expectedOutput);
 });
@@ -121,7 +121,7 @@ test("extract fields :: array", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual([
     { name: "array", kind: "ARRAY" },
@@ -167,7 +167,7 @@ test("extract fields :: enum => SELECT", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual(expectedOutput);
 });
@@ -206,7 +206,7 @@ test("extract fields :: 'a' | 'b' | 'c' => SELECT", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual(expectedOutput);
 });
@@ -218,7 +218,7 @@ test("extract fields :: Date => DATE_TIME", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual(expectedOutput);
 });
@@ -232,7 +232,7 @@ test("extract fields :: any (key contains 'at') => DATE_TIME", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual(expectedOutput);
 });
@@ -271,7 +271,7 @@ test("extract fields :: string (key contains 'id') => UUID", () => {
 
   const actualFields = createTestProgram(
     targetObjectName,
-    targetObject,
+    targetObject
   );
   expect(actualFields).toEqual(expectedOutput);
 });

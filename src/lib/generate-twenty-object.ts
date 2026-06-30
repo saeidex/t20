@@ -18,7 +18,7 @@ export function generateTwentyObject(data: {
 
   const objectUidVarName = toUidVarName(
     data.nameSingular,
-    "OBJECT",
+    "OBJECT"
   );
   const objectUidVarStatement =
     toUidVarStatement(objectUidVarName);
