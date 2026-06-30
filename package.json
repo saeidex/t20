@@ -1,6 +1,6 @@
 {
   "name": "@saeidex/t20",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "license": "GPL-3.0-only",
   "description": "A scaffolding CLI tool for Twenty CRM",
@@ -34,7 +34,7 @@
     "coverage": "vitest run --coverage",
     "copy-package-json": "tsx scripts/copy-package-json.ts",
     "changeset-version": "changeset version && node scripts/version.mjs",
-    "changeset-publish": "pnpm build && changeset publish"
+    "changeset-publish": "bun run build && changeset publish"
   },
   "prettier": {
     "printWidth": 65,
