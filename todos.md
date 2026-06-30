@@ -1,4 +1,13 @@
-# Maybe Near Future
+# Todos
+
+- [ ] (view) label text field position at zero
+- [x] (view) default view name change to `all-${view_name}`
+- [ ] (prompts) custom select prompt with two column layout
+- [x] (prompts) add -v command
+- [ ] (nav) generate default navigation menu item
+
+
+# Maybe in Near Future
 
 - [ ] Array type support (Array)
 - [ ] Object typee Support (RELATION)

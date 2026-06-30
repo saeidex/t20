@@ -9,7 +9,7 @@ export function generateTwentyView(
   viewName: string,
   objectName: string,
   fields: Array<IRField>
-) {
+): string {
   const viewUidVarName = toUidVarName(viewName, "VIEW");
   const viewUidVarStatement = toUidVarStatement(viewUidVarName);
   const objectUidVarName = toUidVarName(objectName, "OBJECT");
@@ -24,7 +24,7 @@ export function generateTwentyView(
 
                 export default defineView({
                   universalIdentifier: ${viewUidVarName},
-                  name: "${toCamelCase(viewName)}",
+                  name: "${viewName}",
                   objectUniversalIdentifier: ${objectUidVarName},
                   icon: "IconList",
                   key: ViewKey.INDEX,

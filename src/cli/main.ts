@@ -8,7 +8,6 @@ import ts from "typescript";
 import dedent from "ts-dedent";
 
 import { generateTwentyObject } from "../lib/generate-twenty-object.js";
-import { toKebabCase } from "../lib/utils/case-transformation.js";
 import { createCLI } from "../lib/create-cli.js";
 import { extractObjectSelectOptions } from "../lib/extract-object-select-options.js";
 import {
@@ -19,6 +18,11 @@ import {
 } from "../lib/user-prompts.js";
 import { extractObjectFields } from "../lib/extract-object-fields.js";
 import { generateTwentyView } from "../lib/generate-twenty-view.js";
+import {
+  toObjectFileName,
+  toViewFileName,
+  toViewName,
+} from "../lib/utils/to-names.js";
 
 async function main() {
   prompts.intro(pc.cyan("◈ t20: Types to Twenty"));
@@ -71,8 +75,11 @@ async function main() {
     namePlural: objectName.plural,
     fields: objectFields,
   });
+
+  const viewName = toViewName(objectName.plural);
+
   const twentyObjectView = generateTwentyView(
-    "default-view",
+    viewName,
     selectedObject,
     objectFields
   );
@@ -81,20 +88,16 @@ async function main() {
     clipboard.copy(twentyObject);
   }
 
-  const outputObjectName = `${toKebabCase(
-    objectName.singular
-  )}.object.ts`;
-  const outputViewName = `${toKebabCase(
-    objectName.singular
-  )}-default-view.ts`;
+  const outputObjectFile = toObjectFileName(objectName.singular);
+  const outputViewFile = toViewFileName(objectName.plural);
 
   const outputObjectFilePath = path.resolve(
     outputDir.objects,
-    outputObjectName
+    outputObjectFile
   );
   const outputViewFilePath = path.resolve(
     outputDir.views,
-    outputViewName
+    outputViewFile
   );
 
   fs.writeFileSync(outputObjectFilePath, twentyObject);
