@@ -102,7 +102,13 @@ export async function objectNamePrompts(
     message: pc.yellow("(Plural) Object name"),
     placeholder: "products",
     initialValue: plural(toTitleCase(selectedObject)),
-    validate: objectNameSchema,
+    validate: v.pipe(
+      objectNameSchema,
+      v.check(
+        (value) => value !== objectNameSingular,
+        "Plural name must be different from singular name"
+      )
+    ),
   })) as string;
 
   handlePromptCancel(objectNamePlural);
