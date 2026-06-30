@@ -2,7 +2,7 @@
 
 **A scaffolding CLI tool for [Twenty CRM](https://github.com/twentyhq/twenty).** Automatically generate objects, fields, views & directly from your TypeScript definitions.
 
-![screenshot]("https://github.com/saeidex/t20/screenshot.png")
+![screenshot](https://github.com/saeidex/t20/blob/main/public/screenshot.png)
 
 ## Twenty Field Compatibility Checklist
 
