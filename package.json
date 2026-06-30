@@ -1,5 +1,5 @@
 {
-  "name": "t20",
+  "name": "@saeidex/t20",
   "version": "0.0.1",
   "type": "module",
   "license": "GPL-3.0-only",
@@ -11,11 +11,13 @@
   "author": "Ebrahim Khalil <ebrahim.khalil.nayeem@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/saeidex/t20"
+    "url": "git+https://github.com/saeidex/t20.git"
   },
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
-    "access": "public",
-    "directory": "dist"
+    "access": "public"
   },
   "scripts": {
     "build": "tsup && bun copy-package-json",

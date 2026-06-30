@@ -2,7 +2,41 @@
 
 **A scaffolding CLI tool for [Twenty CRM](https://github.com/twentyhq/twenty).** Automatically generate objects, fields, views & directly from your TypeScript definitions.
 
-![screenshot](https://github.com/saeidex/t20/blob/main/public/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/saeidex/t20/refs/heads/main/public/screenshot.png?token=GHSAT0AAAAAAEA725WLTK3MYINYVPOYU4DI2SDI7JQ)
+
+## Installation
+
+```bash
+# Global installation
+npm install -g @saeidex/t20
+
+# Run without installing
+npx @saeidex/t20 -h
+```
+
+## Usage
+
+```bash
+t20 -i <path> [options]
+```
+
+#### Options
+
+* `-i, --input <path>` : Path to TypeScript file (e.g., `types.ts`). **(Required)**
+* `-o, --output <dir>` : Directory to save generated metadata.
+* `-p, --print`        : Output result directly to the terminal.
+* `-c, --clipboard`    : Copy result straight to clipboard.
+* `-h, --help`         : Show help interface.
+
+#### Examples
+
+```bash
+# Print fields to console
+t20 -i ./types.ts -p
+
+# Export files to a folder
+t20 -i ./types.ts -o ./packages/my-twenty-app/src
+```
 
 ## Twenty Field Compatibility Checklist
 
