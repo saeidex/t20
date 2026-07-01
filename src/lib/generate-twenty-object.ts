@@ -12,7 +12,10 @@ export function generateTwentyObject(data: {
   nameSingular: string;
   namePlural: string;
   fields: Array<IRField>;
-}) {
+}): {
+  objectUidVarName: string;
+  output: string;
+} {
   const { fieldObjects, fieldUidVarDeclarations } =
     generateTwentyObjectFields(data.fields);
 
@@ -23,7 +26,7 @@ export function generateTwentyObject(data: {
   const objectUidVarStatement =
     toUidVarStatement(objectUidVarName);
 
-  return dedent`
+  const output = dedent`
     import { defineObject, FieldType } from "twenty-sdk/define";
 
     ${objectUidVarStatement}
@@ -41,5 +44,10 @@ export function generateTwentyObject(data: {
         ${fieldObjects}
       ],
     });
-`;
+    `;
+
+  return {
+    objectUidVarName,
+    output,
+  };
 }

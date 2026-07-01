@@ -2,7 +2,6 @@
 import * as prompts from "@clack/prompts";
 import clipboard from "copy-paste";
 import fs from "node:fs";
-import pc from "picocolors";
 import path from "node:path";
 import ts from "typescript";
 import dedent from "ts-dedent";
@@ -11,7 +10,9 @@ import { generateTwentyObject } from "../lib/generate-twenty-object.js";
 import { createCLI } from "../lib/create-cli.js";
 import { extractObjectSelectOptions } from "../lib/extract-object-select-options.js";
 import {
+  finalPrompt,
   objectNamePrompts,
+  OutputDir,
   outputDirPrompt,
   selectedObjectPrompt,
   sourcePathPrompt,
@@ -23,9 +24,18 @@ import {
   toViewFileName,
   toViewName,
 } from "../lib/utils/to-names.js";
+import { renderTitle } from "../lib/utils/render-title.js";
+import { logErrorAndExit } from "../lib/utils/log-error-and-exit.js";
+import { markedTerm } from "../lib/marked-term.js";
+
+const DEFAULT_OUTPUT_ROOT_DIR: OutputDir = {
+  root: "src",
+  objects: "src/objects",
+  views: "src/views",
+} as const;
 
 async function main() {
-  prompts.intro(pc.cyan("◈ t20: Types to Twenty"));
+  prompts.intro(renderTitle());
 
   const cli = createCLI();
 
@@ -35,10 +45,8 @@ async function main() {
   const sourceFile = program.getSourceFile(sourcePath);
 
   if (!sourceFile) {
-    console.error(
-      pc.red(`Failed to read source file: ${sourcePath}`)
-    );
-    process.exit(1);
+    logErrorAndExit(`Failed to read source file: ${sourcePath}`);
+    return;
   }
 
   const objectOptions = extractObjectSelectOptions(
@@ -47,8 +55,7 @@ async function main() {
   );
 
   if (objectOptions.length === 0) {
-    console.error(pc.red("No exported types/interfaces found."));
-    process.exit(1);
+    logErrorAndExit("No exported types/interfaces found.");
   }
 
   const selectedObject = await selectedObjectPrompt(
@@ -56,13 +63,14 @@ async function main() {
   );
 
   if (!selectedObject) {
-    console.error(pc.red("No object selected."));
-    process.exit(1);
+    logErrorAndExit("No object selected.");
   }
 
   const objectName = await objectNamePrompts(selectedObject);
 
-  const outputDir = await outputDirPrompt(cli.output);
+  const outputDir = cli.output
+    ? await outputDirPrompt(cli.output)
+    : DEFAULT_OUTPUT_ROOT_DIR;
 
   const objectFields = extractObjectFields(
     sourceFile,
@@ -70,52 +78,65 @@ async function main() {
     selectedObject
   );
 
-  const twentyObject = generateTwentyObject({
-    nameSingular: objectName.singular,
-    namePlural: objectName.plural,
-    fields: objectFields,
-  });
+  const { objectUidVarName, output: outputTwentyObject } =
+    generateTwentyObject({
+      nameSingular: objectName.singular,
+      namePlural: objectName.plural,
+      fields: objectFields,
+    });
+  const outputObjectFileName = toObjectFileName(
+    objectName.singular
+  );
+  const outputObjectFilePath = path.resolve(
+    outputDir.objects,
+    outputObjectFileName
+  );
 
   const viewName = toViewName(objectName.plural);
-
-  const twentyObjectView = generateTwentyView(
+  const outputViewFileName = toViewFileName(objectName.plural);
+  const outputViewFilePath = path.resolve(
+    outputDir.views,
+    outputViewFileName
+  );
+  const { output: outputTwentyObjectView } = generateTwentyView(
     viewName,
-    selectedObject,
+    outputViewFilePath,
+    objectUidVarName,
+    outputObjectFilePath,
     objectFields
   );
 
-  if (cli.clipboard) {
-    clipboard.copy(twentyObject);
+  if (!cli.printOnly) {
+    fs.mkdirSync(outputDir.root, { recursive: true });
+    fs.mkdirSync(outputDir.objects, { recursive: true });
+    fs.mkdirSync(outputDir.views, { recursive: true });
+
+    fs.writeFileSync(outputObjectFilePath, outputTwentyObject);
+    fs.writeFileSync(outputViewFilePath, outputTwentyObjectView);
+
+    finalPrompt(
+      outputDir,
+      [outputObjectFilePath],
+      [outputViewFilePath]
+    );
   }
 
-  const outputObjectFile = toObjectFileName(objectName.singular);
-  const outputViewFile = toViewFileName(objectName.plural);
+  const markedOutput = markedTerm.parse(dedent`
+    \`\`\`ts
+    /* ${outputObjectFilePath} */
+    ${outputTwentyObject}\n
+    /* ${outputViewFilePath} */
+    ${outputTwentyObjectView}
+    \`\`\``);
 
-  const outputObjectFilePath = path.resolve(
-    outputDir.objects,
-    outputObjectFile
-  );
-  const outputViewFilePath = path.resolve(
-    outputDir.views,
-    outputViewFile
-  );
+  if (cli.clipboard) {
+    clipboard.copy(markedOutput);
+  }
 
-  fs.writeFileSync(outputObjectFilePath, twentyObject);
-  fs.writeFileSync(outputViewFilePath, twentyObjectView);
-
-  prompts.outro(dedent`\n
-    ✨ ${pc.yellow("Generated: [OBJECT]:")} ${pc.green(
-    outputObjectFilePath
-  )}
-    ✨ ${pc.yellow("Generated: [VIEW]:")} ${pc.green(
-    outputViewFilePath
-  )}`);
-
-  if (cli.print) {
+  if (cli.print || cli.printOnly) {
     setTimeout(() => {
       console.clear();
-      console.log(twentyObject);
-      console.log(twentyObjectView);
+      console.log(markedOutput);
     }, 500);
   }
 }

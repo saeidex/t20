@@ -1,23 +1,31 @@
 import dedent from "ts-dedent";
 import { generateTwentyViewFields } from "./generate-twenty-view-fields.js";
 import type { IRField } from "./types.js";
-import { toCamelCase } from "./utils/case-transformation.js";
 import { toUidVarName } from "./utils/to-uid-var-name.js";
 import { toUidVarStatement } from "./utils/to-uid-var-statement.js";
 
 export function generateTwentyView(
   viewName: string,
-  objectName: string,
+  viewFilePath: string,
+  objectUidVarName: string,
+  objectFilePath: string,
   fields: Array<IRField>
-): string {
+): {
+  viewUidVarName: string;
+  output: string;
+} {
   const viewUidVarName = toUidVarName(viewName, "VIEW");
   const viewUidVarStatement = toUidVarStatement(viewUidVarName);
-  const objectUidVarName = toUidVarName(objectName, "OBJECT");
 
   const { fieldMetadataUidsImportStatement, viewFields } =
-    generateTwentyViewFields(objectName, fields);
+    generateTwentyViewFields(
+      objectUidVarName,
+      objectFilePath,
+      viewFilePath,
+      fields
+    );
 
-  return dedent`import { defineView, ViewFilterOperand, ViewKey } from "twenty-sdk/define";
+  const output = dedent`import { defineView, ViewFilterOperand, ViewKey } from "twenty-sdk/define";
                 ${fieldMetadataUidsImportStatement}
 
                 ${viewUidVarStatement}
@@ -34,4 +42,9 @@ export function generateTwentyView(
                   ],
                 });
          `;
+
+  return {
+    viewUidVarName,
+    output,
+  };
 }

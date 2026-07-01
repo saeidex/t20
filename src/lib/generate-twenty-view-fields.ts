@@ -3,25 +3,29 @@ import { v4 } from "uuid";
 import type { IRField } from "./types.js";
 import { toUidVarName } from "./utils/to-uid-var-name.js";
 import { fieldUidVarNames } from "./utils/fields.js";
-import { toKebabCase } from "./utils/case-transformation.js";
+import path from "node:path";
 
 export function generateTwentyViewFields(
-  objectName: string,
+  objectUidVarName: string,
+  objectFilePath: string,
+  viewFilePath: string,
   fields: Array<IRField>
 ): {
   fieldMetadataUidsImportStatement: string;
   viewFields: string;
 } {
-  const objectPath = `../objects/${toKebabCase(
-    objectName
-  )}.object`;
+  const fromDir = path.dirname(viewFilePath);
+  const objectFileRealtivePath = path.relative(
+    fromDir,
+    objectFilePath
+  );
 
   const fieldMetadataUidsImportStatement = dedent`
     import {
-      ${toUidVarName(objectName, "OBJECT")},
+      ${objectUidVarName},
 
       ${fieldUidVarNames(fields).join(",\n")},
-    } from "${objectPath}";`;
+    } from "${objectFileRealtivePath}";`;
 
   let viewFields: Array<string> = [];
 

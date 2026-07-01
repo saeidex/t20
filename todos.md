@@ -2,7 +2,7 @@
 
 - [ ] (view) label text field position at zero
 - [x] (view) default view name change to `all-${view_name}`
-- [ ] (prompts) custom select prompt with two column layout
+- [x] (prompts) show object on select prompt
 - [x] (prompts) add -v command
 - [ ] (nav) generate default navigation menu item
 

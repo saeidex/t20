@@ -1,5 +1,4 @@
 import ts from "typescript";
-import pc from "picocolors";
 
 export type Option = {
   label: string;
@@ -22,9 +21,9 @@ export function extractObjectSelectOptions(
 
       if (isTrueObject(type, checker)) {
         items.push({
-          label: pc.green(node.name.text),
+          label: node.name.text,
           value: node.name.text,
-          // hint: node.getText(),
+          hint: node.getText(),
         });
       }
     }
