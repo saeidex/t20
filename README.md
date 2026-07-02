@@ -1,8 +1,13 @@
-# t20 - Types to Twenty
+<div align="center">
+  <img src="public/logo.png" width="144" height="144" alt="t20" />
+  <h1>t20 - Types to Twenty</h1>
 
-**A scaffolding CLI tool for [Twenty CRM](https://github.com/twentyhq/twenty).** Automatically generate objects, fields, views & directly from your TypeScript definitions.
+  <p>
+      <strong>A scaffolding CLI tool for [Twenty CRM](https://github.com/twentyhq/twenty).</strong>Automatically generate objects, fields, views & directly from your TypeScript definitions.
+  </p>
+</div>
 
-![screenshot](https://github.com/saeidex/t20/blob/main/public/screenshot.png?raw=true)
+---
 
 ## Installation
 
