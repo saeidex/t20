@@ -7,8 +7,6 @@
   </p>
 </div>
 
----
-
 ## Installation
 
 ```bash
