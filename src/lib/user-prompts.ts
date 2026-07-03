@@ -1,7 +1,6 @@
 import * as prompts from "@clack/prompts";
 import * as v from "valibot";
 import fs from "node:fs";
-import path from "node:path";
 import { plural, singular } from "pluralize";
 import { handlePromptCancel } from "./utils/handle-prompt-cancel.js";
 import { toTitleCase } from "./utils/case-transformation.js";
@@ -9,6 +8,7 @@ import type { Option } from "./extract-object-select-options.ts";
 import { styleText } from "node:util";
 import { logErrorAndExit } from "./utils/log-error-and-exit.js";
 import dedent from "ts-dedent";
+import { OutputDir } from "./get-output-directories.js";
 
 const objectNameSchema = v.pipe(
   v.string(),
@@ -133,68 +133,20 @@ export async function objectNamePrompts(
   };
 }
 
-export type OutputDir = {
-  root: string;
-  objects: string;
-  views: string;
-};
-
-export async function outputDirPrompt(
-  outputRootDir?: string
-): Promise<OutputDir> {
-  let rootDir = outputRootDir;
-
-  if (!rootDir) {
-    rootDir = (await prompts.text({
-      message: styleText("yellow", "Output Root directory"),
-      placeholder: "src",
-      initialValue: "src",
-      validate: v.pipe(
-        v.string(),
-        v.minLength(1, "Output directory cannot be empty"),
-        v.maxLength(
-          255,
-          "Output directory cannot be longer than 255 characters"
-        )
-      ),
-    })) as string;
-
-    handlePromptCancel(rootDir);
-  }
-
-  const outputObjectsDir = path.join(`${rootDir}/objects`);
-  const outputViewsDir = path.join(`${rootDir}/views`);
-
-  return {
-    root: rootDir,
-    objects: outputObjectsDir,
-    views: outputViewsDir,
-  };
-}
-
-export function finalPrompt(
-  outputDir: OutputDir,
-  outputObjectFilePaths: Array<string>,
-  outputViewFilePaths: Array<string>
-) {
+export function finalPrompt(outputFilePaths: {
+  [Property in keyof OutputDir]?: Array<string>;
+}) {
   prompts.note(
-    dedent`Objects: ${outputDir.objects}
-      Views  : ${outputDir.views}`,
-    styleText("yellow", "Output directories")
-  );
-
-  prompts.note(
-    dedent`✨ ${styleText("yellow", "[Objects]")}
-      ${outputObjectFilePaths
-        .map((file) => `:: ${file}`)
-        .join("\n")}
-      ✨ ${styleText("yellow", "[Views]")}
-      ${outputViewFilePaths
-        .map((file) => `:: ${file}`)
-        .join("\n")}`,
-    styleText("yellow", "Generated files"),
-    {
-      withGuide: false,
-    }
+    Object.entries(outputFilePaths)
+      .map(([key, value]) => {
+        const title = `✨ ${styleText(
+          "yellow",
+          `[${toTitleCase(key, true)}]`
+        )}`;
+        const body = dedent`
+      ${value.map((file) => `:: ${file}`).join("\n")}`;
+        return title + "\n" + body;
+      })
+      .join("\n")
   );
 }

@@ -1,10 +1,12 @@
-import dedent from "ts-dedent";
-import { v4 } from "uuid";
 import type { IRField } from "./types.js";
+
+import dedent from "ts-dedent";
+
+import { v4 } from "uuid";
 import { toUidVarName } from "./utils/to-uid-var-name.js";
 import { fieldUidVarNames } from "./utils/fields.js";
-import path from "node:path";
 import { FieldType } from "twenty-sdk/define";
+import { toImportStatement } from "./utils/to-import-statement.js";
 
 export function generateTwentyViewFields(
   objectUidVarName: string,
@@ -15,18 +17,12 @@ export function generateTwentyViewFields(
   fieldMetadataUidsImportStatement: string;
   viewFields: string;
 } {
-  const fromDir = path.dirname(viewFilePath);
-  const { dir, name } = path.parse(
-    path.relative(fromDir, objectFilePath)
+  const fieldMetadataUidsImportStatement = toImportStatement(
+    objectFilePath,
+    viewFilePath,
+    objectUidVarName,
+    ...fieldUidVarNames(fields)
   );
-  const objectFileImportPath = `${dir}/${name}`;
-
-  const fieldMetadataUidsImportStatement = dedent`
-    import {
-      ${objectUidVarName},
-
-      ${fieldUidVarNames(fields).join(",\n")},
-    } from "${objectFileImportPath}";`;
 
   let viewFields: Array<string> = [];
   let labelField: string = "";

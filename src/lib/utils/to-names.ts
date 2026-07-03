@@ -18,3 +18,7 @@ export function toViewFileName(
 ): string {
   return `all-${toKebabCase(objectNamePlural)}-view.ts`;
 }
+
+export function toNavMenuItemFileName(name: string): string {
+  return `${toKebabCase(name)}-navigation-menu-item.ts`;
+}

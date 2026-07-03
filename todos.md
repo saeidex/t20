@@ -4,7 +4,7 @@
 - [x] (view) default view name change to `all-${view_name}`
 - [x] (prompts) show object on select prompt
 - [x] (prompts) add -v command
-- [ ] (nav) generate default navigation menu item
+- [x] (nav) generate default navigation menu item
 
 
 # Maybe in Near Future

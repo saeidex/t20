@@ -12,14 +12,13 @@ import { extractObjectSelectOptions } from "../lib/extract-object-select-options
 import {
   finalPrompt,
   objectNamePrompts,
-  OutputDir,
-  outputDirPrompt,
   selectedObjectPrompt,
   sourcePathPrompt,
 } from "../lib/user-prompts.js";
 import { extractObjectFields } from "../lib/extract-object-fields.js";
 import { generateTwentyView } from "../lib/generate-twenty-view.js";
 import {
+  toNavMenuItemFileName,
   toObjectFileName,
   toViewFileName,
   toViewName,
@@ -27,12 +26,9 @@ import {
 import { renderTitle } from "../lib/utils/render-title.js";
 import { logErrorAndExit } from "../lib/utils/log-error-and-exit.js";
 import { markedTerm } from "../lib/marked-term.js";
-
-const DEFAULT_OUTPUT_ROOT_DIR: OutputDir = {
-  root: "src",
-  objects: "src/objects",
-  views: "src/views",
-} as const;
+import { generateTwentyNavMenuItem } from "../lib/generate-twenty-nav-menu-item.js";
+import { getOutputDirectories } from "../lib/get-output-directories.js";
+import { createEmptyDirectories } from "../lib/utils/create-empty-directories.js";
 
 async function main() {
   prompts.intro(renderTitle());
@@ -68,9 +64,7 @@ async function main() {
 
   const objectName = await objectNamePrompts(selectedObject);
 
-  const outputDir = cli.output
-    ? await outputDirPrompt(cli.output)
-    : DEFAULT_OUTPUT_ROOT_DIR;
+  const outputDir = getOutputDirectories(cli.output);
 
   const objectFields = extractObjectFields(
     sourceFile,
@@ -98,27 +92,44 @@ async function main() {
     outputDir.views,
     outputViewFileName
   );
-  const { output: outputTwentyObjectView } = generateTwentyView(
-    viewName,
-    outputViewFilePath,
-    objectUidVarName,
-    outputObjectFilePath,
-    objectFields
+  const { viewUidVarName, output: outputTwentyObjectView } =
+    generateTwentyView(
+      viewName,
+      outputViewFilePath,
+      objectUidVarName,
+      outputObjectFilePath,
+      objectFields
+    );
+
+  const navMenuItemName = toNavMenuItemFileName(viewName);
+  const outputNavMenuItemFilePath = path.resolve(
+    outputDir.navMenuItems,
+    navMenuItemName
   );
 
+  const { output: outputTwentyNavMenuItem } =
+    generateTwentyNavMenuItem(
+      navMenuItemName,
+      outputNavMenuItemFilePath,
+      viewUidVarName,
+      outputViewFilePath
+    );
+
   if (!cli.printOnly) {
-    fs.mkdirSync(outputDir.root, { recursive: true });
-    fs.mkdirSync(outputDir.objects, { recursive: true });
-    fs.mkdirSync(outputDir.views, { recursive: true });
+    createEmptyDirectories(outputDir);
 
     fs.writeFileSync(outputObjectFilePath, outputTwentyObject);
     fs.writeFileSync(outputViewFilePath, outputTwentyObjectView);
-
-    finalPrompt(
-      outputDir,
-      [outputObjectFilePath],
-      [outputViewFilePath]
+    fs.writeFileSync(
+      outputNavMenuItemFilePath,
+      outputTwentyNavMenuItem
     );
+
+    finalPrompt({
+      objects: [outputObjectFilePath],
+      views: [outputViewFilePath],
+      navMenuItems: [outputNavMenuItemFilePath],
+    });
   }
 
   const markedOutput = markedTerm.parse(dedent`
