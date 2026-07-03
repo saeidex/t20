@@ -32,3 +32,9 @@ export function toNavMenuItemFileName(
     objectNamePlural
   )}-navigation-menu-item.ts`;
 }
+
+export function toConstantFileName(
+  objectNameSingular: string
+): string {
+  return `${toKebabCase(objectNameSingular)}.constants.ts`;
+}

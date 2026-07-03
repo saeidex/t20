@@ -5,6 +5,7 @@
 - [x] (prompts) show object on select prompt
 - [x] (prompts) add -v command
 - [x] (nav) generate default navigation menu item
+- [x] (constants) extract entinty constants into a seperate file
 
 
 # Maybe in Near Future

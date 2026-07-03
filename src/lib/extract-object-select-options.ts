@@ -23,7 +23,7 @@ export function extractObjectSelectOptions(
         items.push({
           label: node.name.text,
           value: node.name.text,
-          hint: node.getText(),
+          // hint: node.getText(),
         });
       }
     }

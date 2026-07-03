@@ -5,12 +5,14 @@ import {
 } from "./utils/case-transformation.js";
 import type { IRField } from "./types.js";
 import { toUidVarName } from "./utils/to-uid-var-name.js";
-import { toUidVarStatement } from "./utils/to-uid-var-statement.js";
 import { generateTwentyObjectFields } from "./generate-twenty-object-fields.js";
+import { toImportStatement } from "./utils/to-import-statement.js";
 
 export function generateTwentyObject(data: {
   nameSingular: string;
   namePlural: string;
+  objectFilePath: string;
+  constantFilePath: string;
   fields: Array<IRField>;
 }): {
   objectUidVarName: string;
@@ -23,13 +25,15 @@ export function generateTwentyObject(data: {
     data.nameSingular,
     "OBJECT"
   );
-  const objectUidVarStatement =
-    toUidVarStatement(objectUidVarName);
+  const objectUidImportStatement = toImportStatement(
+    data.constantFilePath,
+    data.objectFilePath,
+    objectUidVarName
+  );
 
   const output = dedent`
     import { defineObject, FieldType } from "twenty-sdk/define";
-
-    ${objectUidVarStatement}
+    ${objectUidImportStatement}
 
     ${fieldUidVarDeclarations}
 

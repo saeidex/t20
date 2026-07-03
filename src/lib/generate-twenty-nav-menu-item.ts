@@ -2,7 +2,6 @@ import dedent from "ts-dedent";
 
 import { NavigationMenuItemType } from "twenty-sdk/define";
 import { toUidVarName } from "./utils/to-uid-var-name.js";
-import { toUidVarStatement } from "./utils/to-uid-var-statement.js";
 import { toImportStatement } from "./utils/to-import-statement.js";
 import { toKebabCase } from "./utils/case-transformation.js";
 
@@ -10,7 +9,8 @@ export function generateTwentyNavMenuItem(
   navItemName: string,
   navItemFilePath: string,
   objectFilePath: string,
-  objectUidVarName: string
+  objectUidVarName: string,
+  constantFilePath: string
 ): {
   navMenuItemUidVarName: string;
   output: string;
@@ -19,20 +19,15 @@ export function generateTwentyNavMenuItem(
     navItemName,
     "NAV_MENU_ITEM"
   );
-  const navItemUidVarStatement = toUidVarStatement(
-    navMenuItemUidVarName
-  );
-
-  const objectUidImportStatement = toImportStatement(
-    objectFilePath,
+  const constantImportStatement = toImportStatement(
+    constantFilePath,
     navItemFilePath,
+    navMenuItemUidVarName,
     objectUidVarName
   );
 
   const output = dedent`import { defineNavigationMenuItem, NavigationMenuItemType } from "twenty-sdk/define";
-                ${objectUidImportStatement}
-
-                ${navItemUidVarStatement}
+                ${constantImportStatement}
 
                 export default defineNavigationMenuItem({
                   universalIdentifier: ${navMenuItemUidVarName},

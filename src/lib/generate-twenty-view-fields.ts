@@ -9,7 +9,6 @@ import { FieldType } from "twenty-sdk/define";
 import { toImportStatement } from "./utils/to-import-statement.js";
 
 export function generateTwentyViewFields(
-  objectUidVarName: string,
   objectFilePath: string,
   viewFilePath: string,
   fields: Array<IRField>
@@ -20,7 +19,6 @@ export function generateTwentyViewFields(
   const fieldMetadataUidsImportStatement = toImportStatement(
     objectFilePath,
     viewFilePath,
-    objectUidVarName,
     ...fieldUidVarNames(fields)
   );
 
@@ -31,6 +29,7 @@ export function generateTwentyViewFields(
   fields.forEach((field, idx) => {
     const fieldUidVarName = toUidVarName(field.name, "FIELD");
 
+    // get first text field and set positon to 0(zero) as label field
     if (!islabelFieldExists && field.kind == FieldType.TEXT) {
       labelField = getFieldString(0, fieldUidVarName);
       islabelFieldExists = true;

@@ -134,7 +134,7 @@ export async function objectNamePrompts(
 }
 
 export function finalPrompt(outputFilePaths: {
-  [Property in keyof OutputDir]?: Array<string>;
+  [k in keyof OutputDir]?: Array<string> | undefined;
 }) {
   prompts.note(
     Object.entries(outputFilePaths)
@@ -144,7 +144,7 @@ export function finalPrompt(outputFilePaths: {
           `[${toTitleCase(key, true)}]`
         )}`;
         const body = dedent`
-      ${value.map((file) => `:: ${file}`).join("\n")}`;
+      ${value?.map((file) => `:: ${file}`).join("\n")}`;
         return title + "\n" + body;
       })
       .join("\n"),

@@ -18,6 +18,7 @@ import {
 import { extractObjectFields } from "../lib/extract-object-fields.js";
 import { generateTwentyView } from "../lib/generate-twenty-view.js";
 import {
+  toConstantFileName,
   toNavMenuItemFileName,
   toNavMenuItemName,
   toObjectFileName,
@@ -29,13 +30,13 @@ import { logErrorAndExit } from "../lib/utils/log-error-and-exit.js";
 import { markedTerm } from "../lib/marked-term.js";
 import { generateTwentyNavMenuItem } from "../lib/generate-twenty-nav-menu-item.js";
 import { getOutputDirectories } from "../lib/get-output-directories.js";
-import { createEmptyDirectories } from "../lib/utils/create-empty-directories.js";
+import { generateTwentyConstants } from "../lib/generate-twenty-constants.js";
+import { isEntityIncludes } from "../lib/utils/is-entity-includes.js";
 
 async function main() {
   prompts.intro(renderTitle());
 
   const cli = createCLI();
-
   let sourcePath = await sourcePathPrompt(cli.input);
   const program = ts.createProgram([sourcePath], {});
   const checker = program.getTypeChecker();
@@ -50,21 +51,17 @@ async function main() {
     sourceFile,
     checker
   );
-
   if (objectOptions.length === 0) {
     logErrorAndExit("No exported types/interfaces found.");
   }
-
   const selectedObject = await selectedObjectPrompt(
     objectOptions
   );
-
   if (!selectedObject) {
     logErrorAndExit("No object selected.");
   }
 
   const objectNames = await objectNamePrompts(selectedObject);
-
   const outputDir = getOutputDirectories(cli.output);
 
   const objectFields = extractObjectFields(
@@ -73,65 +70,118 @@ async function main() {
     selectedObject
   );
 
-  const { objectUidVarName, output: outputTwentyObject } =
-    generateTwentyObject({
-      nameSingular: objectNames.singular,
-      namePlural: objectNames.plural,
-      fields: objectFields,
-    });
-  const outputObjectFileName = toObjectFileName(
-    objectNames.singular
+  const objectName = objectNames.singular;
+  const constantName = objectName;
+  const viewName = toViewName(objectNames.plural);
+  const navMenuItemName = toNavMenuItemName(objectNames.plural);
+
+  const outputObjectFileName = toObjectFileName(objectName);
+  const constantFileName = toConstantFileName(constantName);
+  const outputViewFileName = toViewFileName(objectNames.plural);
+  const navMenuItemFileName = toNavMenuItemFileName(
+    objectNames.plural
   );
+
   const outputObjectFilePath = path.join(
     outputDir.objects,
     outputObjectFileName
   );
-
-  const viewName = toViewName(objectNames.plural);
-  const outputViewFileName = toViewFileName(objectNames.plural);
-  const outputViewFilePath = path.join(
-    outputDir.views,
-    outputViewFileName
-  );
-  const { output: outputTwentyObjectView } = generateTwentyView(
-    viewName,
-    outputViewFilePath,
-    objectUidVarName,
-    outputObjectFilePath,
-    objectFields
-  );
-
-  const navMenuItemName = toNavMenuItemName(objectNames.plural);
-  const navMenuItemFileName = toNavMenuItemFileName(
-    objectNames.plural
+  const outputConstantFilePath = path.join(
+    outputDir.constants,
+    constantFileName
   );
   const outputNavMenuItemFilePath = path.join(
     outputDir.navMenuItems,
     navMenuItemFileName
   );
+  const outputViewFilePath = path.join(
+    outputDir.views,
+    outputViewFileName
+  );
 
-  const { output: outputTwentyNavMenuItem } =
-    generateTwentyNavMenuItem(
-      navMenuItemName,
-      outputNavMenuItemFilePath,
+  const { objectUidVarName, output: outputTwentyObject } =
+    generateTwentyObject({
+      nameSingular: objectNames.singular,
+      namePlural: objectNames.plural,
+      objectFilePath: outputObjectFilePath,
+      constantFilePath: outputConstantFilePath,
+      fields: objectFields,
+    });
+
+  const { viewUidVarName, output: outputTwentyObjectView } =
+    generateTwentyView(
+      viewName,
+      outputViewFilePath,
+      objectUidVarName,
       outputObjectFilePath,
-      objectUidVarName
+      outputConstantFilePath,
+      objectFields
     );
+
+  const {
+    navMenuItemUidVarName,
+    output: outputTwentyNavMenuItem,
+  } = generateTwentyNavMenuItem(
+    navMenuItemName,
+    outputNavMenuItemFilePath,
+    outputObjectFilePath,
+    objectUidVarName,
+    outputConstantFilePath
+  );
+
+  const outputTwentyConstants = generateTwentyConstants(
+    objectUidVarName,
+    viewUidVarName,
+    navMenuItemUidVarName
+  );
 
   if (!cli.printOnly) {
-    createEmptyDirectories(outputDir);
-
-    fs.writeFileSync(outputObjectFilePath, outputTwentyObject);
-    fs.writeFileSync(outputViewFilePath, outputTwentyObjectView);
-    fs.writeFileSync(
-      outputNavMenuItemFilePath,
-      outputTwentyNavMenuItem
-    );
+    if (isEntityIncludes(cli.entities, "object")) {
+      fs.mkdirSync(outputDir.objects, { recursive: true });
+      fs.writeFileSync(outputObjectFilePath, outputTwentyObject);
+    }
+    if (isEntityIncludes(cli.entities, "view")) {
+      fs.mkdirSync(outputDir.views, { recursive: true });
+      fs.writeFileSync(
+        outputViewFilePath,
+        outputTwentyObjectView
+      );
+    }
+    if (isEntityIncludes(cli.entities, "navItem")) {
+      fs.mkdirSync(outputDir.navMenuItems, { recursive: true });
+      fs.writeFileSync(
+        outputNavMenuItemFilePath,
+        outputTwentyNavMenuItem
+      );
+    }
+    if (isEntityIncludes(cli.entities, "constant")) {
+      if (fs.existsSync(outputConstantFilePath)) {
+        fs.appendFileSync(
+          outputConstantFilePath,
+          outputTwentyConstants
+        );
+      } else {
+        fs.mkdirSync(outputDir.constants, { recursive: true });
+        fs.writeFileSync(
+          outputConstantFilePath,
+          outputTwentyConstants
+        );
+      }
+    }
 
     finalPrompt({
-      objects: [outputObjectFilePath],
-      views: [outputViewFilePath],
-      navMenuItems: [outputNavMenuItemFilePath],
+      objects: isEntityIncludes(cli.entities, "object")
+        ? [outputObjectFilePath]
+        : undefined,
+      views: isEntityIncludes(cli.entities, "view")
+        ? [outputViewFilePath]
+        : undefined,
+      navMenuItems: isEntityIncludes(cli.entities, "navItem")
+        ? [outputNavMenuItemFilePath]
+        : undefined,
+      constants: isEntityIncludes(cli.entities, "constant")
+        ? [outputConstantFilePath]
+        : undefined,
     });
   }
 
@@ -142,7 +192,9 @@ async function main() {
     /* ${outputViewFilePath} */
     ${outputTwentyObjectView}\n
     /* ${outputNavMenuItemFilePath} */
-    ${outputTwentyNavMenuItem}
+    ${outputTwentyNavMenuItem}\n
+    /* ${outputConstantFilePath} */
+    ${outputTwentyConstants}
     \`\`\``);
 
   if (cli.clipboard) {

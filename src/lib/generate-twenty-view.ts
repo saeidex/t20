@@ -2,33 +2,37 @@ import dedent from "ts-dedent";
 import { generateTwentyViewFields } from "./generate-twenty-view-fields.js";
 import type { IRField } from "./types.js";
 import { toUidVarName } from "./utils/to-uid-var-name.js";
-import { toUidVarStatement } from "./utils/to-uid-var-statement.js";
+import { toImportStatement } from "./utils/to-import-statement.js";
 
 export function generateTwentyView(
   viewName: string,
   viewFilePath: string,
   objectUidVarName: string,
   objectFilePath: string,
+  constantFilePath: string,
   fields: Array<IRField>
 ): {
   viewUidVarName: string;
   output: string;
 } {
   const viewUidVarName = toUidVarName(viewName, "VIEW");
-  const viewUidVarStatement = toUidVarStatement(viewUidVarName);
+  const viewUidImportStatement = toImportStatement(
+    constantFilePath,
+    viewFilePath,
+    objectUidVarName,
+    viewUidVarName
+  );
 
   const { fieldMetadataUidsImportStatement, viewFields } =
     generateTwentyViewFields(
-      objectUidVarName,
       objectFilePath,
       viewFilePath,
       fields
     );
 
   const output = dedent`import { defineView, ViewKey } from "twenty-sdk/define";
+                ${viewUidImportStatement}
                 ${fieldMetadataUidsImportStatement}
-
-                ${viewUidVarStatement}
 
                 export default defineView({
                   universalIdentifier: ${viewUidVarName},
