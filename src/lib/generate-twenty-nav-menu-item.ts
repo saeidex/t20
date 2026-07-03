@@ -17,7 +17,7 @@ export function generateTwentyNavMenuItem(
 } {
   const navMenuItemUidVarName = toUidVarName(
     navItemName,
-    "VIEW"
+    "NAV_MENU_ITEM"
   );
   const navItemUidVarStatement = toUidVarStatement(
     navMenuItemUidVarName
@@ -29,7 +29,7 @@ export function generateTwentyNavMenuItem(
     viewUidVarName
   );
 
-  const output = dedent`import { defineView, ViewKey } from "twenty-sdk/define";
+  const output = dedent`import { defineNavigationMenuItem, NavigationMenuItemType } from "twenty-sdk/define";
                 ${viewImportStatement}
 
                 ${navItemUidVarStatement}

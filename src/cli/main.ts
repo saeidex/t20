@@ -19,6 +19,7 @@ import { extractObjectFields } from "../lib/extract-object-fields.js";
 import { generateTwentyView } from "../lib/generate-twenty-view.js";
 import {
   toNavMenuItemFileName,
+  toNavMenuItemName,
   toObjectFileName,
   toViewFileName,
   toViewName,
@@ -62,7 +63,7 @@ async function main() {
     logErrorAndExit("No object selected.");
   }
 
-  const objectName = await objectNamePrompts(selectedObject);
+  const objectNames = await objectNamePrompts(selectedObject);
 
   const outputDir = getOutputDirectories(cli.output);
 
@@ -74,21 +75,21 @@ async function main() {
 
   const { objectUidVarName, output: outputTwentyObject } =
     generateTwentyObject({
-      nameSingular: objectName.singular,
-      namePlural: objectName.plural,
+      nameSingular: objectNames.singular,
+      namePlural: objectNames.plural,
       fields: objectFields,
     });
   const outputObjectFileName = toObjectFileName(
-    objectName.singular
+    objectNames.singular
   );
-  const outputObjectFilePath = path.resolve(
+  const outputObjectFilePath = path.join(
     outputDir.objects,
     outputObjectFileName
   );
 
-  const viewName = toViewName(objectName.plural);
-  const outputViewFileName = toViewFileName(objectName.plural);
-  const outputViewFilePath = path.resolve(
+  const viewName = toViewName(objectNames.plural);
+  const outputViewFileName = toViewFileName(objectNames.plural);
+  const outputViewFilePath = path.join(
     outputDir.views,
     outputViewFileName
   );
@@ -101,10 +102,13 @@ async function main() {
       objectFields
     );
 
-  const navMenuItemName = toNavMenuItemFileName(viewName);
-  const outputNavMenuItemFilePath = path.resolve(
+  const navMenuItemName = toNavMenuItemName(objectNames.plural);
+  const navMenuItemFileName = toNavMenuItemFileName(
+    objectNames.plural
+  );
+  const outputNavMenuItemFilePath = path.join(
     outputDir.navMenuItems,
-    navMenuItemName
+    navMenuItemFileName
   );
 
   const { output: outputTwentyNavMenuItem } =
@@ -137,7 +141,9 @@ async function main() {
     /* ${outputObjectFilePath} */
     ${outputTwentyObject}\n
     /* ${outputViewFilePath} */
-    ${outputTwentyObjectView}
+    ${outputTwentyObjectView}\n
+    /* ${outputNavMenuItemFilePath} */
+    ${outputTwentyNavMenuItem}
     \`\`\``);
 
   if (cli.clipboard) {

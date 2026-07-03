@@ -1,6 +1,6 @@
 import { toSnakeCase } from "./case-transformation.js";
 
-type EntityType = "OBJECT" | "FIELD" | "VIEW";
+type EntityType = "OBJECT" | "FIELD" | "VIEW" | "NAV_MENU_ITEM";
 
 export const toUidVarName = (
   name: string,

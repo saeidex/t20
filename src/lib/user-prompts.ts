@@ -147,6 +147,7 @@ export function finalPrompt(outputFilePaths: {
       ${value.map((file) => `:: ${file}`).join("\n")}`;
         return title + "\n" + body;
       })
-      .join("\n")
+      .join("\n"),
+    "Output files"
   );
 }

@@ -15,7 +15,10 @@ const NAV_MENU_ITEMS_DIR = "navigation-menu-items";
 export function getOutputDirectories(
   outputroot?: string
 ): OutputDir {
-  const root = outputroot ?? DEFAULT_ROOT_DIR;
+  let root = outputroot ?? DEFAULT_ROOT_DIR;
+  if (path.isAbsolute(root))
+    root = path.relative(path.dirname("."), root);
+
   const objects = path.join(`${root}/${OBJECTS_DIR}`);
   const views = path.join(`${root}/${VIEWS_DIR}`);
   const navMenuItems = path.join(
