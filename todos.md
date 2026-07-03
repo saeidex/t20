@@ -1,6 +1,6 @@
 # Todos
 
-- [ ] (view) label text field position at zero
+- [x] (view) label text field position at zero
 - [x] (view) default view name change to `all-${view_name}`
 - [x] (prompts) show object on select prompt
 - [x] (prompts) add -v command

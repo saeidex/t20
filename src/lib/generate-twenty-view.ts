@@ -25,7 +25,7 @@ export function generateTwentyView(
       fields
     );
 
-  const output = dedent`import { defineView, ViewFilterOperand, ViewKey } from "twenty-sdk/define";
+  const output = dedent`import { defineView, ViewKey } from "twenty-sdk/define";
                 ${fieldMetadataUidsImportStatement}
 
                 ${viewUidVarStatement}
