@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.3.0
+
+### Minor Changes
+
+- add: constants file generation & cli multiselect entities
+
 ## 0.2.0
 
 ### Minor Changes
