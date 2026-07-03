@@ -22,7 +22,7 @@ export function toViewFileName(
 export function toNavMenuItemName(
   objectNamePlural: string
 ): string {
-  return `All ${toTitleCase(objectNamePlural)}`;
+  return `${toTitleCase(objectNamePlural)}`;
 }
 
 export function toNavMenuItemFileName(

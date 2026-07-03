@@ -93,14 +93,13 @@ async function main() {
     outputDir.views,
     outputViewFileName
   );
-  const { viewUidVarName, output: outputTwentyObjectView } =
-    generateTwentyView(
-      viewName,
-      outputViewFilePath,
-      objectUidVarName,
-      outputObjectFilePath,
-      objectFields
-    );
+  const { output: outputTwentyObjectView } = generateTwentyView(
+    viewName,
+    outputViewFilePath,
+    objectUidVarName,
+    outputObjectFilePath,
+    objectFields
+  );
 
   const navMenuItemName = toNavMenuItemName(objectNames.plural);
   const navMenuItemFileName = toNavMenuItemFileName(
@@ -115,8 +114,8 @@ async function main() {
     generateTwentyNavMenuItem(
       navMenuItemName,
       outputNavMenuItemFilePath,
-      viewUidVarName,
-      outputViewFilePath
+      outputObjectFilePath,
+      objectUidVarName
     );
 
   if (!cli.printOnly) {

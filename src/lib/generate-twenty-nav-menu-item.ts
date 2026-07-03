@@ -9,8 +9,8 @@ import { toKebabCase } from "./utils/case-transformation.js";
 export function generateTwentyNavMenuItem(
   navItemName: string,
   navItemFilePath: string,
-  viewUidVarName: string,
-  viewFilePath: string
+  objectFilePath: string,
+  objectUidVarName: string
 ): {
   navMenuItemUidVarName: string;
   output: string;
@@ -23,14 +23,14 @@ export function generateTwentyNavMenuItem(
     navMenuItemUidVarName
   );
 
-  const viewImportStatement = toImportStatement(
-    viewFilePath,
+  const objectUidImportStatement = toImportStatement(
+    objectFilePath,
     navItemFilePath,
-    viewUidVarName
+    objectUidVarName
   );
 
   const output = dedent`import { defineNavigationMenuItem, NavigationMenuItemType } from "twenty-sdk/define";
-                ${viewImportStatement}
+                ${objectUidImportStatement}
 
                 ${navItemUidVarStatement}
 
@@ -40,9 +40,9 @@ export function generateTwentyNavMenuItem(
                   icon: "IconList",
                   position: 0,
                   type: NavigationMenuItemType.${
-                    NavigationMenuItemType.VIEW
+                    NavigationMenuItemType.OBJECT
                   },
-                  viewUniversalIdentifier: "${viewUidVarName}",
+                  targetObjectUniversalIdentifier: ${objectUidVarName},
                 });
          `;
 
