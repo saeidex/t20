@@ -92,10 +92,16 @@ export async function selectedObjectPrompt(
 
   handlePromptCancel(selectedObject);
 
+  if (!selectedObject) {
+    logErrorAndExit(
+      "Selected Interface/Object were not found in your input file"
+    );
+  }
+
   return selectedObject;
 }
 
-type ObjectName = {
+export type ObjectName = {
   singular: string;
   plural: string;
 };

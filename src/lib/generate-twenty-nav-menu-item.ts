@@ -9,8 +9,8 @@ export function generateTwentyNavMenuItem(
   navItemName: string,
   navItemFilePath: string,
   objectFilePath: string,
-  objectUidVarName: string,
-  constantFilePath: string
+  constantFilePath: string,
+  objectUidVarName: string
 ): {
   navMenuItemUidVarName: string;
   output: string;

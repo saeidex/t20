@@ -1,3 +1,4 @@
+import { OutputDir } from "../get-output-directories.js";
 import {
   toKebabCase,
   toTitleCase,
@@ -13,10 +14,8 @@ export function toViewName(objectNamePlural: string): string {
   return `All ${toTitleCase(objectNamePlural).toLowerCase()}`;
 }
 
-export function toViewFileName(
-  objectNamePlural: string
-): string {
-  return `all-${toKebabCase(objectNamePlural)}-view.ts`;
+export function toViewFileName(viewName: string): string {
+  return `${toKebabCase(viewName)}-view.ts`;
 }
 
 export function toNavMenuItemName(
@@ -26,11 +25,9 @@ export function toNavMenuItemName(
 }
 
 export function toNavMenuItemFileName(
-  objectNamePlural: string
+  navItemName: string
 ): string {
-  return `all-${toKebabCase(
-    objectNamePlural
-  )}-navigation-menu-item.ts`;
+  return `${toKebabCase(navItemName)}-navigation-menu-item.ts`;
 }
 
 export function toConstantFileName(
@@ -38,3 +35,14 @@ export function toConstantFileName(
 ): string {
   return `${toKebabCase(objectNameSingular)}.constants.ts`;
 }
+
+export const fileNameTransformers: {
+  [key in keyof Omit<OutputDir, "root">]: (
+    name: string
+  ) => string;
+} = {
+  constants: toConstantFileName,
+  objects: toObjectFileName,
+  views: toViewFileName,
+  navMenuItems: toNavMenuItemFileName,
+} as const;

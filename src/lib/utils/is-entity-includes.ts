@@ -1,4 +1,4 @@
-import type { Entity } from "../create-cli.js";
+import type { Entity } from "../../cli/create-cli.js";
 
 export function isEntityIncludes(
   entities: Array<Entity> | undefined,

@@ -1,4 +1,5 @@
 import path from "node:path";
+import { CliOptions } from "../cli/create-cli.js";
 
 export type OutputDir = {
   root: string;
@@ -8,27 +9,19 @@ export type OutputDir = {
   navMenuItems: string;
 };
 
-const DEFAULT_ROOT_DIR = "src";
-const DEFAULT_CONSTANTS_DIR = "constants";
-const DEFAULT_OBJECTS_DIR = "objects";
-const DEFAULT_VIEWS_DIR = "views";
-const DEFAULT_NAV_MENU_ITEMS_DIR = "navigation-menu-items";
-
-const getDir = (root: string, child: string) => {
-  return path.join(`${root}/${child}`);
-};
+const getRelativePathFromCwd = (targetPath: string): string =>
+  path.relative(".", targetPath);
 
 export function getOutputDirectories(
-  outputroot?: string
+  opts: CliOptions
 ): OutputDir {
-  let root = outputroot ?? DEFAULT_ROOT_DIR;
-  if (path.isAbsolute(root))
-    root = path.relative(path.dirname("."), root);
-
-  const constants = getDir(root, DEFAULT_CONSTANTS_DIR);
-  const objects = getDir(root, DEFAULT_OBJECTS_DIR);
-  const views = getDir(root, DEFAULT_VIEWS_DIR);
-  const navMenuItems = getDir(root, DEFAULT_NAV_MENU_ITEMS_DIR);
+  const root = getRelativePathFromCwd(opts.output);
+  const constants = getRelativePathFromCwd(opts.constantsDir);
+  const objects = getRelativePathFromCwd(opts.objectsDir);
+  const views = getRelativePathFromCwd(opts.viewsDir);
+  const navMenuItems = getRelativePathFromCwd(
+    opts.navMenuItemsDir
+  );
 
   return {
     root,

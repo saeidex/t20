@@ -7,9 +7,9 @@ import { toImportStatement } from "./utils/to-import-statement.js";
 export function generateTwentyView(
   viewName: string,
   viewFilePath: string,
-  objectUidVarName: string,
   objectFilePath: string,
   constantFilePath: string,
+  objectUidVarName: string,
   fields: Array<IRField>
 ): {
   viewUidVarName: string;

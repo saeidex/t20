@@ -1,13 +1,9 @@
 #!/usr/bin/env node
 import * as prompts from "@clack/prompts";
 import clipboard from "copy-paste";
-import fs from "node:fs";
-import path from "node:path";
-import ts from "typescript";
 import dedent from "ts-dedent";
 
-import { generateTwentyObject } from "../lib/generate-twenty-object.js";
-import { createCLI } from "../lib/create-cli.js";
+import { createCLI } from "./create-cli.js";
 import { extractObjectSelectOptions } from "../lib/extract-object-select-options.js";
 import {
   finalPrompt,
@@ -15,197 +11,87 @@ import {
   selectedObjectPrompt,
   sourcePathPrompt,
 } from "../lib/user-prompts.js";
-import { extractObjectFields } from "../lib/extract-object-fields.js";
-import { generateTwentyView } from "../lib/generate-twenty-view.js";
-import {
-  toConstantFileName,
-  toNavMenuItemFileName,
-  toNavMenuItemName,
-  toObjectFileName,
-  toViewFileName,
-  toViewName,
-} from "../lib/utils/to-names.js";
 import { renderTitle } from "../lib/utils/render-title.js";
-import { logErrorAndExit } from "../lib/utils/log-error-and-exit.js";
 import { markedTerm } from "../lib/marked-term.js";
-import { generateTwentyNavMenuItem } from "../lib/generate-twenty-nav-menu-item.js";
-import { getOutputDirectories } from "../lib/get-output-directories.js";
-import { generateTwentyConstants } from "../lib/generate-twenty-constants.js";
 import { isEntityIncludes } from "../lib/utils/is-entity-includes.js";
+import { parseTypeScriptAST } from "../lib/parse-typescript-ast.js";
+import { resolveContext } from "../lib/resolve-context.js";
+import { generateResult } from "../lib/generate-result.js";
+import { writeResult } from "../lib/write-result.js";
+
+const WAIT_BEFORE_PRINT_MS = 500;
 
 async function main() {
   prompts.intro(renderTitle());
 
-  const cli = createCLI();
-  let sourcePath = await sourcePathPrompt(cli.input);
-  const program = ts.createProgram([sourcePath], {});
-  const checker = program.getTypeChecker();
-  const sourceFile = program.getSourceFile(sourcePath);
+  const opts = createCLI();
 
-  if (!sourceFile) {
-    logErrorAndExit(`Failed to read source file: ${sourcePath}`);
-    return;
-  }
-
+  let sourcePath = await sourcePathPrompt(opts.input);
+  const { sourceFile, checker } = parseTypeScriptAST(sourcePath);
   const objectOptions = extractObjectSelectOptions(
     sourceFile,
     checker
   );
-  if (objectOptions.length === 0) {
-    logErrorAndExit("No exported types/interfaces found.");
-  }
-  const selectedObject = await selectedObjectPrompt(
-    objectOptions
-  );
-  if (!selectedObject) {
-    logErrorAndExit("No object selected.");
-  }
+  const rootObject = await selectedObjectPrompt(objectOptions);
+  const objectName = await objectNamePrompts(rootObject);
+  const objectNames = [objectName];
+  const ctx = resolveContext(opts, objectNames);
+  const result = generateResult(ctx, sourceFile, checker);
 
-  const objectNames = await objectNamePrompts(selectedObject);
-  const outputDir = getOutputDirectories(cli.output);
-
-  const objectFields = extractObjectFields(
-    sourceFile,
-    checker,
-    selectedObject
-  );
-
-  const objectName = objectNames.singular;
-  const constantName = objectName;
-  const viewName = toViewName(objectNames.plural);
-  const navMenuItemName = toNavMenuItemName(objectNames.plural);
-
-  const outputObjectFileName = toObjectFileName(objectName);
-  const constantFileName = toConstantFileName(constantName);
-  const outputViewFileName = toViewFileName(objectNames.plural);
-  const navMenuItemFileName = toNavMenuItemFileName(
-    objectNames.plural
-  );
-
-  const outputObjectFilePath = path.join(
-    outputDir.objects,
-    outputObjectFileName
-  );
-  const outputConstantFilePath = path.join(
-    outputDir.constants,
-    constantFileName
-  );
-  const outputNavMenuItemFilePath = path.join(
-    outputDir.navMenuItems,
-    navMenuItemFileName
-  );
-  const outputViewFilePath = path.join(
-    outputDir.views,
-    outputViewFileName
-  );
-
-  const { objectUidVarName, output: outputTwentyObject } =
-    generateTwentyObject({
-      nameSingular: objectNames.singular,
-      namePlural: objectNames.plural,
-      objectFilePath: outputObjectFilePath,
-      constantFilePath: outputConstantFilePath,
-      fields: objectFields,
-    });
-
-  const { viewUidVarName, output: outputTwentyObjectView } =
-    generateTwentyView(
-      viewName,
-      outputViewFilePath,
-      objectUidVarName,
-      outputObjectFilePath,
-      outputConstantFilePath,
-      objectFields
-    );
-
-  const {
-    navMenuItemUidVarName,
-    output: outputTwentyNavMenuItem,
-  } = generateTwentyNavMenuItem(
-    navMenuItemName,
-    outputNavMenuItemFilePath,
-    outputObjectFilePath,
-    objectUidVarName,
-    outputConstantFilePath
-  );
-
-  const outputTwentyConstants = generateTwentyConstants(
-    objectUidVarName,
-    viewUidVarName,
-    navMenuItemUidVarName
-  );
-
-  if (!cli.printOnly) {
-    if (isEntityIncludes(cli.entities, "object")) {
-      fs.mkdirSync(outputDir.objects, { recursive: true });
-      fs.writeFileSync(outputObjectFilePath, outputTwentyObject);
-    }
-    if (isEntityIncludes(cli.entities, "view")) {
-      fs.mkdirSync(outputDir.views, { recursive: true });
-      fs.writeFileSync(
-        outputViewFilePath,
-        outputTwentyObjectView
-      );
-    }
-    if (isEntityIncludes(cli.entities, "navItem")) {
-      fs.mkdirSync(outputDir.navMenuItems, { recursive: true });
-      fs.writeFileSync(
-        outputNavMenuItemFilePath,
-        outputTwentyNavMenuItem
-      );
-    }
-    if (isEntityIncludes(cli.entities, "constant")) {
-      if (fs.existsSync(outputConstantFilePath)) {
-        fs.appendFileSync(
-          outputConstantFilePath,
-          outputTwentyConstants
-        );
-      } else {
-        fs.mkdirSync(outputDir.constants, { recursive: true });
-        fs.writeFileSync(
-          outputConstantFilePath,
-          outputTwentyConstants
-        );
-      }
-    }
+  if (!opts.dryRun) {
+    writeResult(ctx, opts, result);
 
     finalPrompt({
-      objects: isEntityIncludes(cli.entities, "object")
-        ? [outputObjectFilePath]
+      objects: isEntityIncludes(opts.entities, "object")
+        ? ctx.paths.objects
         : undefined,
-      views: isEntityIncludes(cli.entities, "view")
-        ? [outputViewFilePath]
+      views: isEntityIncludes(opts.entities, "view")
+        ? ctx.paths.views
         : undefined,
-      navMenuItems: isEntityIncludes(cli.entities, "navItem")
-        ? [outputNavMenuItemFilePath]
+      navMenuItems: isEntityIncludes(opts.entities, "navItem")
+        ? ctx.paths.navMenuItems
         : undefined,
-      constants: isEntityIncludes(cli.entities, "constant")
-        ? [outputConstantFilePath]
+      constants: isEntityIncludes(opts.entities, "constant")
+        ? ctx.paths.constants
         : undefined,
     });
   }
 
-  const markedOutput = markedTerm.parse(dedent`
-    \`\`\`ts
-    /* ${outputObjectFilePath} */
-    ${outputTwentyObject}\n
-    /* ${outputViewFilePath} */
-    ${outputTwentyObjectView}\n
-    /* ${outputNavMenuItemFilePath} */
-    ${outputTwentyNavMenuItem}\n
-    /* ${outputConstantFilePath} */
-    ${outputTwentyConstants}
-    \`\`\``);
+  const output = Array.from({ length: objectNames.length })
+    .map((_, idx) => {
+      return dedent`
+        /* ${ctx.paths.objects[idx]} */
+        ${result.objects[idx]}
 
-  if (cli.clipboard) {
-    clipboard.copy(markedOutput);
+        /* ${ctx.paths.views[idx]} */
+        ${result.views[idx]}
+
+        /* ${ctx.paths.navMenuItems[idx]} */
+        ${result.navMenuItems[idx]}
+
+        /* ${ctx.paths.constants[idx]} */
+        ${result.constants[idx]}
+      `.trimStart();
+    })
+    .join("\n");
+
+  const markedOutput = markedTerm.parse(
+    dedent`
+      \`\`\`ts
+      ${output}
+      \`\`\`
+      `
+  );
+
+  if (opts.clipboard) {
+    clipboard.copy(output);
   }
 
-  if (cli.print || cli.printOnly) {
+  if (opts.print || opts.dryRun) {
     setTimeout(() => {
       console.clear();
       console.log(markedOutput);
-    }, 500);
+    }, WAIT_BEFORE_PRINT_MS);
   }
 }
 
