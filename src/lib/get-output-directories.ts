@@ -16,12 +16,13 @@ export function getOutputDirectories(
   opts: CliOptions
 ): OutputDir {
   const root = getRelativePathFromCwd(opts.output);
-  const constants = getRelativePathFromCwd(opts.constantsDir);
-  const objects = getRelativePathFromCwd(opts.objectsDir);
-  const views = getRelativePathFromCwd(opts.viewsDir);
-  const navMenuItems = getRelativePathFromCwd(
-    opts.navMenuItemsDir
-  );
+
+  const getDir = (dir: string): string => root + `/${dir}`;
+
+  const constants = getDir(opts.constantsDir);
+  const objects = getDir(opts.objectsDir);
+  const views = getDir(opts.viewsDir);
+  const navMenuItems = getDir(opts.navMenuItemsDir);
 
   return {
     root,

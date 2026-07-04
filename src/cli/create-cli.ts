@@ -19,10 +19,10 @@ export type CliOptions = {
 
 
 const DEFAULT_ROOT_DIR = "src";
-const DEFAULT_CONSTANTS_DIR = DEFAULT_ROOT_DIR + "/constants";
-const DEFAULT_OBJECTS_DIR = DEFAULT_ROOT_DIR + "/objects";
-const DEFAULT_VIEWS_DIR = DEFAULT_ROOT_DIR + "/views";
-const DEFAULT_NAV_MENU_ITEMS_DIR = DEFAULT_ROOT_DIR + "/navigation-menu-items";
+const DEFAULT_CONSTANTS_DIR = "constants";
+const DEFAULT_OBJECTS_DIR = "objects";
+const DEFAULT_VIEWS_DIR = "views";
+const DEFAULT_NAV_MENU_ITEMS_DIR = "navigation-menu-items";
 
 export function createCLI() {
   return new Command()
