@@ -4,9 +4,9 @@
   "type": "module",
   "license": "GPL-3.0-only",
   "description": "A scaffolding CLI tool for Twenty CRM",
-  "main": "dist/main.cjs",
+  "main": "dist/bin.cjs",
   "bin": {
-    "t20": "dist/main.cjs"
+    "t20": "dist/bin.cjs"
   },
   "author": "Ebrahim Khalil <ebrahim.khalil.nayeem@gmail.com>",
   "repository": {
@@ -33,7 +33,7 @@
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",
     "copy-package-json": "tsx scripts/copy-package-json.ts",
-    "changeset-version": "changeset version && node scripts/version.mjs",
+    "changeset-version": "changeset version",
     "changeset-publish": "bun run build && changeset publish"
   },
   "prettier": {
@@ -42,10 +42,23 @@
     "bracketSpacing": true,
     "tabWidth": 2
   },
+  "dependencies": {
+    "@clack/prompts": "^1.6.0",
+    "commander": "^15.0.0",
+    "copy-paste": "^2.2.0",
+    "gradient-string": "^3.0.0",
+    "marked": "^18.0.5",
+    "marked-terminal": "^7.3.0",
+    "pluralize": "^8.0.0",
+    "ts-dedent": "^2.3.0",
+    "twenty-sdk": "2.13.0",
+    "typescript": "^6.0.3",
+    "uuid": "^14.0.1",
+    "valibot": "^1.4.2"
+  },
   "devDependencies": {
     "@changesets/changelog-github": "^0.7.0",
     "@changesets/cli": "^2.31.0",
-    "@clack/prompts": "^1.6.0",
     "@types/copy-paste": "^2.1.0",
     "@types/marked-terminal": "^6.1.1",
     "@types/node": "^26.0.1",
@@ -53,23 +66,11 @@
     "@typescript/native-preview": "7.0.0-dev.20260310.1",
     "@vitest/coverage-v8": "^3.2.6",
     "@vitest/ui": "^4.1.9",
-    "commander": "^15.0.0",
-    "copy-paste": "^2.2.0",
     "eslint-plugin-codegen": "0.28.0",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
-    "gradient-string": "^3.0.0",
-    "marked": "^18.0.5",
-    "marked-terminal": "^7.3.0",
     "oxlint": "^1.71.0",
-    "picocolors": "^1.1.1",
-    "pluralize": "^8.0.0",
-    "ts-dedent": "^2.3.0",
     "tsup": "^8.5.1",
     "tsx": "^4.22.4",
-    "twenty-sdk": "2.13.0",
-    "typescript": "^6.0.3",
-    "uuid": "^14.0.1",
-    "valibot": "^1.4.2",
     "vitest": "^4.1.9"
   }
 }
