@@ -2,14 +2,14 @@ import path from "node:path";
 import {
   getOutputDirectories,
   OutputDir,
-} from "./get-output-directories.js";
-import { ObjectName } from "./user-prompts.js";
+} from "../get-output-directories.js";
+import { ObjectName } from "../user-prompts.js";
 import {
   fileNameTransformers,
   toNavMenuItemName,
   toViewName,
-} from "./utils/to-names.js";
-import { CliOptions } from "../cli/create-cli.js";
+} from "../utils/to-names.js";
+import { CliOptions } from "../create-cli.js";
 
 export type Context = {
   names: {

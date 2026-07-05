@@ -3,7 +3,7 @@ import * as prompts from "@clack/prompts";
 import clipboard from "copy-paste";
 import dedent from "ts-dedent";
 
-import { createCLI } from "./create-cli.js";
+import { createCLI } from "../lib/create-cli.js";
 import { extractObjectSelectOptions } from "../lib/extract-object-select-options.js";
 import {
   finalPrompt,
@@ -15,7 +15,7 @@ import { renderTitle } from "../lib/utils/render-title.js";
 import { markedTerm } from "../lib/marked-term.js";
 import { isEntityIncludes } from "../lib/utils/is-entity-includes.js";
 import { parseTypeScriptAST } from "../lib/parse-typescript-ast.js";
-import { resolveContext } from "../lib/resolve-context.js";
+import { resolveContext } from "../lib/resolvers/resolve-context.js";
 import { generateResult } from "../lib/generate-result.js";
 import { writeResult } from "../lib/write-result.js";
 

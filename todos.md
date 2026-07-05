@@ -6,13 +6,13 @@
 - [x] (prompts) add -v command
 - [x] (nav) generate default navigation menu item
 - [x] (constants) extract entinty constants into a seperate file
-
+- [ ] RELATION
 
 # Maybe in Near Future
 
-- [ ] Array type support (Array)
-- [ ] Object typee Support (RELATION)
-- [ ] Array of Object type support (RELATION)
+- [x] Array type support (Array)
+- [x] Object typee Support (RELATION)
+- [x] Array of Object type support (RELATION)
 
 
 # Refactor

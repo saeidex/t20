@@ -43,7 +43,7 @@ t20 -i ./types.ts -o ./packages/my-twenty-app/src
 
 ## Twenty Field Compatibility Checklist
 
-Below is the status checklist for mapping TypeScript code definitions into Twenty's `FieldType/FieldMetadataType`.
+Below is the status checklist for mapping TypeScript code definitions into Twenty's `FieldType`.
 
 ### 🟩 Supported & Implemented
 

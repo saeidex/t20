@@ -1,6 +1,6 @@
 import ts from "typescript";
 import type { IRField } from "./types.js";
-import { resolveType } from "./resolve-type.js";
+import { resolveType } from "./resolvers/resolve-type.js";
 
 export function extractObjectFields(
   sourceFile: ts.SourceFile,

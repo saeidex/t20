@@ -1,54 +1,95 @@
 import type {
-  FieldType as _FieldType,
+  FieldType,
   OnDeleteAction,
   RelationType,
 } from "twenty-sdk/define";
 
-type FieldType = Extract<
-  _FieldType,
-  // string
-  | _FieldType.TEXT
-  // number
-  | _FieldType.NUMBER
-  // boolean
-  | _FieldType.BOOLEAN
-  // enum || "a" | "b" | "c"
-  | _FieldType.SELECT
-  // any[]
-  | _FieldType.ARRAY // doesn't support yet
-  // Array<"a" | "b">
-  | _FieldType.MULTI_SELECT // doesn't suppport yet
-  // object relation
-  | _FieldType.RELATION // doesn't suppport yet
-  // date
-  | _FieldType.DATE_TIME
-  // uuid
-  | _FieldType.UUID
+// FirstOfAll
+// T[] same as Array<T>
+
+// @ts-ignore for refernce only
+type _FieldType = Extract<
+  FieldType,
+  // BaseField
+  | FieldType.TEXT // #default string
+  | FieldType.UUID
+  | FieldType.NUMERIC
+  | FieldType.RATING
+  | FieldType.NUMBER // #default number
+  | FieldType.POSITION
+  | FieldType.BOOLEAN // #default boolean
+  | FieldType.DATE_TIME // #default Date
+  | FieldType.DATE
+  | FieldType.ARRAY
+  | FieldType.RAW_JSON // #default object
+  | FieldType.FULL_NAME
+  | FieldType.ADDRESS
+  | FieldType.CURRENCY
+  | FieldType.EMAILS
+  | FieldType.PHONES
+  | FieldType.RICH_TEXT
+  | FieldType.LINKS
+  | FieldType.ACTOR
+  | FieldType.FILES
+  //
+  // SelectField
+  | FieldType.SELECT // enum or "x" | "y" | "z"
+  //
+  //MultiSelectField
+  | FieldType.MULTI_SELECT // string[]
+  //
+  //ONE_TO_MANY | MANY_TO_ONE
+  //R = ObjectName|InterfaceName
+  //RelationField
+  | FieldType.RELATION // R | R[]
+  //
+  //MorphRelationField
+  | FieldType.MORPH_RELATION // { morphId: R | R[] }
 >;
 
-export type FieldOption = {
+export type IRFieldOption = {
   position: number;
   label: string;
   value: string;
   color: string;
 };
 
-export type Field = {
+export type IRField = {
+  name: string;
+  kind: FieldType;
+  options?: Array<IRFieldOption>;
+};
+
+type BaseField = {
   universalIdentifier: string;
   name: string;
   label: string;
   type: FieldType;
-  options?: Array<FieldOption>;
-  relationTargetObjectMetadataUniversalIdentifier?: string;
-  relationTargetFieldMetadataUniversalIdentifier?: string;
-  universalSettings?: {
+};
+
+type FieldWithOptions = BaseField & {
+  options: Array<IRFieldOption>;
+};
+
+export type SelectField = FieldWithOptions;
+export type MultiSelectField = FieldWithOptions;
+
+type RelationField = BaseField & {
+  relationTargetObjectMetadataUniversalIdentifier: string;
+  relationTargetFieldMetadataUniversalIdentifier: string;
+  universalSettings: {
     relationType: RelationType;
     onDelete: OnDeleteAction;
   };
 };
 
-export type IRField = {
-  name: string;
-  kind: FieldType;
-  options?: Array<FieldOption>;
+type MorphRelationField = BaseField & {
+  morphId: string;
 };
+
+export type Field =
+  | BaseField
+  | SelectField
+  | MultiSelectField
+  | RelationField
+  | MorphRelationField;

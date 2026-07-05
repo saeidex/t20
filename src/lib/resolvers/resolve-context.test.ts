@@ -1,9 +1,16 @@
 import { expect, test } from "vitest";
 import { resolveContext } from "./resolve-context.js";
+import { CliOptions } from "../create-cli.js";
 
 test("multiple objects", () => {
   const input = {
-    root: "src",
+    opts: {
+      output: "src",
+      constantsDir: "constants",
+      objectsDir: "objects",
+      viewsDir: "views",
+      navMenuItemsDir: "navigation-menu-items",
+    } as CliOptions,
     objectNames: [
       { singular: "product", plural: "products" },
       { singular: "brand", plural: "brands" },
@@ -12,7 +19,18 @@ test("multiple objects", () => {
   const expectedOutput = {
     names: {
       constants: ["product", "brand"],
-      objects: ["product", "brand"],
+      objects: [
+        {
+          singular: "product",
+          plural: "products",
+          output: "product",
+        },
+        {
+          singular: "brand",
+          plural: "brands",
+          output: "brand",
+        },
+      ],
       views: ["All products", "All brands"],
       navMenuItems: ["Products", "Brands"],
     },
@@ -37,7 +55,7 @@ test("multiple objects", () => {
   };
 
   const actualOutput = resolveContext(
-    input.root,
+    input.opts,
     input.objectNames
   );
 

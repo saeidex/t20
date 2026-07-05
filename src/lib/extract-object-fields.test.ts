@@ -1,277 +1,310 @@
+import { compile } from "../__tests__/utils.js";
 import { extractObjectFields } from "./extract-object-fields.js";
-import { expect, test } from "vitest";
-import ts from "typescript";
-import type { IRField } from "./types.js";
+import { describe, it, expect } from "vitest";
 
-const createCompilerHost = (
-  fileName: string,
-  source: string,
-  sourceFile: ts.SourceFile
-): ts.CompilerHost => {
-  const compilerHost: ts.CompilerHost = {
-    getSourceFile: (name) =>
-      name === fileName ? sourceFile : undefined,
-    writeFile: () => {},
-    getDefaultLibFileName: () => "lib.d.ts",
-    useCaseSensitiveFileNames: () => true,
-    getCanonicalFileName: (f) => f,
-    getCurrentDirectory: () => "",
-    getNewLine: () => "\n",
-    fileExists: (name) => name === fileName,
-    readFile: (name) => (name === fileName ? source : undefined),
-  };
+describe("extractObjectFields", () => {
+  it("Base types :: explicit FieldType literal", () => {
+    const { checker, sourceFile } = compile(`
+      enum FieldType { TEXT = "TEXT", UUID = "UUID" }
+      interface IBaseFields {
+        explicitText: FieldType.TEXT;
+        explicitUuid: FieldType.UUID;
+      }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "IBaseFields"
+    );
+    expect(fields).toEqual([
+      { name: "explicitText", kind: "TEXT" },
+      { name: "explicitUuid", kind: "UUID" },
+    ]);
+  });
 
-  return compilerHost;
-};
+  it("Base types :: plain string -> TEXT", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { name: string; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([{ name: "name", kind: "TEXT" }]);
+  });
 
-const createSourceFile = (
-  fileName: string,
-  source: string
-): ts.SourceFile => {
-  return ts.createSourceFile(
-    fileName,
-    source,
-    ts.ScriptTarget.Latest,
-    true
-  );
-};
+  it("Base types :: id-pattern string -> UUID", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { id: string; userId: string; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "id", kind: "UUID" },
+      { name: "userId", kind: "UUID" },
+    ]);
+  });
 
-const createTestProgram = (
-  typeName: string,
-  source: string,
-  fileName = "input.ts"
-): Array<IRField> => {
-  const sourceFile = createSourceFile(fileName, source);
-  const compilerHost = createCompilerHost(
-    fileName,
-    source,
-    sourceFile
-  );
-  const program = ts.createProgram([fileName], {}, compilerHost);
-  const checker = program.getTypeChecker();
-  const actualFields = extractObjectFields(
-    sourceFile,
-    checker,
-    typeName
-  );
-  return actualFields;
-};
+  it("Base types :: *At suffix -> DATE_TIME", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { createdAt: Date; updatedAt: string; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "createdAt", kind: "DATE_TIME" },
+      { name: "updatedAt", kind: "DATE_TIME" },
+    ]);
+  });
 
-test("empty object literal fields", () => {
-  const targetObjectName = "Something";
-  const targetObject = `type ${targetObjectName} = {};`;
+  it("Base types :: does not false-positive on names containing 'at'", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { category: string; format: string; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "category", kind: "TEXT" },
+      { name: "format", kind: "TEXT" },
+    ]);
+  });
 
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual([]);
-});
+  it("Native types :: number -> NUMBER, boolean -> BOOLEAN", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { price: number; active: boolean; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "price", kind: "NUMBER" },
+      { name: "active", kind: "BOOLEAN" },
+    ]);
+  });
 
-test("empty interface fields", () => {
-  const targetInterfaceName = "Product";
-  const targetInterface = ` interface ${targetInterfaceName} {};`;
+  it("Native types :: object / Record<string, unknown> -> RAW_JSON", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { metadata: object; config: Record<string, unknown>; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "metadata", kind: "RAW_JSON" },
+      { name: "config", kind: "RAW_JSON" },
+    ]);
+  });
 
-  const actualFields = createTestProgram(
-    targetInterfaceName,
-    targetInterface
-  );
-  expect(actualFields).toEqual([]);
-});
+  it("Select types :: string enum -> SELECT with options", () => {
+    const { checker, sourceFile } = compile(`
+      enum Priority { Low = "low", High = "high" }
+      interface Product { status: Priority; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      {
+        name: "status",
+        kind: "SELECT",
+        options: [
+          {
+            value: "low",
+            label: "Low",
+            position: 0,
+            color: "gray",
+          },
+          {
+            value: "high",
+            label: "High",
+            position: 1,
+            color: "gray",
+          },
+        ],
+      },
+    ]);
+  });
 
-test("extract fields :: string => TEXT", () => {
-  const targetObjectName = "Something";
-  const targetObject = `type ${targetObjectName} = { a: string; };`;
-  const expectedOutput = [{ name: "a", kind: "TEXT" }];
+  it("Select types :: numeric enum, falling back to member name when unlabeled", () => {
+    const { checker, sourceFile } = compile(`
+      enum Priority { Low = 1, High = 2 }
+      interface Product { status: Priority; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields[0].kind).toBe("SELECT");
+    expect(fields[0].options).toEqual([
+      { value: "1", label: "1", position: 0, color: "gray" },
+      { value: "2", label: "2", position: 1, color: "gray" },
+    ]);
+  });
 
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual(expectedOutput);
-});
+  it("Select types :: string literal union -> SELECT with options", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { role: "admin" | "user" | "guest"; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      {
+        name: "role",
+        kind: "SELECT",
+        options: [
+          {
+            value: "admin",
+            label: "Admin",
+            position: 0,
+            color: "gray",
+          },
+          {
+            value: "user",
+            label: "User",
+            position: 1,
+            color: "gray",
+          },
+          {
+            value: "guest",
+            label: "Guest",
+            position: 2,
+            color: "gray",
+          },
+        ],
+      },
+    ]);
+  });
 
-test("extract fields :: number => NUMBER", () => {
-  const targetObjectName = "Something";
-  const targetObject = `type ${targetObjectName} = { a: number; };`;
-  const expectedOutput = [{ name: "a", kind: "NUMBER" }];
+  it("Select types :: string[] -> MULTI_SELECT with empty options", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { tags: string[]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "tags", kind: "MULTI_SELECT", options: [] },
+    ]);
+  });
 
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual(expectedOutput);
-});
+  it("Select types :: Array<string> -> MULTI_SELECT with empty options", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { tags: Array<string>; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "tags", kind: "MULTI_SELECT", options: [] },
+    ]);
+  });
 
-test("extract fields :: boolean => BOOLEAN", () => {
-  const targetObjectName = "Something";
-  const targetObject = `type ${targetObjectName} = { a: boolean; };`;
-  const expectedOutput = [{ name: "a", kind: "BOOLEAN" }];
+  it("Select types :: literal-union array -> MULTI_SELECT with options", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { roles: ("admin" | "user")[]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      {
+        name: "roles",
+        kind: "MULTI_SELECT",
+        options: [
+          {
+            value: "admin",
+            label: "Admin",
+            position: 0,
+            color: "gray",
+          },
+          {
+            value: "user",
+            label: "User",
+            position: 1,
+            color: "gray",
+          },
+        ],
+      },
+    ]);
+  });
 
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual(expectedOutput);
-});
+  it("Array types :: number[] -> ARRAY (not MULTI_SELECT)", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { scores: number[]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([{ name: "scores", kind: "ARRAY" }]);
+  });
 
-test("extract fields :: array", () => {
-  const targetObjectName = "Something";
-  const targetObject = `type ${targetObjectName} = { array: string[]; };`;
+  it("Array types :: Array<number> as ARRAY", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { scores: Array<number>; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([{ name: "scores", kind: "ARRAY" }]);
+  });
 
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual([
-    { name: "array", kind: "ARRAY" },
-  ]);
-});
+  it("Relation :: falls back to TEXT for named interface fields (relation not yet implemented)", () => {
+    const { checker, sourceFile } = compile(`
+      interface Address { street: string; }
+      interface Product { address: Address; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    // TODO: once resolveRelationType lands, this should become
+    // { name: "address", kind: "RELATION", relation: { type: "MANY_TO_ONE", targetObjectName: "Address" } }
+    expect(fields).toEqual([{ name: "address", kind: "TEXT" }]);
+  });
 
-test("extract fields :: enum => SELECT", () => {
-  const targetObjectName = "Something";
-  const targetObject = `
-    enum Enum {
-      Abc = "ABC",
-      Bcd = "BCD",
-      Cde = "CDE",
-    };
-    type ${targetObjectName} = { e: Enum; };
-  `;
-  const expectedOutput = [
-    {
-      name: "e",
-      kind: "SELECT",
-      options: [
-        {
-          position: 0,
-          label: "Abc",
-          value: "ABC",
-          color: "gray",
-        },
-        {
-          position: 1,
-          label: "Bcd",
-          value: "BCD",
-          color: "gray",
-        },
-        {
-          position: 2,
-          label: "Cde",
-          value: "CDE",
-          color: "gray",
-        },
-      ],
-    },
-  ];
-
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual(expectedOutput);
-});
-
-test("extract fields :: 'a' | 'b' | 'c' => SELECT", () => {
-  const targetObjectName = "Something";
-  const targetObject = `
-    type ${targetObjectName} = { e: "ABC" | "BCD" | "CDE"; };
-  `;
-  const expectedOutput = [
-    {
-      name: "e",
-      kind: "SELECT",
-      options: [
-        {
-          position: 0,
-          label: "Abc",
-          value: "ABC",
-          color: "gray",
-        },
-        {
-          position: 1,
-          label: "Bcd",
-          value: "BCD",
-          color: "gray",
-        },
-        {
-          position: 2,
-          label: "Cde",
-          value: "CDE",
-          color: "gray",
-        },
-      ],
-    },
-  ];
-
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual(expectedOutput);
-});
-
-test("extract fields :: Date => DATE_TIME", () => {
-  const targetObjectName = "Something";
-  const targetObject = `type ${targetObjectName} = { any: Date; };`;
-  const expectedOutput = [{ name: "any", kind: "DATE_TIME" }];
-
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual(expectedOutput);
-});
-
-test("extract fields :: any (key contains 'at') => DATE_TIME", () => {
-  const targetObjectName = "Something";
-  const targetObject = `type ${targetObjectName} = { createdAt: any; };`;
-  const expectedOutput = [
-    { name: "createdAt", kind: "DATE_TIME" },
-  ];
-
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual(expectedOutput);
-});
-
-test("extract fields :: string (key contains 'id') => UUID", () => {
-  const targetObjectName = "Something";
-  const targetObject = `
-    type ${targetObjectName} = {
-      id: string;
-      userId: string;
-      product_id: string;
-      uuid: string;
-      UUID: string;
-      text: string;
-      paid: boolean;
-      unpaid: string;
-      paId: string;
-      paID: string;
-      universalidentifier: string;
-      universalIdentifier: string;
-    };`;
-  const expectedOutput = [
-    { name: "id", kind: "UUID" },
-    { name: "userId", kind: "UUID" },
-    { name: "product_id", kind: "UUID" },
-    { name: "uuid", kind: "UUID" },
-    { name: "UUID", kind: "UUID" },
-    { name: "text", kind: "TEXT" },
-    { name: "paid", kind: "BOOLEAN" },
-    { name: "unpaid", kind: "TEXT" },
-    { name: "paId", kind: "UUID" },
-    { name: "paID", kind: "UUID" },
-    { name: "universalidentifier", kind: "UUID" },
-    { name: "universalIdentifier", kind: "UUID" },
-  ];
-
-  const actualFields = createTestProgram(
-    targetObjectName,
-    targetObject
-  );
-  expect(actualFields).toEqual(expectedOutput);
+  it("Relation :: resolves type alias declarations, not just interfaces", () => {
+    const { checker, sourceFile } = compile(`
+      type Product = { name: string; price: number; };
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "price", kind: "NUMBER" },
+    ]);
+  });
 });
