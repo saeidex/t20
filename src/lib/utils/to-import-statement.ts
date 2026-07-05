@@ -9,7 +9,7 @@ export function toImportStatement(
 ): string {
   if (vars.length == 0) {
     logErrorAndExit(
-      "[To_IMPORT_STATEMENT]: Variables not found!"
+      "[TO_IMPORT_STATEMENT]: Variables not found!"
     );
   }
 

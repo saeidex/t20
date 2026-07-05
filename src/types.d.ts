@@ -71,3 +71,42 @@ interface IBaseFields {
   field19: FieldType.ACTOR;
   field20: FieldType.FILES;
 }
+
+enum Priority {
+  Low = "low",
+  Medium = "medium",
+  High = "high",
+}
+
+interface Address {
+  street: string;
+  city: string;
+}
+
+interface Product {
+  id: string;
+  userId: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: string;
+  price: number;
+  quantity: number;
+  active: boolean;
+  metadata: object;
+  config: Record<string, unknown>;
+  priority: Priority;
+  role: "admin" | "user" | "guest";
+  tags: string[];
+  labels: Array<string>;
+  permissions: ("read" | "write" | "delete")[];
+  scores: number[];
+  ratings: Array<number>;
+  address: Address; // relation candidate — not implemented yet, falls to TEXT
+}
+
+// type alias form — same resolver pipeline applies
+type Category = {
+  name: string;
+  slug: string;
+  itemCount: number;
+};

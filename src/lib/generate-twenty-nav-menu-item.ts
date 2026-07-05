@@ -8,7 +8,6 @@ import { toKebabCase } from "./utils/case-transformation.js";
 export function generateTwentyNavMenuItem(
   navItemName: string,
   navItemFilePath: string,
-  objectFilePath: string,
   constantFilePath: string,
   objectUidVarName: string
 ): {

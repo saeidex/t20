@@ -1,6 +1,6 @@
 import ts from "typescript";
 import { extractObjectFields } from "./extract-object-fields.js";
-import { Context } from "./resolve-context.js";
+import { Context } from "./resolvers/resolve-context.js";
 import { generateTwentyObject } from "./generate-twenty-object.js";
 import { generateTwentyView } from "./generate-twenty-view.js";
 import { generateTwentyNavMenuItem } from "./generate-twenty-nav-menu-item.js";
@@ -66,7 +66,6 @@ export function generateResult(
       generateTwentyNavMenuItem(
         ctx.names.navMenuItems[i],
         ctx.paths.navMenuItems[i],
-        ctx.paths.objects[i],
         ctx.paths.constants[i],
         objectUidVarName
       );
