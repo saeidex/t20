@@ -1,6 +1,6 @@
 import path from "node:path";
+import { styleText } from "node:util";
 import dedent from "ts-dedent";
-import { logErrorAndExit } from "./log-error-and-exit.js";
 
 export function toImportStatement(
   importFromFile: string,
@@ -8,8 +8,8 @@ export function toImportStatement(
   ...vars: Array<string>
 ): string {
   if (vars.length == 0) {
-    logErrorAndExit(
-      "[TO_IMPORT_STATEMENT]: Variables not found!"
+    console.warn(
+      styleText("yellow", "[WARNING]: No Field founds!")
     );
   }
 
