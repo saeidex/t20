@@ -73,6 +73,7 @@ export function generateResult(
     result.navMenuItemUidVars.push(navMenuItemUidVarName);
 
     const outputConstants = generateTwentyConstants(
+      ctx,
       objectUidVarName,
       viewUidVarName,
       navMenuItemUidVarName

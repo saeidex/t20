@@ -1,10 +1,10 @@
 import fs from "node:fs";
 
-import { CliOptions } from "../cli/create-cli.js";
 import { getOutputDirectories } from "./get-output-directories.js";
 import { isEntityIncludes } from "./utils/is-entity-includes.js";
-import { Context } from "./resolve-context.js";
 import { Result } from "./generate-result.js";
+import { Context } from "./resolvers/resolve-context.js";
+import { CliOptions } from "./create-cli.js";
 
 export function writeResult(
   ctx: Context,
@@ -33,11 +33,14 @@ export function writeResult(
   }
   if (isEntityIncludes(opts.entities, "constant")) {
     ctx.paths.constants.forEach((p, i) => {
+      const content = result.constants[i];
+      if (!content) return;
+
       if (fs.existsSync(p)) {
-        fs.appendFileSync(p, result.constants[i], "utf-8");
+        fs.appendFileSync(p, "\n\n" + content, "utf-8");
       } else {
         fs.mkdirSync(dirs.constants, { recursive: true });
-        fs.writeFileSync(p, result.constants[i], "utf-8");
+        fs.writeFileSync(p, content, "utf-8");
       }
     });
   }
