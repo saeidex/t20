@@ -25,7 +25,12 @@ export function resolveBaseTypes(
     return undefined;
   }
 
-  if (getParentEnumName(symbol) !== "FieldType") {
+  const parentEnumName = getParentEnumName(symbol);
+
+  if (
+    parentEnumName !== "FieldMetadataType" &&
+    parentEnumName !== "FieldType"
+  ) {
     return undefined;
   }
 

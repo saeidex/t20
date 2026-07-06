@@ -37,7 +37,10 @@ const serializeOptions = (
 
 export function generateTwentyObjectFields(
   fields: Array<IRField>
-) {
+): {
+  fieldUidVarDeclarations: string;
+  fieldObjects: string;
+} {
   const fieldObjects = fields
     .map((field) =>
       indent(
