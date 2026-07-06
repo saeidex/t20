@@ -81,24 +81,26 @@ export async function sourcePathPrompt(
   return filePath;
 }
 
-export async function selectedObjectPrompt(
+export async function selectedObjectsPrompt(
   objectOptions: Array<Option>
-): Promise<string> {
-  const selectedObject = (await prompts.autocomplete({
-    message: styleText("yellow", "Select an Object/Interface"),
-    options: objectOptions,
-    filter: getFilteredOption,
-  })) as string;
+): Promise<Array<string>> {
+  const selectedObjects = (await prompts.autocompleteMultiselect(
+    {
+      message: styleText("yellow", "Select an Object/Interface"),
+      options: objectOptions,
+      filter: getFilteredOption,
+    }
+  )) as Array<string>;
 
-  handlePromptCancel(selectedObject);
+  handlePromptCancel(selectedObjects);
 
-  if (!selectedObject) {
+  if (!selectedObjects.length) {
     logErrorAndExit(
-      "Selected Interface/Object were not found in your input file"
+      `${selectedObjects} not found in your input file`
     );
   }
 
-  return selectedObject;
+  return selectedObjects;
 }
 
 export type ObjectName = {

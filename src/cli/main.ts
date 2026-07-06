@@ -7,8 +7,9 @@ import { createCLI } from "../lib/create-cli.js";
 import { extractObjectSelectOptions } from "../lib/extract-object-select-options.js";
 import {
   finalPrompt,
+  ObjectName,
   objectNamePrompts,
-  selectedObjectPrompt,
+  selectedObjectsPrompt,
   sourcePathPrompt,
 } from "../lib/user-prompts.js";
 import { renderTitle } from "../lib/utils/render-title.js";
@@ -32,9 +33,12 @@ async function main() {
     sourceFile,
     checker
   );
-  const rootObject = await selectedObjectPrompt(objectOptions);
-  const objectName = await objectNamePrompts(rootObject);
-  const objectNames = [objectName];
+  const rootObjects = await selectedObjectsPrompt(objectOptions);
+  const objectNames: Array<ObjectName> = [];
+  for (const obj of rootObjects) {
+    const name = await objectNamePrompts(obj);
+    objectNames.push(name);
+  }
   const ctx = resolveContext(opts, objectNames);
   const result = generateResult(ctx, sourceFile, checker);
 

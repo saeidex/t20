@@ -69,12 +69,24 @@ enum Priority {
   High = "high",
 }
 
+type Language =
+  | "javascript"
+  | "typescript"
+  | "rust"
+  | "python"
+  | "php";
+
 type SelectFields = {
   priority: Priority;
   role: "admin" | "user" | "guest";
+  language: Language;
 };
 
-type multiSelectFields = {};
+type multiSelectFields = {
+  roles: ("admin" | "user" | "guest")[];
+  languages: Array<Language>;
+  // priorities: Priority[]; // want to support this
+};
 
 interface Address {
   street: string;

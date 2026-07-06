@@ -93,6 +93,7 @@ export function createCLI(argv = process.argv) {
 
   if (!opts) {
     logErrorAndExit("CLI options were not parsed.");
+    process.exit(1); // unreachable (added for type safety)
   }
 
   return opts;

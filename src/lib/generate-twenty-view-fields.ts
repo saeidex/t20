@@ -25,23 +25,27 @@ export function generateTwentyViewFields(
   let viewFields: Array<string> = [];
   let labelField: string = "";
   let islabelFieldExists = false;
+  let position = 0;
 
-  fields.forEach((field, idx) => {
+  fields.forEach((field) => {
     const fieldUidVarName = toUidVarName(field.name, "FIELD");
 
-    // get first text field and set positon to 0(zero) as label field
-    if (!islabelFieldExists && field.kind == FieldType.TEXT) {
+    if (!islabelFieldExists && field.kind === FieldType.TEXT) {
       labelField = getFieldString(0, fieldUidVarName);
       islabelFieldExists = true;
-    } else {
-      idx = islabelFieldExists ? idx : idx + 1;
-      viewFields.push(getFieldString(idx, fieldUidVarName));
+      return;
     }
+
+    position += 1;
+    viewFields.push(getFieldString(position, fieldUidVarName));
   });
 
   return {
     fieldMetadataUidsImportStatement,
-    viewFields: [labelField, ...viewFields].join(",\n"),
+    viewFields: (islabelFieldExists
+      ? [labelField, ...viewFields]
+      : viewFields
+    ).join(",\n"),
   };
 }
 
