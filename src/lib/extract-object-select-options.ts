@@ -4,7 +4,7 @@ import { logErrorAndExit } from "./utils/log-error-and-exit.js";
 export type Option = {
   label: string;
   value: string;
-  hint?: string;
+  // hint: string;
 };
 
 export function extractObjectSelectOptions(

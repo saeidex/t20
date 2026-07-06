@@ -36,7 +36,7 @@ export function generateResult(
     const objectFields = extractObjectFields(
       sourceFile,
       checker,
-      ctx.names.objects[i].output
+      ctx.names.objects[i].original
     );
 
     const { objectUidVarName, output: outputObjects } =

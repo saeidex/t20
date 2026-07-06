@@ -1,30 +1,4 @@
-enum FieldType {
-  ACTOR = "ACTOR",
-  ADDRESS = "ADDRESS",
-  ARRAY = "ARRAY",
-  BOOLEAN = "BOOLEAN",
-  CURRENCY = "CURRENCY",
-  DATE = "DATE",
-  DATE_TIME = "DATE_TIME",
-  EMAILS = "EMAILS",
-  FILES = "FILES",
-  FULL_NAME = "FULL_NAME",
-  LINKS = "LINKS",
-  MORPH_RELATION = "MORPH_RELATION",
-  MULTI_SELECT = "MULTI_SELECT",
-  NUMBER = "NUMBER",
-  NUMERIC = "NUMERIC",
-  PHONES = "PHONES",
-  POSITION = "POSITION",
-  RATING = "RATING",
-  RAW_JSON = "RAW_JSON",
-  RELATION = "RELATION",
-  RICH_TEXT = "RICH_TEXT",
-  SELECT = "SELECT",
-  TEXT = "TEXT",
-  TS_VECTOR = "TS_VECTOR",
-  UUID = "UUID",
-}
+import { FieldType } from "twenty-sdk/define";
 
 type BaseFields = {
   field1: FieldType.TEXT; // #default string

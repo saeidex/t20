@@ -1,8 +1,16 @@
 import { Command } from "commander";
-import packageJson from "../../package.json" with { type: "json" };
 import { styleText } from "node:util";
+import packageJson from "../../package.json" with { type: "json" };
+import { logErrorAndExit } from "./utils/log-error-and-exit.js";
 
 export type Entity = "constant" | "object" | "view" | "navItem";
+
+const VALID_ENTITIES = new Set<Entity>([
+  "constant",
+  "object",
+  "view",
+  "navItem",
+]);
 
 export type CliOptions = {
   input: string;
@@ -24,8 +32,46 @@ const DEFAULT_OBJECTS_DIR = "objects";
 const DEFAULT_VIEWS_DIR = "views";
 const DEFAULT_NAV_MENU_ITEMS_DIR = "navigation-menu-items";
 
-export function createCLI() {
-  return new Command()
+function validateEntities(entities: Array<string>) {
+  if (entities.length === 0) return;
+
+  const invalidEntities = entities.filter(
+    (entity): entity is string => !VALID_ENTITIES.has(entity as Entity)
+  );
+
+  if (invalidEntities.length > 0) {
+    logErrorAndExit(
+      `Invalid entity name(s): ${invalidEntities.join(", ")}. Allowed values: ${Array.from(VALID_ENTITIES).join(", ")}.`
+    );
+  }
+}
+
+function normalizeEntities(entities: unknown): Array<string> {
+  if (entities === undefined || entities === null || entities === false) {
+    return [];
+  }
+
+  if (entities === true) {
+    logErrorAndExit(
+      `Option -e requires one or more entity names. Allowed values: ${Array.from(VALID_ENTITIES).join(", ")}.`
+    );
+  }
+
+  if (Array.isArray(entities)) {
+    return entities.filter((entity): entity is string => typeof entity === "string");
+  }
+
+  if (typeof entities === "string") {
+    return [entities];
+  }
+
+  return [String(entities)];
+}
+
+export function createCLI(argv = process.argv) {
+  let opts: CliOptions | undefined;
+
+  new Command()
     .name("Generate twenty fields from types(Object/Interface)")
     .option("-i, --input <path>", "*.ts/*.d.ts file")
     .option("-o, --output <dir>", "output root directory", DEFAULT_ROOT_DIR)
@@ -39,6 +85,15 @@ export function createCLI() {
     .option("-c, --clipboard", "copy object to clipboard", false)
     .version(packageJson.version, "-v, --version")
     .helpOption()
-    .parse()
-    .opts<CliOptions>()
+    .action((parsedOpts: CliOptions) => {
+      validateEntities(normalizeEntities(parsedOpts.entities));
+      opts = parsedOpts;
+    })
+    .parse(argv);
+
+  if (!opts) {
+    logErrorAndExit("CLI options were not parsed.");
+  }
+
+  return opts;
 }

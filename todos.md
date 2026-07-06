@@ -7,6 +7,7 @@
 - [x] (nav) generate default navigation menu item
 - [x] (constants) extract entinty constants into a seperate file
 - [ ] RELATION
+- [ ] handle invalid -e entities options 
 
 # Maybe in Near Future
 

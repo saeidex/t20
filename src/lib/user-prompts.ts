@@ -102,6 +102,7 @@ export async function selectedObjectPrompt(
 }
 
 export type ObjectName = {
+  original: string;
   singular: string;
   plural: string;
 };
@@ -134,6 +135,7 @@ export async function objectNamePrompts(
   handlePromptCancel(objectNamePlural);
 
   return {
+    original: selectedObject,
     singular: objectNameSingular,
     plural: objectNamePlural,
   };
@@ -142,18 +144,29 @@ export async function objectNamePrompts(
 export function finalPrompt(outputFilePaths: {
   [k in keyof OutputDir]?: Array<string> | undefined;
 }) {
+  const message = Object.entries(outputFilePaths)
+    .map(([key, value]) => {
+      const title = `✨ ${styleText(
+        "yellow",
+        `[${toTitleCase(key, true)}]`
+      )}`;
+
+      if (!value || value.length === 0) {
+        return undefined;
+      }
+
+      const body = dedent`
+          ${value.map((file) => `:: ${file}`).join("\n")}`;
+
+      return title + "\n" + body;
+    })
+    .join("\n")
+    .trim();
+
   prompts.note(
-    Object.entries(outputFilePaths)
-      .map(([key, value]) => {
-        const title = `✨ ${styleText(
-          "yellow",
-          `[${toTitleCase(key, true)}]`
-        )}`;
-        const body = dedent`
-      ${value?.map((file) => `:: ${file}`).join("\n")}`;
-        return title + "\n" + body;
-      })
-      .join("\n"),
+    message.length
+      ? message
+      : styleText("red", "No output generated!"),
     "Output files"
   );
 }
