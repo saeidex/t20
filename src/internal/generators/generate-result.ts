@@ -1,6 +1,6 @@
 import ts from "typescript";
-import { extractObjectFields } from "./extract-object-fields.js";
-import { Context } from "./resolvers/resolve-context.js";
+import { extractObjectFields } from "../extractors/extract-object-fields.js";
+import { Context } from "../resolvers/resolve-context.js";
 import { generateTwentyObject } from "./generate-twenty-object.js";
 import { generateTwentyView } from "./generate-twenty-view.js";
 import { generateTwentyNavMenuItem } from "./generate-twenty-nav-menu-item.js";

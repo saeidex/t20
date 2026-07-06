@@ -1,5 +1,5 @@
 import path from "node:path";
-import { CliOptions } from "./create-cli.js";
+import { CliOptions } from "../create-cli.js";
 
 export type OutputDir = {
   root: string;
@@ -12,7 +12,7 @@ export type OutputDir = {
 const getRelativePathFromCwd = (targetPath: string): string =>
   path.relative(".", targetPath);
 
-export function getOutputDirectories(
+export function resolveOutputDirectories(
   opts: CliOptions
 ): OutputDir {
   const root = getRelativePathFromCwd(opts.output);

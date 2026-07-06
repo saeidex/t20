@@ -1,4 +1,4 @@
-import { compile } from "../__tests__/utils.js";
+import { compile } from "../../__tests__/utils.js";
 import { extractObjectFields } from "./extract-object-fields.js";
 import { describe, it, expect } from "vitest";
 

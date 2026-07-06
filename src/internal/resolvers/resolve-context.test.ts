@@ -12,8 +12,16 @@ test("multiple objects", () => {
       navMenuItemsDir: "navigation-menu-items",
     } as CliOptions,
     objectNames: [
-      { singular: "product", plural: "products" },
-      { singular: "brand", plural: "brands" },
+      {
+        original: "product",
+        singular: "product",
+        plural: "products",
+      },
+      {
+        original: "brand",
+        singular: "brand",
+        plural: "brands",
+      },
     ],
   };
   const expectedOutput = {
@@ -21,11 +29,13 @@ test("multiple objects", () => {
       constants: ["product", "brand"],
       objects: [
         {
+          original: "product",
           singular: "product",
           plural: "products",
           output: "product",
         },
         {
+          original: "brand",
           singular: "brand",
           plural: "brands",
           output: "brand",

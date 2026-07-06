@@ -1,12 +1,12 @@
-import type { IRField } from "./types.js";
+import type { IRField } from "../types.js";
 
 import dedent from "ts-dedent";
 
 import { v4 } from "uuid";
-import { toUidVarName } from "./utils/to-uid-var-name.js";
-import { fieldUidVarNames } from "./utils/fields.js";
+import { toUidVarName } from "../utils/to-uid-var-name.js";
+import { fieldUidVarNames } from "../utils/fields.js";
 import { FieldType } from "twenty-sdk/define";
-import { toImportStatement } from "./utils/to-import-statement.js";
+import { toImportStatement } from "../utils/to-import-statement.js";
 
 export function generateTwentyViewFields(
   objectFilePath: string,

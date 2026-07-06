@@ -1,10 +1,10 @@
-import type { IRField, IRFieldOption } from "./types.js";
+import type { IRField, IRFieldOption } from "../types.js";
 import {
   toCamelCase,
   toTitleCase,
-} from "./utils/case-transformation.js";
-import { toUidVarName } from "./utils/to-uid-var-name.js";
-import { fieldUidVarStatements } from "./utils/fields.js";
+} from "../utils/case-transformation.js";
+import { toUidVarName } from "../utils/to-uid-var-name.js";
+import { fieldUidVarStatements } from "../utils/fields.js";
 
 const indent = (lines: Array<string>, spaces: number) =>
   lines

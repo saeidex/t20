@@ -1,9 +1,9 @@
 import dedent from "ts-dedent";
 
 import { NavigationMenuItemType } from "twenty-sdk/define";
-import { toUidVarName } from "./utils/to-uid-var-name.js";
-import { toImportStatement } from "./utils/to-import-statement.js";
-import { toKebabCase } from "./utils/case-transformation.js";
+import { toUidVarName } from "../utils/to-uid-var-name.js";
+import { toImportStatement } from "../utils/to-import-statement.js";
+import { toKebabCase } from "../utils/case-transformation.js";
 
 export function generateTwentyNavMenuItem(
   navItemName: string,

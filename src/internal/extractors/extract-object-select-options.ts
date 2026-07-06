@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { logErrorAndExit } from "./utils/log-error-and-exit.js";
+import { logErrorAndExit } from "../utils/log-error-and-exit.js";
 
 export type Option = {
   label: string;

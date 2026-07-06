@@ -3,22 +3,22 @@ import * as prompts from "@clack/prompts";
 import clipboard from "copy-paste";
 import dedent from "ts-dedent";
 
-import { createCLI } from "../lib/create-cli.js";
-import { extractObjectSelectOptions } from "../lib/extract-object-select-options.js";
+import { createCLI } from "../internal/create-cli.js";
+import { extractObjectSelectOptions } from "../internal/extractors/extract-object-select-options.js";
 import {
   finalPrompt,
   ObjectName,
   objectNamePrompts,
   selectedObjectsPrompt,
   sourcePathPrompt,
-} from "../lib/user-prompts.js";
-import { renderTitle } from "../lib/utils/render-title.js";
-import { markedTerm } from "../lib/marked-term.js";
-import { isEntityIncludes } from "../lib/utils/is-entity-includes.js";
-import { parseTypeScriptAST } from "../lib/parse-typescript-ast.js";
-import { resolveContext } from "../lib/resolvers/resolve-context.js";
-import { generateResult } from "../lib/generate-result.js";
-import { writeResult } from "../lib/write-result.js";
+} from "../internal/user-prompts.js";
+import { renderTitle } from "../internal/utils/render-title.js";
+import { markedTerm } from "../internal/marked-term.js";
+import { isEntityIncludes } from "../internal/utils/is-entity-includes.js";
+import { parseTypeScriptAST } from "../internal/parse-typescript-ast.js";
+import { resolveContext } from "../internal/resolvers/resolve-context.js";
+import { generateResult } from "../internal/generators/generate-result.js";
+import { writeResult } from "../internal/write-result.js";
 
 const WAIT_BEFORE_PRINT_MS = 500;
 

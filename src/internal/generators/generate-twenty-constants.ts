@@ -1,6 +1,6 @@
 import { dedent } from "ts-dedent";
 import { v4 } from "uuid";
-import { Context } from "./resolvers/resolve-context.js";
+import { Context } from "../resolvers/resolve-context.js";
 import fs from "node:fs";
 
 export function generateTwentyConstants(

@@ -1,8 +1,4 @@
 import path from "node:path";
-import {
-  getOutputDirectories,
-  OutputDir,
-} from "../get-output-directories.js";
 import { ObjectName } from "../user-prompts.js";
 import {
   fileNameTransformers,
@@ -10,6 +6,10 @@ import {
   toViewName,
 } from "../utils/to-names.js";
 import { CliOptions } from "../create-cli.js";
+import {
+  OutputDir,
+  resolveOutputDirectories,
+} from "./resolve-output-directories.js";
 
 export type Context = {
   names: {
@@ -45,7 +45,7 @@ export function resolveContext(
     ),
   } as const satisfies Context["names"];
 
-  const dirs = getOutputDirectories(cliOptions);
+  const dirs = resolveOutputDirectories(cliOptions);
   const paths = getInitialPaths();
 
   for (const key of Object.keys(names) as Array<

@@ -2,11 +2,11 @@ import { dedent } from "ts-dedent";
 import {
   toCamelCase,
   toTitleCase,
-} from "./utils/case-transformation.js";
-import type { IRField } from "./types.js";
-import { toUidVarName } from "./utils/to-uid-var-name.js";
+} from "../utils/case-transformation.js";
+import type { IRField } from "../types.js";
+import { toUidVarName } from "../utils/to-uid-var-name.js";
 import { generateTwentyObjectFields } from "./generate-twenty-object-fields.js";
-import { toImportStatement } from "./utils/to-import-statement.js";
+import { toImportStatement } from "../utils/to-import-statement.js";
 
 export function generateTwentyObject(data: {
   nameSingular: string;

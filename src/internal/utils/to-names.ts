@@ -1,4 +1,4 @@
-import { OutputDir } from "../get-output-directories.js";
+import { OutputDir } from "../resolvers/resolve-output-directories.js";
 import {
   toKebabCase,
   toTitleCase,

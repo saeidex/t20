@@ -1,8 +1,9 @@
 import dedent from "ts-dedent";
+
 import { generateTwentyViewFields } from "./generate-twenty-view-fields.js";
-import type { IRField } from "./types.js";
-import { toUidVarName } from "./utils/to-uid-var-name.js";
-import { toImportStatement } from "./utils/to-import-statement.js";
+import type { IRField } from "../types.js";
+import { toUidVarName } from "../utils/to-uid-var-name.js";
+import { toImportStatement } from "../utils/to-import-statement.js";
 
 export function generateTwentyView(
   viewName: string,

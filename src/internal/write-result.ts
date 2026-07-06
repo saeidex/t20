@@ -1,17 +1,17 @@
 import fs from "node:fs";
 
-import { getOutputDirectories } from "./get-output-directories.js";
 import { isEntityIncludes } from "./utils/is-entity-includes.js";
-import { Result } from "./generate-result.js";
 import { Context } from "./resolvers/resolve-context.js";
 import { CliOptions } from "./create-cli.js";
+import { resolveOutputDirectories } from "./resolvers/resolve-output-directories.js";
+import { Result } from "./generators/generate-result.js";
 
 export function writeResult(
   ctx: Context,
   opts: CliOptions,
   result: Result
 ): void {
-  const dirs = getOutputDirectories(opts);
+  const dirs = resolveOutputDirectories(opts);
 
   if (isEntityIncludes(opts.entities, "object")) {
     fs.mkdirSync(dirs.objects, { recursive: true });

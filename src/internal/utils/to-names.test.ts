@@ -10,7 +10,7 @@ test("toViewName", () => {
 });
 
 test("toViewFileName", () => {
-  expect(toViewFileName("orderItems")).toBe(
+  expect(toViewFileName("allOrderItems")).toBe(
     "all-order-items-view.ts"
   );
 });

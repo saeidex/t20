@@ -4,11 +4,11 @@ import fs from "node:fs";
 import { plural, singular } from "pluralize";
 import { handlePromptCancel } from "./utils/handle-prompt-cancel.js";
 import { toTitleCase } from "./utils/case-transformation.js";
-import type { Option } from "./extract-object-select-options.ts";
+import type { Option } from "./extractors/extract-object-select-options.ts";
 import { styleText } from "node:util";
 import { logErrorAndExit } from "./utils/log-error-and-exit.js";
 import dedent from "ts-dedent";
-import { OutputDir } from "./get-output-directories.js";
+import { OutputDir } from "./resolvers/resolve-output-directories.js";
 
 const objectNameSchema = v.pipe(
   v.string(),
