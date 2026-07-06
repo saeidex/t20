@@ -1,19 +1,22 @@
-# Todos
+# Roadmap
 
 - [x] (view) label text field position at zero
 - [x] (view) default view name change to `all-${view_name}`
 - [x] (prompts) show object on select prompt
 - [x] (prompts) add -v command
 - [x] (nav) generate default navigation menu item
-- [x] (constants) extract entinty constants into a seperate file
-- [ ] RELATION
-- [ ] handle invalid -e entities options 
+- [x] (constant) extract entinty constants into a seperate file
+- [ ] (object) RELATION
+- [x] (cli) handle invalid -e entities options 
+- [ ] (prompts) replace object select with multi-select
+- [ ] (object) extend multi-select for enum[] or Array<enum>
+- [ ] add users guide, layout: ##TwentyType ###shortDescription ####examples
 
 # Maybe in Near Future
 
 - [x] Array type support (Array)
-- [x] Object typee Support (RELATION)
-- [x] Array of Object type support (RELATION)
+- [ ] Object typee Support (RELATION)
+- [ ] Array of Object type support (RELATION)
 
 
 # Refactor
