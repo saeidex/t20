@@ -21,6 +21,39 @@ export function resolveMultiSelectType(
     return { name, kind: FieldType.MULTI_SELECT, options: [] };
   }
 
+  // Enum[] or Array<Enum>
+  if (
+    elementType.symbol &&
+    elementType.symbol.flags & ts.SymbolFlags.Enum
+  ) {
+    const declarations = elementType.symbol.declarations ?? [];
+    const enumDecl = declarations.find(ts.isEnumDeclaration);
+
+    if (enumDecl) {
+      const options = createFieldOptions(
+        enumDecl.members.map((member) => {
+          const initializer = member.initializer;
+
+          if (initializer) {
+            if (ts.isStringLiteral(initializer))
+              return initializer.text;
+
+            if (ts.isNumericLiteral(initializer))
+              return initializer.text;
+          }
+
+          return member.name.getText();
+        })
+      );
+
+      return {
+        name,
+        kind: FieldType.MULTI_SELECT,
+        options,
+      };
+    }
+  }
+
   // ("a"|"b")[] or Array<"a"|"b"> — literal union, derive options
   if (elementType.isUnion()) {
     const literalMembers = elementType.types.filter(

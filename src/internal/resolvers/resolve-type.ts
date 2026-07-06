@@ -16,10 +16,10 @@ export function resolveType(
   return (
     resolveBaseTypes(name, type) ??
     resolveDateAndStringTypes(checker, name, type) ??
-    resolveNativeTypes(checker, name, type) ??
     resolveSelectTypes(name, type) ??
     resolveMultiSelectType(checker, name, type) ??
-    resolveArrayType(checker, name, type) ?? {
+    resolveArrayType(checker, name, type) ??
+    resolveNativeTypes(checker, name, type) ?? {
       name,
       kind: FieldType.TEXT,
     }

@@ -195,7 +195,7 @@ describe("extractObjectFields", () => {
     ]);
   });
 
-  it("Select types :: string[] -> MULTI_SELECT with empty options", () => {
+  it("MultiSelect types :: string[] -> MULTI_SELECT with empty options", () => {
     const { checker, sourceFile } = compile(`
       interface Product { tags: string[]; }
     `);
@@ -209,7 +209,7 @@ describe("extractObjectFields", () => {
     ]);
   });
 
-  it("Select types :: Array<string> -> MULTI_SELECT with empty options", () => {
+  it("MultiSelect types :: Array<string> -> MULTI_SELECT with empty options", () => {
     const { checker, sourceFile } = compile(`
       interface Product { tags: Array<string>; }
     `);
@@ -223,9 +223,41 @@ describe("extractObjectFields", () => {
     ]);
   });
 
-  it("Select types :: literal-union array -> MULTI_SELECT with options", () => {
+  it("MultiSelect types :: literal-union array -> MULTI_SELECT with options", () => {
     const { checker, sourceFile } = compile(`
       interface Product { roles: ("admin" | "user")[]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      {
+        name: "roles",
+        kind: "MULTI_SELECT",
+        options: [
+          {
+            value: "admin",
+            label: "Admin",
+            position: 0,
+            color: "gray",
+          },
+          {
+            value: "user",
+            label: "User",
+            position: 1,
+            color: "gray",
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("MultiSelect types :: enum array -> MULTI_SELECT with options", () => {
+    const { checker, sourceFile } = compile(`
+      enum Role { ADMIN = "admin", USER = "user" }
+      interface Product { roles: Role[]; }
     `);
     const fields = extractObjectFields(
       sourceFile,

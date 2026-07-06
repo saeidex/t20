@@ -47,11 +47,11 @@ interface IBaseFields {
 }
 
 type DateAndStringFields = {
-  id: any;
-  uuid: any;
-  orderId: any;
-  createdAt: any;
-  updatedAt: any;
+  id: string;
+  uuid: string;
+  orderId: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 type NativeFields = {
@@ -82,10 +82,11 @@ type SelectFields = {
   language: Language;
 };
 
+/// note: Array<T>, T[] are same
 type multiSelectFields = {
   roles: ("admin" | "user" | "guest")[];
   languages: Array<Language>;
-  // priorities: Priority[]; // want to support this
+  priorities: Priority[];
 };
 
 interface Address {
