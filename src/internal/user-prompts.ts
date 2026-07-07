@@ -19,22 +19,6 @@ const objectNameSchema = v.pipe(
   )
 );
 
-function getFilteredOption<T>(
-  searchText: string,
-  option: prompts.Option<T>
-): boolean {
-  if (!searchText) {
-    return true;
-  }
-  const label = (
-    option.label ?? String(option.value ?? "")
-  ).toLowerCase();
-  const value = String(option.value).toLowerCase();
-  const term = searchText.toLowerCase();
-
-  return label.includes(term) || value.includes(term);
-}
-
 export async function sourcePathPrompt(
   filePath: string
 ): Promise<string> {
@@ -84,13 +68,10 @@ export async function sourcePathPrompt(
 export async function selectedObjectsPrompt(
   objectOptions: Array<Option>
 ): Promise<Array<string>> {
-  const selectedObjects = (await prompts.autocompleteMultiselect(
-    {
-      message: styleText("yellow", "Select an Object/Interface"),
-      options: objectOptions,
-      filter: getFilteredOption,
-    }
-  )) as Array<string>;
+  const selectedObjects = (await prompts.multiselect({
+    message: styleText("yellow", "Select an Object/Interface"),
+    options: objectOptions,
+  })) as Array<string>;
 
   handlePromptCancel(selectedObjects);
 

@@ -41,7 +41,7 @@ function validateEntities(entities: Array<string>) {
 
   if (invalidEntities.length > 0) {
     logErrorAndExit(
-      `Invalid entity name(s): ${invalidEntities.join(", ")}. Allowed values: ${Array.from(VALID_ENTITIES).join(", ")}.`
+      `Invalid entity name(s): ${invalidEntities.join(", ")}.\nAllowed values: ${Array.from(VALID_ENTITIES).join(", ")}.`
     );
   }
 }
