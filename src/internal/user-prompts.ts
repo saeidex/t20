@@ -9,6 +9,7 @@ import { styleText } from "node:util";
 import { logErrorAndExit } from "./utils/log-error-and-exit.js";
 import dedent from "ts-dedent";
 import { OutputDir } from "./resolvers/resolve-output-directories.js";
+import { renderTitle } from "./utils/render-title.js";
 
 const objectNameSchema = v.pipe(
   v.string(),
@@ -18,6 +19,10 @@ const objectNameSchema = v.pipe(
     "Object name cannot be longer than 50 characters"
   )
 );
+
+export function introPrompt() {
+  prompts.intro(renderTitle());
+}
 
 export async function sourcePathPrompt(
   filePath: string
@@ -93,8 +98,13 @@ export type ObjectName = {
 export async function objectNamePrompts(
   selectedObject: string
 ): Promise<ObjectName> {
-  const objectNameSingular = (await prompts.text({
-    message: styleText("yellow", "(Singular) Object name"),
+  let objectNameSingular;
+  let objectNamePlural;
+
+  objectNameSingular = (await prompts.text({
+    message:
+      styleText("red", selectedObject) +
+      styleText("yellow", " -> Singular name"),
     placeholder: "product",
     initialValue: singular(toTitleCase(selectedObject)),
     validate: objectNameSchema,
@@ -102,8 +112,10 @@ export async function objectNamePrompts(
 
   handlePromptCancel(objectNameSingular);
 
-  const objectNamePlural = (await prompts.text({
-    message: styleText("yellow", "(Plural) Object name"),
+  objectNamePlural = (await prompts.text({
+    message:
+      styleText("red", selectedObject) +
+      styleText("yellow", " -> Plural name"),
     placeholder: "products",
     initialValue: plural(objectNameSingular),
     validate: v.pipe(

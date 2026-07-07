@@ -40,12 +40,19 @@ export function generateTwentyViewFields(
     viewFields.push(getFieldString(position, fieldUidVarName));
   });
 
+  if (!islabelFieldExists) {
+    labelField = dedent`
+      // @ts-expect-error No label field found!
+      // :: Position 0 is reserved for the label field.
+      // :: Please add a text field to your object to be used as the label field.`;
+    console.error(
+      `|\n|  [ERROR]: No label field found: ${viewFilePath}`
+    );
+  }
+
   return {
     fieldMetadataUidsImportStatement,
-    viewFields: (islabelFieldExists
-      ? [labelField, ...viewFields]
-      : viewFields
-    ).join(",\n"),
+    viewFields: labelField + "\n" + [viewFields].join(",\n"),
   };
 }
 

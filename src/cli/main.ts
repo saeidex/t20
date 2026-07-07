@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import * as prompts from "@clack/prompts";
 import clipboard from "copy-paste";
 import dedent from "ts-dedent";
 
@@ -7,12 +6,12 @@ import { createCLI } from "../internal/create-cli.js";
 import { extractObjectSelectOptions } from "../internal/extractors/extract-object-select-options.js";
 import {
   finalPrompt,
+  introPrompt,
   ObjectName,
   objectNamePrompts,
   selectedObjectsPrompt,
   sourcePathPrompt,
 } from "../internal/user-prompts.js";
-import { renderTitle } from "../internal/utils/render-title.js";
 import { markedTerm } from "../internal/marked-term.js";
 import { isEntityIncludes } from "../internal/utils/is-entity-includes.js";
 import { parseTypeScriptAST } from "../internal/parse-typescript-ast.js";
@@ -23,8 +22,7 @@ import { writeResult } from "../internal/write-result.js";
 const WAIT_BEFORE_PRINT_MS = 500;
 
 async function main() {
-  prompts.intro(renderTitle());
-
+  introPrompt();
   const opts = createCLI();
 
   let sourcePath = await sourcePathPrompt(opts.input);
