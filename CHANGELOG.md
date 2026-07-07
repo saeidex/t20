@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.4.1
+
+### Patch Changes
+
+- update documentation
+
 ## 0.4.0
 
 ### Minor Changes
