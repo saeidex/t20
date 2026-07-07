@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.4.0
+
+### Minor Changes
+
+- add: all types support expect relation types
+
 ## 0.3.0
 
 ### Minor Changes
