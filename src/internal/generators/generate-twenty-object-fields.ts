@@ -1,4 +1,4 @@
-import type { IRField, IRFieldOption } from "../types.js";
+import type { IRField, FieldOption } from "../types.js";
 import {
   toCamelCase,
   toTitleCase,
@@ -12,7 +12,7 @@ const indent = (lines: Array<string>, spaces: number) =>
     .join("\n");
 
 const serializeOptions = (
-  opts: Array<IRFieldOption> = []
+  opts: Array<FieldOption> = []
 ): string => {
   if (!opts.length) return "";
 

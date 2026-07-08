@@ -1,11 +1,12 @@
 import ts from "typescript";
-import { IRField } from "../types.js";
-import { resolveType } from "../resolvers/resolve-type.js";
+import type { IRField } from "../types.js";
+import { resolveField } from "../resolvers/resolve-field.js";
 
 export function extractObjectFields(
   sourceFile: ts.SourceFile,
   checker: ts.TypeChecker,
-  objectName: string
+  objectName: string,
+  knownObjectNames?: Set<string>
 ): Array<IRField> {
   const fields: Array<IRField> = [];
 
@@ -20,39 +21,43 @@ export function extractObjectFields(
           if (ts.isPropertySignature(member) && member.name) {
             const name = member.name.getText();
             const type = checker.getTypeAtLocation(member);
-            const resolved = resolveType(checker, name, type);
-            if (Array.isArray(resolved)) {
-              fields.push(...resolved);
-            } else {
-              fields.push(resolved);
-            }
+            fields.push(
+              resolveField(
+                checker,
+                name,
+                type,
+                member.type,
+                knownObjectNames
+              )
+            );
           }
         });
       } else if (ts.isTypeAliasDeclaration(node)) {
         const type = checker.getTypeAtLocation(node.name);
-        const properties = type.getProperties();
-
-        properties.forEach((property) => {
+        type.getProperties().forEach((property) => {
           const name = property.getName();
           const declaration =
             property.valueDeclaration ??
             property.declarations?.[0];
-
           if (declaration) {
             const propType = checker.getTypeOfSymbolAtLocation(
               property,
               declaration
             );
-            const resolved = resolveType(
-              checker,
-              name,
-              propType
+            const typeNode =
+              ts.isPropertySignature(declaration) ||
+              ts.isPropertyDeclaration(declaration)
+                ? declaration.type
+                : undefined;
+            fields.push(
+              resolveField(
+                checker,
+                name,
+                propType,
+                typeNode,
+                knownObjectNames
+              )
             );
-            if (Array.isArray(resolved)) {
-              fields.push(...resolved);
-            } else {
-              fields.push(resolved);
-            }
           }
         });
       }
