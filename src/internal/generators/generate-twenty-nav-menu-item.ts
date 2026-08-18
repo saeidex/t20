@@ -4,6 +4,7 @@ import { NavigationMenuItemType } from "twenty-sdk/define";
 import { toUidVarName } from "../utils/to-uid-var-name.js";
 import { toImportStatement } from "../utils/to-import-statement.js";
 import { toKebabCase } from "../utils/case-transformation.js";
+import { tempStore } from "../utils/temp-store.js";
 
 export function generateTwentyNavMenuItem(
   navItemName: string,
@@ -25,6 +26,9 @@ export function generateTwentyNavMenuItem(
     objectUidVarName
   );
 
+  const navMenuItemsPositionStore =
+    tempStore().navMenuItemsPositionStore;
+
   const output = dedent`import { defineNavigationMenuItem, NavigationMenuItemType } from "twenty-sdk/define";
                 ${constantImportStatement}
 
@@ -32,7 +36,7 @@ export function generateTwentyNavMenuItem(
                   universalIdentifier: ${navMenuItemUidVarName},
                   name: "${toKebabCase(navItemName)}",
                   icon: "IconList",
-                  position: 0,
+                  position: ${navMenuItemsPositionStore.getPositionAndIncrement()},
                   type: NavigationMenuItemType.${
                     NavigationMenuItemType.OBJECT
                   },
