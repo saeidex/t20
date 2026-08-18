@@ -3,7 +3,7 @@
   <h1>t20 - Types to Twenty</h1>
 
   <p>
-      <strong>A scaffolding CLI tool for [Twenty CRM](https://github.com/twentyhq/twenty).</strong>Automatically generate objects, fields, views & directly from your TypeScript definitions.
+      <strong>A scaffolding CLI tool for [Twenty CRM](https://github.com/twentyhq/twenty). </strong>Automatically generate objects, fields, views & directly from your TypeScript definitions.
   </p>
 </div>
 
