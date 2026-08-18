@@ -8,6 +8,8 @@ import { fieldUidVarNames } from "../utils/fields.js";
 import { FieldType } from "twenty-sdk/define";
 import { toImportStatement } from "../utils/to-import-statement.js";
 
+const fieldSeperator = ",\n";
+
 export function generateTwentyViewFields(
   objectFilePath: string,
   viewFilePath: string,
@@ -22,7 +24,7 @@ export function generateTwentyViewFields(
     ...fieldUidVarNames(fields)
   );
 
-  let viewFields: Array<string> = [];
+  let viewFields: string = "";
   let labelField: string = "";
   let islabelFieldExists = false;
   let position = 0;
@@ -37,7 +39,8 @@ export function generateTwentyViewFields(
     }
 
     position += 1;
-    viewFields.push(getFieldString(position, fieldUidVarName));
+    viewFields += getFieldString(position, fieldUidVarName);
+    viewFields += fieldSeperator;
   });
 
   if (!islabelFieldExists) {
@@ -50,9 +53,13 @@ export function generateTwentyViewFields(
     );
   }
 
+  const labelFieldSeperator = islabelFieldExists
+    ? fieldSeperator
+    : "\n";
+
   return {
     fieldMetadataUidsImportStatement,
-    viewFields: labelField + "\n" + [viewFields].join(",\n"),
+    viewFields: labelField + labelFieldSeperator + viewFields,
   };
 }
 
