@@ -17,7 +17,7 @@
 - [x] Array type support (Array)
 - [ ] Object typee Support (RELATION)
 - [ ] Array of Object type support (RELATION)
-
+- [ ] Show Relation info in Select prompt
 
 # Refactor
 
