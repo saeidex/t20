@@ -4,6 +4,7 @@ import { generateTwentyViewFields } from "./generate-twenty-view-fields.js";
 import type { IRField } from "../types.js";
 import { toUidVarName } from "../utils/to-uid-var-name.js";
 import { toImportStatement } from "../utils/to-import-statement.js";
+import { tempStore } from "../utils/temp-store.js";
 
 export function generateTwentyView(
   viewName: string,
@@ -31,6 +32,8 @@ export function generateTwentyView(
       fields
     );
 
+  const viewPositionStore = tempStore().viewsPositionStore;
+
   const output = dedent`import { defineView, ViewKey } from "twenty-sdk/define";
                 ${viewUidImportStatement}
                 ${fieldMetadataUidsImportStatement}
@@ -41,7 +44,7 @@ export function generateTwentyView(
                   objectUniversalIdentifier: ${objectUidVarName},
                   icon: "IconList",
                   key: ViewKey.INDEX,
-                  position: 0,
+                  position: ${viewPositionStore.getPositionAndIncrement()},
                   fields: [
                     ${viewFields}
                   ],

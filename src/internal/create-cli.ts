@@ -2,6 +2,7 @@ import { Command } from "commander";
 import { styleText } from "node:util";
 import packageJson from "../../package.json" with { type: "json" };
 import { logErrorAndExit } from "./utils/log-error-and-exit.js";
+import { stringToInt } from "./utils/string-to-int.js";
 
 export type Entity = "constant" | "object" | "view" | "navItem";
 
@@ -15,11 +16,13 @@ const VALID_ENTITIES = new Set<Entity>([
 export type CliOptions = {
   input: string;
   output: string;
+  entities: Array<Entity>;
   constantsDir: string;
   objectsDir: string;
   viewsDir: string;
   navMenuItemsDir: string;
-  entities: Array<Entity>;
+  viewsBasePosition: number;
+  navMenuItemsBasePosition: number;
   print: boolean;
   dryRun: boolean;
   clipboard: boolean;
@@ -32,6 +35,9 @@ const DEFAULT_OBJECTS_DIR = "objects";
 const DEFAULT_VIEWS_DIR = "views";
 const DEFAULT_NAV_MENU_ITEMS_DIR = "navigation-menu-items";
 
+const DEFAULT_VIEWS_BASE_POSITION = "0";
+const DEFAULT_NAV_MENU_ITEMS_BASE_POSITION = "0";
+
 function validateEntities(entities: Array<string>) {
   if (entities.length === 0) return;
 
@@ -41,7 +47,7 @@ function validateEntities(entities: Array<string>) {
 
   if (invalidEntities.length > 0) {
     logErrorAndExit(
-      `Invalid entity name(s): ${invalidEntities.join(", ")}.\nAllowed values: ${Array.from(VALID_ENTITIES).join(", ")}.`
+      `Invalid entity name(s): ${invalidEntities.join(", ")}. Allowed values: ${Array.from(VALID_ENTITIES).join(", ")}.`
     );
   }
 }
@@ -75,11 +81,13 @@ export function createCLI(argv = process.argv) {
     .name("Generate twenty fields from types(Object/Interface)")
     .option("-i, --input <path>", "*.ts/*.d.ts file")
     .option("-o, --output <dir>", "output root directory", DEFAULT_ROOT_DIR)
+    .option("-e, --entities [entities...]", `can specify single or multiple entities among: ${styleText("yellow", "(constant | object | view | navItem)")}`)
     .option("--constants-dir <dir>", "output constants directory", DEFAULT_CONSTANTS_DIR)
     .option("--objects-dir <dir>", "output object directory", DEFAULT_OBJECTS_DIR)
     .option("--views-dir <dir>", "output views directory", DEFAULT_VIEWS_DIR)
     .option("--nav-menu-items-dir <dir>", "output navigation menu items directory", DEFAULT_NAV_MENU_ITEMS_DIR)
-    .option("-e, --entities [entities...]", `can specify single or multiple entities among: ${styleText("yellow", "(constant | object | view | navItem)")}`)
+    .option("--views-base-position <number>", "offset for views starting index", DEFAULT_VIEWS_BASE_POSITION)
+    .option("--nav-menu-items-base-position <number>", "offset for navigation menu items starting index", DEFAULT_NAV_MENU_ITEMS_BASE_POSITION)
     .option("-p, --print", "print to console", false)
     .option("-d, --dry-run", "print outputs to console, do not write on disk", false)
     .option("-c, --clipboard", "copy object to clipboard", false)
@@ -87,7 +95,11 @@ export function createCLI(argv = process.argv) {
     .helpOption()
     .action((parsedOpts: CliOptions) => {
       validateEntities(normalizeEntities(parsedOpts.entities));
-      opts = parsedOpts;
+
+      const viewsBasePosition = stringToInt(parsedOpts.viewsBasePosition);
+      const navMenuItemsBasePosition = stringToInt(parsedOpts.navMenuItemsBasePosition);
+
+      opts = { ...parsedOpts, viewsBasePosition, navMenuItemsBasePosition};
     })
     .parse(argv);
 
