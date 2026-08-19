@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.5.0
+
+### Minor Changes
+
+- Fixes #1 and Fixes #3 issues
+
 ## 0.4.1
 
 ### Patch Changes

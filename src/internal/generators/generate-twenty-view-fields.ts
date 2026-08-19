@@ -43,6 +43,8 @@ export function generateTwentyViewFields(
     viewFields += fieldSeperator;
   });
 
+  viewFields = viewFields.trimEnd();
+
   if (!islabelFieldExists) {
     labelField = dedent`
       // @ts-expect-error No label field found!
