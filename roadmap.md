@@ -6,22 +6,22 @@
 - [x] (prompts) add -v command
 - [x] (nav) generate default navigation menu item
 - [x] (constant) extract entinty constants into a seperate file
+- [x] (cli) handle invalid -e entities options
+- [x] (prompts) replace object select with multi-select
+- [x] (object) extend multi-select for enum[] or Array<enum>
+- [x] add users guide, examples
+- [x] Array type support (Array)
 - [ ] (object) RELATION
-- [x] (cli) handle invalid -e entities options 
-- [ ] (prompts) replace object select with multi-select
-- [ ] (object) extend multi-select for enum[] or Array<enum>
-- [ ] add users guide, layout: ##TwentyType ###shortDescription ####examples
 
 # Maybe in Near Future
 
-- [x] Array type support (Array)
 - [ ] Object typee Support (RELATION)
 - [ ] Array of Object type support (RELATION)
 - [ ] Show Relation info in Select prompt
 
 # Refactor
 
-- [ ] Retain the original enum structure instead of hardcoded SELECT Options. Example: 
+- [ ] Retain the original enum structure instead of hardcoded SELECT Options. Example:
   ```diff
   - {
   -   universalIdentifier: TAX_STATUS_FIELD_UNIVERSAL_IDENTIFIER,

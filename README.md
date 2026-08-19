@@ -31,18 +31,18 @@ t20 -i ./src/types.ts -o ./packages/my-twenty-app/src
 
 #### Options
 
-*  `-i, --input <path>`            *.ts/*.d.ts file
-*  `-o, --output <dir>`            output root directory (default: "src")
-*  `--constants-dir <dir>`         output constants directory (default: "constants")
-*  `--objects-dir <dir>`           output object directory (default: "objects")
-*  `--views-dir <dir>`             output views directory (default: "views")
-*  `--nav-menu-items-dir <dir>`    output navigation menu items directory (default: "navigation-menu-items")
-*  `-e, --entities [entities...]`  can specify single or multiple entities among: (constant | object | view | navItem)
-*  `-p, --print`                   print to console (default: false)
-*  `-d, --dry-run`                 print outputs to console, do not write on disk (default: false)
-*  `-c, --clipboard`               copy object to clipboard (default: false)
-*  `-v, --version`                 output the version number
-*  `-h, --help`                    display help for command
+- `-i, --input <path>` _.ts/_.d.ts file
+- `-o, --output <dir>` output root directory (default: "src")
+- `--constants-dir <dir>` output constants directory (default: "constants")
+- `--objects-dir <dir>` output object directory (default: "objects")
+- `--views-dir <dir>` output views directory (default: "views")
+- `--nav-menu-items-dir <dir>` output navigation menu items directory (default: "navigation-menu-items")
+- `-e, --entities [entities...]` can specify single or multiple entities among: (constant | object | view | navItem)
+- `-p, --print` print to console (default: false)
+- `-d, --dry-run` print outputs to console, do not write on disk (default: false)
+- `-c, --clipboard` copy object to clipboard (default: false)
+- `-v, --version` output the version number
+- `-h, --help` display help for command
 
 ### Example Types Definitions
 
@@ -60,7 +60,7 @@ type BaseFields = {
   uuid: FieldType.UUID;
   numeric: FieldType.NUMERIC;
   rating: FieldType.RATING;
-  number: FieldType.NUMBER; 
+  number: FieldType.NUMBER;
   position: FieldType.POSITION;
   boolean: FieldType.BOOLEAN;
   dateTime: FieldType.DATE_TIME;
@@ -79,17 +79,17 @@ type BaseFields = {
 };
 
 interface IBaseFields {
-  text: FieldType.TEXT; 
+  text: FieldType.TEXT;
   uuid: FieldType.UUID;
   numeric: FieldType.NUMERIC;
   rating: FieldType.RATING;
-  number: FieldType.NUMBER; 
+  number: FieldType.NUMBER;
   position: FieldType.POSITION;
-  boolean: FieldType.BOOLEAN; 
+  boolean: FieldType.BOOLEAN;
   dateTime: FieldType.DATE_TIME;
   date: FieldType.DATE;
   array: FieldType.ARRAY;
-  rawJson: FieldType.RAW_JSON; 
+  rawJson: FieldType.RAW_JSON;
   fullUame: FieldType.FULL_NAME;
   address: FieldType.ADDRESS;
   currency: FieldType.CURRENCY;
@@ -116,7 +116,7 @@ type UUIDFields = {
   id: string; // #sameAs `id: FieldType.UUID;`
   uuid: string;
   orderId: string;
-}
+};
 
 type NativeFields = {
   text: string; // #sameAs `text: FieldType.TEXT;`
