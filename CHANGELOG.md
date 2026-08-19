@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.5.4
+
+### Patch Changes
+
+- uuid type for id literal
+
 ## 0.5.3
 
 ### Patch Changes

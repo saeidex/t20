@@ -36,7 +36,7 @@ describe("extractObjectFields", () => {
 
   it("Base types :: id-pattern string -> UUID", () => {
     const { checker, sourceFile } = compile(`
-      interface Product { id: string; userId: string; }
+      interface Product { id: number; userId: string; }
     `);
     const fields = extractObjectFields(
       sourceFile,
