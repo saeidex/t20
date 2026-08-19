@@ -36,7 +36,11 @@ describe("extractObjectFields", () => {
 
   it("Base types :: id-pattern string -> UUID", () => {
     const { checker, sourceFile } = compile(`
-      interface Product { id: number; userId: string; }
+      interface Product {
+        id: number;
+        userId: string;
+        categoryId: number;
+      }
     `);
     const fields = extractObjectFields(
       sourceFile,
@@ -45,7 +49,8 @@ describe("extractObjectFields", () => {
     );
     expect(fields).toEqual([
       { name: "id", kind: "UUID" },
-      { name: "userId", kind: "UUID" },
+      { name: "userId", kind: "TEXT" },
+      { name: "categoryId", kind: "NUMBER" },
     ]);
   });
 

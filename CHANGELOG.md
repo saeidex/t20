@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.5.5
+
+### Patch Changes
+
+- id suffix retain types for string or numbers instead of UUID
+
 ## 0.5.4
 
 ### Patch Changes

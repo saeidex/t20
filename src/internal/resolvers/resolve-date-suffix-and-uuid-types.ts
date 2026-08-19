@@ -4,8 +4,7 @@ import type { IRField } from "../types.js";
 
 export function resolveDateSuffixAndUUIDTypes(
   checker: ts.TypeChecker,
-  name: string,
-  type: ts.Type
+  name: string
 ): IRField | undefined {
   // createdAt, updatedAt, etc — camelCase "At" suffix only
   if (isDateSuffix(name)) {
@@ -16,19 +15,22 @@ export function resolveDateSuffixAndUUIDTypes(
     return { name, kind: FieldType.UUID };
   }
 
+  if (
+    isIdSuffix(name) &&
+    !ts.TypeFlags.String &&
+    !ts.TypeFlags.Number
+  ) {
+    return { name, kind: FieldType.UUID };
+  }
+
   return undefined;
 }
 
 const isDateSuffix = (name: string) =>
   /(?:^|[a-z])At$/.test(name);
 
-const isUUID = (name: string) => {
-  const isUniversal = /universalidentifier/i.test(name);
-  const isIdField =
-    name === "id" ||
-    /(?:Id|ID|_[iI]d|-[iI]d|[uU][uU][iI]d)$|^[iI][dD]$/.test(
-      name
-    );
+const isUUID = (name: string) =>
+  /(id|ID)/.test(name) || /universalidentifier/i.test(name);
 
-  return isIdField || isUniversal;
-};
+const isIdSuffix = (name: string) =>
+  /(?:Id|ID|_[iI]d|-[iI]d|[uU][uU][iI]d)$|^[iI][dD]$/.test(name);

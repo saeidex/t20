@@ -18,7 +18,7 @@ export function resolveField(
 ): IRField {
   return (
     resolveBaseTypes(name, type) ??
-    resolveDateSuffixAndUUIDTypes(checker, name, type) ??
+    resolveDateSuffixAndUUIDTypes(checker, name) ??
     resolveSelectTypes(name, type) ??
     resolveMultiSelectType(checker, name, type) ??
     resolveRelationType(checker, name, type, knownObjectNames) ??
