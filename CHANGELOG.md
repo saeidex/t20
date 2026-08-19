@@ -1,5 +1,17 @@
 # @saeidex/t20
 
+## 0.5.2
+
+### Patch Changes
+
+- render version info in title
+
+## 0.5.1
+
+### Patch Changes
+
+- fix formating
+
 ## 0.5.0
 
 ### Minor Changes

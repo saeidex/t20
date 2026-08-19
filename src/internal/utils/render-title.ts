@@ -1,4 +1,5 @@
 import gradient from "gradient-string";
+import packageJson from "../../../package.json" with {type: "json"};
 
 const colors = {
   x: "#606060",
@@ -15,7 +16,8 @@ const titleText = `
 |  |____|/  ___/|.  |   |
 |  types|:  :   |:  :   |
 |     to|::.. . |::.. . |
-|       \`-------\`-------'`;
+|       \`-------\`-------'
+|  ${packageJson.version}`;
 
 export const renderTitle = () => {
   const gradientText = gradient(Object.values(colors));
