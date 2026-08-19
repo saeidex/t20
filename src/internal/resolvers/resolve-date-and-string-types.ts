@@ -18,6 +18,7 @@ export function resolveDateAndStringTypes(
   ) {
     const isUniversal = /universalidentifier/i.test(name);
     const isIdField =
+      name === "id" ||
       /(?:Id|ID|_[iI]d|-[iI]d|[uU][uU][iI]d)$|^[iI][dD]$/.test(
         name
       );

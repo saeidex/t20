@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.5.3
+
+### Patch Changes
+
+- id parse as UUID
+
 ## 0.5.2
 
 ### Patch Changes
