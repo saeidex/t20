@@ -1,17 +1,11 @@
 import ts from "typescript";
 import { logErrorAndExit } from "../utils/log-error-and-exit.js";
 
-export type Option = {
-  label: string;
-  value: string;
-  // hint: string;
-};
-
-export function extractObjectSelectOptions(
+export function extractObjectNodeNames(
   sourceFile: ts.SourceFile,
   checker: ts.TypeChecker
-): Array<Option> {
-  const items: Array<Option> = [];
+): Array<string> {
+  const names: Array<string> = [];
 
   sourceFile.forEachChild((node) => {
     if (
@@ -21,22 +15,18 @@ export function extractObjectSelectOptions(
       const type = checker.getTypeAtLocation(node.name);
 
       if (isTrueObject(type, checker)) {
-        items.push({
-          label: node.name.text,
-          value: node.name.text,
-          // hint: node.getText(),
-        });
+        names.push(node.name.text);
       }
     }
   });
 
-  if (items.length === 0) {
+  if (names.length === 0) {
     logErrorAndExit(
       "No Interfaces/Object were found in your input file."
     );
   }
 
-  return items.sort((a, b) => a.label.localeCompare(b.label));
+  return names.sort();
 }
 
 function isTrueObject(
