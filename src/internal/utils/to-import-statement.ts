@@ -14,9 +14,11 @@ export function toImportStatement(
   }
 
   const fromDir = path.dirname(importToFile);
-  const { dir, name } = path.parse(
-    path.relative(fromDir, importFromFile)
-  );
+  const relativePath = path.relative(fromDir, importFromFile);
+
+  const name = path.parse(relativePath).name;
+  const dir = path.dirname(relativePath);
+
   const fromRelativePath = `${dir}/${name}`;
 
   return dedent`import {
