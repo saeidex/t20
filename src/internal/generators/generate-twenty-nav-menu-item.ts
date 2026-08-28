@@ -1,29 +1,18 @@
 import dedent from "ts-dedent";
 
 import { NavigationMenuItemType } from "twenty-sdk/define";
-import { toUidVarName } from "../utils/to-uid-var-name.js";
 import { toImportStatement } from "../utils/to-import-statement.js";
-import { toKebabCase } from "../utils/case-transformation.js";
 import { tempStore } from "../utils/temp-store.js";
+import { ObjectMapEntry } from "../types.js";
 
 export function generateTwentyNavMenuItem(
-  navItemName: string,
-  navItemFilePath: string,
-  constantFilePath: string,
-  objectUidVarName: string
-): {
-  navMenuItemUidVarName: string;
-  output: string;
-} {
-  const navMenuItemUidVarName = toUidVarName(
-    navItemName,
-    "NAV_MENU_ITEM"
-  );
+  entry: ObjectMapEntry
+): string {
   const constantImportStatement = toImportStatement(
-    constantFilePath,
-    navItemFilePath,
-    navMenuItemUidVarName,
-    objectUidVarName
+    entry.results.constant.filePath,
+    entry.results.navMenuItem.filePath,
+    entry.results.navMenuItem.uidVarName!,
+    entry.results.object.uidVarName!
   );
 
   const navMenuItemsPositionStore =
@@ -33,19 +22,20 @@ export function generateTwentyNavMenuItem(
                 ${constantImportStatement}
 
                 export default defineNavigationMenuItem({
-                  universalIdentifier: ${navMenuItemUidVarName},
-                  name: "${toKebabCase(navItemName)}",
+                  universalIdentifier: ${
+                    entry.results.navMenuItem.uidVarName
+                  },
+                  name: "${entry.results.navMenuItem.name}",
                   icon: "IconList",
                   position: ${navMenuItemsPositionStore.getPositionAndIncrement()},
                   type: NavigationMenuItemType.${
                     NavigationMenuItemType.OBJECT
                   },
-                  targetObjectUniversalIdentifier: ${objectUidVarName},
+                  targetObjectUniversalIdentifier: ${
+                    entry.results.object.uidVarName
+                  },
                 });
          `;
 
-  return {
-    navMenuItemUidVarName,
-    output,
-  };
+  return output;
 }

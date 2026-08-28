@@ -1,10 +1,19 @@
-import type { IRField, FieldOption } from "../types.js";
+import { FieldType } from "twenty-sdk/define";
+import { styleText } from "node:util";
+import type {
+  IRField,
+  FieldOption,
+  ObjectsMap,
+  ObjectMapEntry,
+} from "../types.js";
 import {
   toCamelCase,
   toTitleCase,
 } from "../utils/case-transformation.js";
 import { toUidVarName } from "../utils/to-uid-var-name.js";
 import { fieldUidVarStatements } from "../utils/fields.js";
+import { toImportStatement } from "../utils/to-import-statement.js";
+import { resolveRelationRef } from "../resolvers/resolve-relation-refs.js";
 
 const indent = (lines: Array<string>, spaces: number) =>
   lines
@@ -35,15 +44,79 @@ const serializeOptions = (
   return `,\n  options: [\n${items}\n  ]`;
 };
 
+const serializeRelation = (
+  relation: NonNullable<IRField["relation"]>,
+  relationRef: ReturnType<typeof resolveRelationRef> & {}
+): string => {
+  return [
+    `,`,
+    `  relationTargetObjectMetadataUniversalIdentifier: ${
+      relationRef!.targetObjectUidVarName
+    },`,
+    `  relationTargetFieldMetadataUniversalIdentifier: ${toUidVarName(
+      "refId",
+      "FIELD"
+    )},`,
+    `  universalSettings: {`,
+    `    relationType: RelationType.${relation.type},`,
+    `    onDelete: OnDeleteAction.${relation.onDelete},`,
+    `  }`,
+  ].join("\n");
+};
+
 export function generateTwentyObjectFields(
-  fields: Array<IRField>
+  objectEntry: ObjectMapEntry,
+  objectsMap: ObjectsMap
 ): {
   fieldUidVarDeclarations: string;
   fieldObjects: string;
+  relationImportStatements: string;
 } {
-  const fieldObjects = fields
-    .map((field) =>
-      indent(
+  const relationImports = new Set<string>();
+
+  const fieldObjects = objectEntry.fields
+    .map((field) => {
+      let extra = "";
+
+      if (field.kind === FieldType.RELATION && field.relation) {
+        const relationRef = resolveRelationRef(
+          objectsMap,
+          objectEntry.objectNodeName,
+          field
+        );
+
+        if (relationRef) {
+          extra = serializeRelation(field.relation, relationRef);
+          relationImports.add(
+            toImportStatement(
+              relationRef.targetContantFilePath,
+              objectEntry.results.object.filePath,
+              relationRef.targetObjectUidVarName
+            )
+          );
+          relationImports.add(
+            toImportStatement(
+              relationRef.targetObjectFilePath,
+              objectEntry.results.object.filePath,
+              `${toUidVarName("id", "FIELD")} as ${toUidVarName(
+                "refId",
+                "FIELD"
+              )}`
+            )
+          );
+        } else {
+          console.warn(
+            styleText(
+              "yellow",
+              `[WARNING]: No inverse field resolved for relation "${field.name}" -> run resolveInverseRelations first`
+            )
+          );
+        }
+      } else {
+        extra = serializeOptions(field.options);
+      }
+
+      return indent(
         [
           `{`,
           `  universalIdentifier: ${toUidVarName(
@@ -52,19 +125,19 @@ export function generateTwentyObjectFields(
           )},`,
           `  name: "${toCamelCase(field.name)}",`,
           `  label: "${toTitleCase(toTitleCase(field.name))}",`,
-          `  type: FieldType.${field.kind}${serializeOptions(
-            field.options
-          )},`,
+          `  type: FieldType.${field.kind}${extra},`,
           `},`,
         ],
         0
-      )
-    )
+      );
+    })
     .join("\n");
 
   return {
-    fieldUidVarDeclarations:
-      fieldUidVarStatements(fields).join("\n"),
+    fieldUidVarDeclarations: fieldUidVarStatements(
+      objectEntry.fields
+    ).join("\n"),
     fieldObjects,
+    relationImportStatements: [...relationImports].join("\n"),
   };
 }

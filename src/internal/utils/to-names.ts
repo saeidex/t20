@@ -1,43 +1,51 @@
-import { OutputDir } from "../resolvers/resolve-output-directories.js";
+import { plural, singular } from "pluralize";
+import { OutputDirs } from "../resolvers/resolve-output-directories.js";
 import {
+  toCamelCase,
   toKebabCase,
   toTitleCase,
 } from "./case-transformation.js";
 
-export function toObjectFileName(
-  objectNameSingular: string
-): string {
-  return `${toKebabCase(objectNameSingular)}.object.ts`;
+function toObjectNameSingular(objectNamePlural: string): string {
+  return `${toCamelCase(singular(objectNamePlural))}`;
 }
 
-export function toViewName(objectNamePlural: string): string {
-  return `All ${toTitleCase(objectNamePlural).toLowerCase()}`;
+function toObjectNamePlural(objectNameSingular: string): string {
+  return `${toCamelCase(plural(objectNameSingular))}`;
 }
 
-export function toViewFileName(viewName: string): string {
-  return `${toKebabCase(viewName)}-view.ts`;
+function toObjectFileName(objectNameSingular: string): string {
+  return `${toKebabCase(
+    singular(objectNameSingular)
+  )}.object.ts`;
 }
 
-export function toNavMenuItemName(
-  objectNamePlural: string
-): string {
-  return `${toTitleCase(objectNamePlural)}`;
+function toViewName(objectName: string): string {
+  const name = toTitleCase(singular(objectName)).toLowerCase();
+  if (name.includes("item")) return `All ${name}s`;
+  return `All ${name} items`;
 }
 
-export function toNavMenuItemFileName(
-  navItemName: string
-): string {
-  return `${toKebabCase(navItemName)}-navigation-menu-item.ts`;
+function toViewFileName(objectNameSingular: string): string {
+  return `${toKebabCase(singular(objectNameSingular))}.view.ts`;
 }
 
-export function toConstantFileName(
-  objectNameSingular: string
-): string {
-  return `${toKebabCase(objectNameSingular)}.constants.ts`;
+function toNavMenuItemName(objectName: string): string {
+  return `${toKebabCase(singular(objectName))}`;
 }
 
-export const fileNameTransformers: {
-  [key in keyof Omit<OutputDir, "root">]: (
+function toNavMenuItemFileName(objectName: string): string {
+  return `${toKebabCase(
+    singular(objectName)
+  )}.navigation-menu-item.ts`;
+}
+
+function toConstantFileName(objectName: string): string {
+  return `${toKebabCase(singular(objectName))}.constant.ts`;
+}
+
+const fileNameTransformers: {
+  [key in keyof Omit<OutputDirs, "root">]: (
     name: string
   ) => string;
 } = {
@@ -46,3 +54,18 @@ export const fileNameTransformers: {
   views: toViewFileName,
   navMenuItems: toNavMenuItemFileName,
 } as const;
+
+export {
+  // entity name transformers
+  toViewName,
+  toNavMenuItemName,
+  toObjectNameSingular,
+  toObjectNamePlural,
+
+  // file name transformers
+  fileNameTransformers,
+  toConstantFileName,
+  toObjectFileName,
+  toViewFileName,
+  toNavMenuItemFileName,
+};

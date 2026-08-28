@@ -13,7 +13,7 @@ type _FieldType = Extract<
   //ONE_TO_MANY | MANY_TO_ONE
   //R = ObjectName|InterfaceName
   //RelationField
-  | FieldType.RELATION // R | R[]
+  | FieldType.RELATION // R["fieldName"] | Array<R["fieldName"]>
   //
   //MorphRelationField
   | FieldType.MORPH_RELATION // { morphId: R | R[] }
@@ -39,6 +39,8 @@ type IRFieldRelation = {
   type: RelationType;
   onDelete: OnDeleteAction;
   targetObjectName: string;
+
+  // TODO: add targetFieldName
 };
 
 export type IRField = {
@@ -47,3 +49,37 @@ export type IRField = {
   options?: Array<FieldOption>;
   relation?: IRFieldRelation;
 };
+
+export type RelationRecord = {
+  parentObjectNodeName: string;
+  targetContantFilePath: string;
+  relatedObjectNodeName: string;
+  columnNodeName: string;
+  relationType: RelationType;
+};
+
+export type ResultEntity = {
+  name: string;
+  fileName: string;
+  filePath: string;
+  uidVarName?: string;
+};
+
+export type ObjectMapEntry = {
+  objectNodeName: string;
+  objectSingularName: string;
+  objectPluralName: string;
+  fields: Array<IRField>;
+  relations: Array<RelationRecord>;
+  isExtracted: boolean;
+  isGenerated: boolean;
+  isUserSelected: boolean;
+  results: {
+    constant: ResultEntity;
+    object: ResultEntity;
+    view: ResultEntity;
+    navMenuItem: ResultEntity;
+  };
+};
+
+export type ObjectsMap = Map<string, ObjectMapEntry>;

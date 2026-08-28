@@ -11,12 +11,15 @@
 - [x] (object) extend multi-select for enum[] or Array<enum>
 - [x] add users guide, examples
 - [x] Array type support (Array)
-- [ ] (object) RELATION
+- [x] (object) RELATION
+- [x] Object type Support (RELATION)
+- [x] Array of Object type support (RELATION)
+- [ ] (entity) remove constant entity
+- [ ] (relation) related object with field, e.g. Products["id"]
+- [ ] (relation) fix relation type
 
 # Maybe in Near Future
 
-- [ ] Object typee Support (RELATION)
-- [ ] Array of Object type support (RELATION)
 - [ ] Show Relation info in Select prompt
 
 # Refactor

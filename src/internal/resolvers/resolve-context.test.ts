@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
-import { resolveContext } from "./resolve-context.js";
+import { resolveContext } from "./resolve-context-deprecated.js";
 import { CliOptions } from "../create-cli.js";
+import { ObjectName } from "../user-prompts.js";
 
 test("multiple objects", () => {
   const input = {
@@ -13,12 +14,12 @@ test("multiple objects", () => {
     } as CliOptions,
     objectNames: [
       {
-        original: "product",
+        objectName: "product",
         singular: "product",
         plural: "products",
       },
       {
-        original: "brand",
+        objectName: "brand",
         singular: "brand",
         plural: "brands",
       },
@@ -29,45 +30,47 @@ test("multiple objects", () => {
       constants: ["product", "brand"],
       objects: [
         {
-          original: "product",
+          objectName: "product",
           singular: "product",
           plural: "products",
           output: "product",
         },
         {
-          original: "brand",
+          objectName: "brand",
           singular: "brand",
           plural: "brands",
           output: "brand",
         },
       ],
-      views: ["All products", "All brands"],
-      navMenuItems: ["Products", "Brands"],
+      views: ["All product items", "All brand items"],
+      navMenuItems: ["product", "brand"],
     },
     paths: {
       constants: [
-        "src/constants/product.constants.ts",
-        "src/constants/brand.constants.ts",
+        "src/constants/product.constant.ts",
+        "src/constants/brand.constant.ts",
       ],
       objects: [
         "src/objects/product.object.ts",
         "src/objects/brand.object.ts",
       ],
       views: [
-        "src/views/all-products-view.ts",
-        "src/views/all-brands-view.ts",
+        "src/views/product.view.ts",
+        "src/views/brand.view.ts",
       ],
       navMenuItems: [
-        "src/navigation-menu-items/products-navigation-menu-item.ts",
-        "src/navigation-menu-items/brands-navigation-menu-item.ts",
+        "src/navigation-menu-items/product.navigation-menu-item.ts",
+        "src/navigation-menu-items/brand.navigation-menu-item.ts",
       ],
     },
   };
 
-  const actualOutput = resolveContext(
-    input.opts,
-    input.objectNames
-  );
+  const names: Map<string, ObjectName> = new Map();
+  input.objectNames.forEach((v) => {
+    names.set(v.objectName, v);
+  });
+
+  const actualOutput = resolveContext(input.opts, names);
 
   expect(actualOutput).toStrictEqual(expectedOutput);
 });

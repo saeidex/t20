@@ -4,12 +4,13 @@ import fs from "node:fs";
 import { plural, singular } from "pluralize";
 import { handlePromptCancel } from "./utils/handle-prompt-cancel.js";
 import { toTitleCase } from "./utils/case-transformation.js";
-import type { Option } from "./extractors/extract-object-select-options.ts";
 import { styleText } from "node:util";
 import { logErrorAndExit } from "./utils/log-error-and-exit.js";
 import dedent from "ts-dedent";
-import { OutputDir } from "./resolvers/resolve-output-directories.js";
 import { renderTitle } from "./utils/render-title.js";
+import { ObjectsMap } from "./types.js";
+import { getCliOptions } from "./create-cli.js";
+import { isEntityIncludes } from "./utils/is-entity-includes.js";
 
 const objectNameSchema = v.pipe(
   v.string(),
@@ -71,11 +72,14 @@ export async function sourcePathPrompt(
 }
 
 export async function selectedObjectsPrompt(
-  objectOptions: Array<Option>
+  objectNodeNames: Array<string>
 ): Promise<Array<string>> {
   const selectedObjects = (await prompts.multiselect({
     message: styleText("yellow", "Select an Object/Interface"),
-    options: objectOptions,
+    options: objectNodeNames.map((name) => ({
+      value: name,
+      label: name,
+    })),
   })) as Array<string>;
 
   handlePromptCancel(selectedObjects);
@@ -90,13 +94,16 @@ export async function selectedObjectsPrompt(
 }
 
 export type ObjectName = {
-  original: string;
+  objectName: string;
   singular: string;
   plural: string;
 };
 
 export async function objectNamePrompts(
-  selectedObject: string
+  selectedObject: string,
+  singularName?: string,
+  pluralName?: string,
+  isUserSelected: boolean = false
 ): Promise<ObjectName> {
   let objectNameSingular;
   let objectNamePlural;
@@ -106,7 +113,8 @@ export async function objectNamePrompts(
       styleText("red", selectedObject) +
       styleText("yellow", " -> Singular name"),
     placeholder: "product",
-    initialValue: singular(toTitleCase(selectedObject)),
+    initialValue:
+      singularName ?? singular(toTitleCase(selectedObject)),
     validate: objectNameSchema,
   })) as string;
 
@@ -117,7 +125,7 @@ export async function objectNamePrompts(
       styleText("red", selectedObject) +
       styleText("yellow", " -> Plural name"),
     placeholder: "products",
-    initialValue: plural(objectNameSingular),
+    initialValue: pluralName ?? plural(objectNameSingular),
     validate: v.pipe(
       objectNameSchema,
       v.check(
@@ -130,38 +138,63 @@ export async function objectNamePrompts(
   handlePromptCancel(objectNamePlural);
 
   return {
-    original: selectedObject,
+    objectName: selectedObject,
     singular: objectNameSingular,
     plural: objectNamePlural,
   };
 }
 
-export function finalPrompt(outputFilePaths: {
-  [k in keyof OutputDir]?: Array<string> | undefined;
-}) {
-  const message = Object.entries(outputFilePaths)
-    .map(([key, value]) => {
-      const title = `✨ ${styleText(
-        "yellow",
-        `[${toTitleCase(key, true)}]`
-      )}`;
+export function finalPrompt(objectsMap: ObjectsMap) {
+  const opts = getCliOptions();
 
-      if (!value || value.length === 0) {
-        return undefined;
-      }
+  let constants = toTitle("constants");
+  let objects = toTitle("objects");
+  let views = toTitle("views");
+  let navMenuItems = toTitle("nav menu items");
 
-      const body = dedent`
-          ${value.map((file) => `:: ${file}`).join("\n")}`;
+  for (const [_key, entry] of objectsMap.entries()) {
+    const mark = entry.isGenerated
+      ? styleText("green", "✓")
+      : styleText("red", "✗");
 
-      return title + "\n" + body;
-    })
-    .join("\n")
-    .trim();
+    if (isEntityIncludes(opts.entities, "constant")) {
+      constants += dedent`
+      ${mark} ${entry.results.constant.filePath}\n
+    `;
+    } else {
+      constants = "";
+    }
+
+    if (isEntityIncludes(opts.entities, "object")) {
+      objects += dedent`
+      ${mark} ${entry.results.object.filePath}\n
+    `;
+    } else {
+      objects = "";
+    }
+
+    if (isEntityIncludes(opts.entities, "view")) {
+      views += dedent`
+      ${mark} ${entry.results.view.filePath}\n
+    `;
+    } else {
+      views = "";
+    }
+
+    if (isEntityIncludes(opts.entities, "navItem")) {
+      navMenuItems += dedent`
+      ${mark} ${entry.results.navMenuItem.filePath}\n
+    `;
+    } else {
+      navMenuItems = "";
+    }
+  }
 
   prompts.note(
-    message.length
-      ? message
-      : styleText("red", "No output generated!"),
+    constants + objects + views + navMenuItems,
     "Output files"
   );
 }
+
+const toTitle = (title: string) =>
+  `${styleText("yellow", `[${toTitleCase(title, true)}]`)}\n`;

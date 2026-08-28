@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.6.0
+
+### Minor Changes
+
+- add: relations
+
 ## 0.5.5
 
 ### Patch Changes

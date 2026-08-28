@@ -1,99 +1,68 @@
 #!/usr/bin/env node
 import clipboard from "copy-paste";
-import dedent from "ts-dedent";
 
 import { createCLI } from "../internal/create-cli.js";
-import { extractObjectSelectOptions } from "../internal/extractors/extract-object-select-options.js";
+import { extractObjectNodeNames } from "../internal/extractors/extract-object-node-names.js";
 import {
   finalPrompt,
   introPrompt,
-  ObjectName,
-  objectNamePrompts,
   selectedObjectsPrompt,
   sourcePathPrompt,
 } from "../internal/user-prompts.js";
-import { markedTerm } from "../internal/marked-term.js";
-import { isEntityIncludes } from "../internal/utils/is-entity-includes.js";
 import { parseTypeScriptAST } from "../internal/parse-typescript-ast.js";
-import { resolveContext } from "../internal/resolvers/resolve-context.js";
 import { generateResult } from "../internal/generators/generate-result.js";
-import { writeResult } from "../internal/write-result.js";
+import {
+  markedResultOutput,
+  resultOutput,
+  writeResultOnFiles,
+} from "../internal/write-result.js";
+import { extractObjectsMap } from "../internal/extractors/extract-objects-map.js";
+import { resolveInverseRelations } from "../internal/resolvers/resolve-inverse-relations.js";
+import { reviewObjectNames } from "../internal/review-object-names.js";
 
-const WAIT_BEFORE_PRINT_MS = 500;
+const WAIT_BEFORE_PRINT_IN_MS = 500;
 
 async function main() {
   introPrompt();
-  const opts = createCLI();
 
+  const opts = createCLI();
   let sourcePath = await sourcePathPrompt(opts.input);
   const { sourceFile, checker } = parseTypeScriptAST(sourcePath);
-  const objectOptions = extractObjectSelectOptions(
+  const nodeNames = extractObjectNodeNames(sourceFile, checker);
+  const selectedObjects = await selectedObjectsPrompt(nodeNames);
+
+  const objectsMap = extractObjectsMap(
     sourceFile,
-    checker
+    checker,
+    selectedObjects,
+    new Set(nodeNames)
   );
-  const rootObjects = await selectedObjectsPrompt(objectOptions);
-  const objectNames: Array<ObjectName> = [];
-  for (const obj of rootObjects) {
-    const name = await objectNamePrompts(obj);
-    objectNames.push(name);
+
+  resolveInverseRelations(objectsMap);
+
+  if (!opts.skipReview) {
+    await reviewObjectNames(objectsMap);
   }
-  const ctx = resolveContext(opts, objectNames);
-  const result = generateResult(ctx, sourceFile, checker);
+
+  const result = generateResult(objectsMap);
 
   if (!opts.dryRun) {
-    writeResult(ctx, opts, result);
-
-    finalPrompt({
-      objects: isEntityIncludes(opts.entities, "object")
-        ? ctx.paths.objects
-        : undefined,
-      views: isEntityIncludes(opts.entities, "view")
-        ? ctx.paths.views
-        : undefined,
-      navMenuItems: isEntityIncludes(opts.entities, "navItem")
-        ? ctx.paths.navMenuItems
-        : undefined,
-      constants: isEntityIncludes(opts.entities, "constant")
-        ? ctx.paths.constants
-        : undefined,
-    });
+    writeResultOnFiles(result);
+    finalPrompt(objectsMap);
   }
 
-  const output = Array.from({ length: objectNames.length })
-    .map((_, idx) => {
-      return dedent`
-        /* ${ctx.paths.objects[idx]} */
-        ${result.objects[idx]}
-
-        /* ${ctx.paths.views[idx]} */
-        ${result.views[idx]}
-
-        /* ${ctx.paths.navMenuItems[idx]} */
-        ${result.navMenuItems[idx]}
-
-        /* ${ctx.paths.constants[idx]} */
-        ${result.constants[idx]}
-      `.trimStart();
-    })
-    .join("\n");
-
-  const markedOutput = markedTerm.parse(
-    dedent`
-      \`\`\`ts
-      ${output}
-      \`\`\`
-      `
-  );
+  const output = resultOutput(result);
 
   if (opts.clipboard) {
     clipboard.copy(output);
   }
 
   if (opts.print || opts.dryRun) {
+    const markedOutput = markedResultOutput(output);
     setTimeout(() => {
       console.clear();
       console.log(markedOutput);
-    }, WAIT_BEFORE_PRINT_MS);
+    }, WAIT_BEFORE_PRINT_IN_MS);
   }
 }
 

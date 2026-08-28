@@ -315,19 +315,37 @@ describe("extractObjectFields", () => {
     expect(fields).toEqual([{ name: "scores", kind: "ARRAY" }]);
   });
 
-  it("Relation :: falls back to TEXT for named interface fields (relation not yet implemented)", () => {
+  it("Relation :: object and interface fields", () => {
     const { checker, sourceFile } = compile(`
       interface Address { street: string; }
-      interface Product { address: Address; }
+      type Category = { name: string; };
+      interface Product { address: Array<Address>; category: Array<Category>; }
     `);
     const fields = extractObjectFields(
       sourceFile,
       checker,
       "Product"
     );
-    // TODO: once resolveRelationType lands, this should become
-    // { name: "address", kind: "RELATION", relation: { type: "MANY_TO_ONE", targetObjectName: "Address" } }
-    expect(fields).toEqual([{ name: "address", kind: "TEXT" }]);
+    expect(fields).toEqual([
+      {
+        name: "address",
+        kind: "RELATION",
+        relation: {
+          onDelete: "SET_NULL",
+          type: "ONE_TO_MANY",
+          targetObjectName: "Address",
+        },
+      },
+      {
+        name: "category",
+        kind: "RELATION",
+        relation: {
+          onDelete: "SET_NULL",
+          type: "ONE_TO_MANY",
+          targetObjectName: "Category",
+        },
+      },
+    ]);
   });
 
   it("Relation :: resolves type alias declarations, not just interfaces", () => {

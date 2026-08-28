@@ -1,35 +1,25 @@
 import dedent from "ts-dedent";
 
 import { generateTwentyViewFields } from "./generate-twenty-view-fields.js";
-import type { IRField } from "../types.js";
-import { toUidVarName } from "../utils/to-uid-var-name.js";
+import type { ObjectMapEntry } from "../types.js";
 import { toImportStatement } from "../utils/to-import-statement.js";
 import { tempStore } from "../utils/temp-store.js";
 
 export function generateTwentyView(
-  viewName: string,
-  viewFilePath: string,
-  objectFilePath: string,
-  constantFilePath: string,
-  objectUidVarName: string,
-  fields: Array<IRField>
-): {
-  viewUidVarName: string;
-  output: string;
-} {
-  const viewUidVarName = toUidVarName(viewName, "VIEW");
+  objectEntry: ObjectMapEntry
+): string {
   const viewUidImportStatement = toImportStatement(
-    constantFilePath,
-    viewFilePath,
-    objectUidVarName,
-    viewUidVarName
+    objectEntry.results.constant.filePath,
+    objectEntry.results.view.filePath,
+    objectEntry.results.object.uidVarName!,
+    objectEntry.results.view.uidVarName!
   );
 
   const { fieldMetadataUidsImportStatement, viewFields } =
     generateTwentyViewFields(
-      objectFilePath,
-      viewFilePath,
-      fields
+      objectEntry.results.object.filePath,
+      objectEntry.results.view.filePath,
+      objectEntry.fields
     );
 
   const viewPositionStore = tempStore().viewsPositionStore;
@@ -39,9 +29,13 @@ export function generateTwentyView(
                 ${fieldMetadataUidsImportStatement}
 
                 export default defineView({
-                  universalIdentifier: ${viewUidVarName},
-                  name: "${viewName}",
-                  objectUniversalIdentifier: ${objectUidVarName},
+                  universalIdentifier: ${
+                    objectEntry.results.view.uidVarName
+                  },
+                  name: "${objectEntry.results.view.name}",
+                  objectUniversalIdentifier: ${
+                    objectEntry.results.object.uidVarName
+                  },
                   icon: "IconList",
                   key: ViewKey.INDEX,
                   position: ${viewPositionStore.getPositionAndIncrement()},
@@ -51,8 +45,5 @@ export function generateTwentyView(
                 });
          `;
 
-  return {
-    viewUidVarName,
-    output,
-  };
+  return output;
 }

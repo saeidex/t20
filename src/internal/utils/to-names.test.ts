@@ -11,12 +11,12 @@ test("toViewName", () => {
 
 test("toViewFileName", () => {
   expect(toViewFileName("allOrderItems")).toBe(
-    "all-order-items-view.ts"
+    "all-order-item.view.ts"
   );
 });
 
 test("toObjectFileName", () => {
   expect(toObjectFileName("orderItems")).toBe(
-    "order-items.object.ts"
+    "order-item.object.ts"
   );
 });

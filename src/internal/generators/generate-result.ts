@@ -1,84 +1,47 @@
-import ts from "typescript";
-import { extractObjectFields } from "../extractors/extract-object-fields.js";
-import { Context } from "../resolvers/resolve-context.js";
 import { generateTwentyObject } from "./generate-twenty-object.js";
 import { generateTwentyView } from "./generate-twenty-view.js";
 import { generateTwentyNavMenuItem } from "./generate-twenty-nav-menu-item.js";
 import { generateTwentyConstants } from "./generate-twenty-constants.js";
+import { ObjectsMap } from "../types.js";
 
 export type Result = {
-  constants: Array<string>;
-  objects: Array<string>;
-  views: Array<string>;
-  navMenuItems: Array<string>;
-
-  objectUidVars: Array<string>;
-  viewUidVars: Array<string>;
-  navMenuItemUidVars: Array<string>;
+  objects: Array<Record<string, string>>;
+  constants: Array<Record<string, string>>;
+  views: Array<Record<string, string>>;
+  navMenuItems: Array<Record<string, string>>;
 };
 
-export function generateResult(
-  ctx: Context,
-  sourceFile: ts.SourceFile,
-  checker: ts.TypeChecker
-): Result {
+export function generateResult(objectsMap: ObjectsMap): Result {
   const result: Result = {
-    constants: [],
     objects: [],
+    constants: [],
     views: [],
     navMenuItems: [],
-    objectUidVars: [],
-    viewUidVars: [],
-    navMenuItemUidVars: [],
   };
 
-  for (let i = 0; i < ctx.names.objects.length; i++) {
-    const objectFields = extractObjectFields(
-      sourceFile,
-      checker,
-      ctx.names.objects[i].original
+  for (const [objectNodeName, entry] of objectsMap.entries()) {
+    const twentyObject = generateTwentyObject(
+      objectNodeName,
+      objectsMap
     );
+    const twentyView = generateTwentyView(entry);
+    const twentyNavMenuItem = generateTwentyNavMenuItem(entry);
+    const twentyConstants = generateTwentyConstants(entry);
 
-    const { objectUidVarName, output: outputObjects } =
-      generateTwentyObject({
-        nameSingular: ctx.names.objects[i].singular,
-        namePlural: ctx.names.objects[i].plural,
-        objectFilePath: ctx.paths.objects[i],
-        constantFilePath: ctx.paths.constants[i],
-        fields: objectFields,
-      });
-    result.objects.push(outputObjects);
-    result.objectUidVars.push(objectUidVarName);
+    result.objects.push({
+      [entry.results.object.filePath]: twentyObject,
+    });
+    result.constants.push({
+      [entry.results.constant.filePath]: twentyConstants,
+    });
+    result.views.push({
+      [entry.results.view.filePath]: twentyView,
+    });
+    result.navMenuItems.push({
+      [entry.results.navMenuItem.filePath]: twentyNavMenuItem,
+    });
 
-    const { viewUidVarName, output: outputViews } =
-      generateTwentyView(
-        ctx.names.views[i],
-        ctx.paths.views[i],
-        ctx.paths.objects[i],
-        ctx.paths.constants[i],
-        objectUidVarName,
-        objectFields
-      );
-    result.views.push(outputViews);
-    result.viewUidVars.push(viewUidVarName);
-
-    const { navMenuItemUidVarName, output: outputNavMenuItem } =
-      generateTwentyNavMenuItem(
-        ctx.names.navMenuItems[i],
-        ctx.paths.navMenuItems[i],
-        ctx.paths.constants[i],
-        objectUidVarName
-      );
-    result.navMenuItems.push(outputNavMenuItem);
-    result.navMenuItemUidVars.push(navMenuItemUidVarName);
-
-    const outputConstants = generateTwentyConstants(
-      ctx,
-      objectUidVarName,
-      viewUidVarName,
-      navMenuItemUidVarName
-    );
-    result.constants.push(outputConstants);
+    entry.isGenerated = true;
   }
 
   return result;

@@ -16,6 +16,7 @@ const VALID_ENTITIES = new Set<Entity>([
 export type CliOptions = {
   input: string;
   output: string;
+  skipReview: boolean;
   entities: Array<Entity>;
   constantsDir: string;
   objectsDir: string;
@@ -74,13 +75,15 @@ function normalizeEntities(entities: unknown): Array<string> {
   return [String(entities)];
 }
 
-export function createCLI(argv = process.argv) {
-  let opts: CliOptions | undefined;
 
+let opts: CliOptions | undefined;
+
+export function createCLI(argv = process.argv) {
   new Command()
     .name("Generate twenty fields from types(Object/Interface)")
     .option("-i, --input <path>", "*.ts/*.d.ts file")
     .option("-o, --output <dir>", "output root directory", DEFAULT_ROOT_DIR)
+    .option("-s, --skip-review", "skip review names after selection", false)
     .option("-e, --entities [entities...]", `can specify single or multiple entities among: ${styleText("yellow", "(constant | object | view | navItem)")}`)
     .option("--constants-dir <dir>", "output constants directory", DEFAULT_CONSTANTS_DIR)
     .option("--objects-dir <dir>", "output object directory", DEFAULT_OBJECTS_DIR)
@@ -103,6 +106,15 @@ export function createCLI(argv = process.argv) {
     })
     .parse(argv);
 
+  if (!opts) {
+    logErrorAndExit("CLI options were not parsed.");
+    process.exit(1); // unreachable (added for type safety)
+  }
+
+  return opts;
+}
+
+export function getCliOptions(): CliOptions {
   if (!opts) {
     logErrorAndExit("CLI options were not parsed.");
     process.exit(1); // unreachable (added for type safety)

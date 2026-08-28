@@ -11,11 +11,11 @@ import ts from "typescript";
  * reason (or fail confusingly). Learned this the hard way — verify with
  * `checker.typeToString(type)` if a resolver ever misbehaves only in tests.
  */
-export function compile(source: string) {
+export function compile(source: string | TemplateStringsArray) {
   const fileName = "virtual.ts";
   const virtualSourceFile = ts.createSourceFile(
     fileName,
-    source,
+    source as string,
     ts.ScriptTarget.Latest,
     true
   );
@@ -26,7 +26,9 @@ export function compile(source: string) {
     fileExists: (name) =>
       name === fileName || defaultHost.fileExists(name),
     readFile: (name) =>
-      name === fileName ? source : defaultHost.readFile(name),
+      name === fileName
+        ? (source as string)
+        : defaultHost.readFile(name),
     getSourceFile: (name, ...rest) =>
       name === fileName
         ? virtualSourceFile
