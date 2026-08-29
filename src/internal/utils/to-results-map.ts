@@ -12,7 +12,7 @@ import { toUidVarName } from "./to-uid-var-name.js";
 import { resolveOutputDirectories } from "../resolvers/resolve-output-directories.js";
 import { getCliOptions } from "../create-cli.js";
 
-export function toNamesAndPaths(
+export function toResultsMap(
   objectNodeName: string,
   objectNameSingular?: string,
   objectNamePlural?: string
@@ -24,9 +24,9 @@ export function toNamesAndPaths(
   // example: "user" -> "users"
   // possible fixes: invalid names pass to the user to review
   const objectPluralName =
-    objectNameSingular ?? toObjectNamePlural(objectNodeName);
+    objectNamePlural ?? toObjectNamePlural(objectNodeName);
   const objectSingularName =
-    objectNamePlural ?? toObjectNameSingular(objectPluralName);
+    objectNameSingular ?? toObjectNameSingular(objectPluralName);
 
   const viewName = toViewName(objectPluralName);
   const navMenuItemName = toNavMenuItemName(objectPluralName);

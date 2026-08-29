@@ -2,7 +2,7 @@ import type ts from "typescript";
 import { FieldType } from "twenty-sdk/define";
 import type { ObjectsMap, RelationRecord } from "../types.js";
 import { extractObjectFields } from "./extract-object-fields.js";
-import { toNamesAndPaths } from "../utils/to-names-and-paths.js";
+import { toResultsMap } from "../utils/to-results-map.js";
 import {
   toObjectNamePlural,
   toObjectNameSingular,
@@ -59,9 +59,12 @@ export function extractObjectsMap(
 
       const isUserSelected =
         selectedObjectNames.includes(objectName);
-      const objectPluralName = toObjectNameSingular(objectName);
-      const objectSingularName = toObjectNamePlural(objectName);
-      const results = toNamesAndPaths(
+      const objectSingularName =
+        toObjectNameSingular(objectName);
+      const objectPluralName = toObjectNamePlural(
+        objectSingularName
+      );
+      const results = toResultsMap(
         objectName,
         objectSingularName,
         objectPluralName

@@ -1,5 +1,17 @@
 # @saeidex/t20
 
+## 0.8.4
+
+### Patch Changes
+
+- fix object names generations
+
+## 0.8.3
+
+### Patch Changes
+
+- fix: singular, pluar object name generation
+
 ## 0.8.2
 
 ### Patch Changes

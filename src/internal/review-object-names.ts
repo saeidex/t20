@@ -4,7 +4,7 @@ import type { ObjectsMap } from "./types.js";
 import type { ObjectName } from "./user-prompts.js";
 import { objectNamePrompts } from "./user-prompts.js";
 import { handlePromptCancel } from "./utils/handle-prompt-cancel.js";
-import { toNamesAndPaths } from "./utils/to-names-and-paths.js";
+import { toResultsMap } from "./utils/to-results-map.js";
 import { getCliOptions } from "./create-cli.js";
 
 export async function reviewObjectNames(objectsMap: ObjectsMap) {
@@ -45,7 +45,7 @@ export async function reviewObjectNames(objectsMap: ObjectsMap) {
 
     if (!objectName) continue;
 
-    const results = toNamesAndPaths(
+    const results = toResultsMap(
       objectNodeName,
       objectName.singular,
       objectName.plural
