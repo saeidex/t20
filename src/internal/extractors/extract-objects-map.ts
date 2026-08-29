@@ -1,4 +1,4 @@
-import ts from "typescript";
+import type ts from "typescript";
 import { FieldType } from "twenty-sdk/define";
 import type { ObjectsMap, RelationRecord } from "../types.js";
 import { extractObjectFields } from "./extract-object-fields.js";

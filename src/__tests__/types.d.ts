@@ -1,4 +1,4 @@
-import { FieldType } from "twenty-sdk/define";
+import type { FieldType } from "twenty-sdk/define";
 
 type BaseFields = {
   text: FieldType.TEXT; // #default string
@@ -59,7 +59,7 @@ type NativeFields = {
   number: number;
   boolean: boolean;
   rawJson: object;
-  array: unknown[];
+  array: Array<unknown>;
   dateTime: Date;
 };
 
@@ -84,9 +84,9 @@ type SelectFields = {
 
 /// note: Array<T>, T[] are same
 type multiSelectFields = {
-  roles: ("admin" | "user" | "guest")[];
+  roles: Array<"admin" | "user" | "guest">;
   languages: Array<Language>;
-  priorities: Priority[];
+  priorities: Array<Priority>;
 };
 
 interface Address {
@@ -107,10 +107,10 @@ interface Product {
   config: Record<string, unknown>;
   priority: Priority;
   role: "admin" | "user" | "guest";
-  tags: string[];
+  tags: Array<string>;
   labels: Array<string>;
-  permissions: ("read" | "write" | "delete")[];
-  scores: number[];
+  permissions: Array<"read" | "write" | "delete">;
+  scores: Array<number>;
   ratings: Array<number>;
   address: Address; // relation candidate — not implemented yet, falls to TEXT
 }

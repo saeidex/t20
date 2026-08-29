@@ -1,13 +1,14 @@
 import path from "node:path";
-import { ObjectName } from "../user-prompts.js";
+import type { ObjectName } from "../user-prompts.js";
 import {
   fileNameTransformers,
   toNavMenuItemName,
   toViewName,
 } from "../utils/to-names.js";
-import { CliOptions } from "../create-cli.js";
+import type { CliOptions } from "../create-cli.js";
+import type {
+  OutputDirs} from "./resolve-output-directories.js";
 import {
-  OutputDirs,
   resolveOutputDirectories,
 } from "./resolve-output-directories.js";
 

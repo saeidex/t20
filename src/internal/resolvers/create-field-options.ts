@@ -1,4 +1,4 @@
-import { FieldOption } from "../types.js";
+import type { FieldOption } from "../types.js";
 import { toTitleCase } from "../utils/case-transformation.js";
 
 export function createFieldOptions(

@@ -1,5 +1,5 @@
 import path from "node:path";
-import { CliOptions } from "../create-cli.js";
+import type { CliOptions } from "../create-cli.js";
 
 export type OutputDirs = {
   root: string;

@@ -3,7 +3,7 @@ import dedent from "ts-dedent";
 import { NavigationMenuItemType } from "twenty-sdk/define";
 import { toImportStatement } from "../utils/to-import-statement.js";
 import { tempStore } from "../utils/temp-store.js";
-import { ObjectMapEntry } from "../types.js";
+import type { ObjectMapEntry } from "../types.js";
 import { toUidVarStatement } from "../utils/to-uid-var-statement.js";
 
 export function generateTwentyNavMenuItem(

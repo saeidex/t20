@@ -7,7 +7,7 @@ import {
   toViewFileName,
   toViewName,
 } from "./to-names.js";
-import { ResultEntity } from "../types.js";
+import type { ResultEntity } from "../types.js";
 import { toUidVarName } from "./to-uid-var-name.js";
 import { resolveOutputDirectories } from "../resolvers/resolve-output-directories.js";
 import { getCliOptions } from "../create-cli.js";

@@ -1,8 +1,9 @@
 import * as prompts from "@clack/prompts";
 
-import { ObjectsMap } from "./types.js";
+import type { ObjectsMap } from "./types.js";
+import type {
+  ObjectName} from "./user-prompts.js";
 import {
-  ObjectName,
   objectNamePrompts,
 } from "./user-prompts.js";
 import { handlePromptCancel } from "./utils/handle-prompt-cancel.js";

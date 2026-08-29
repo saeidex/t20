@@ -1,5 +1,5 @@
 import { plural, singular } from "pluralize";
-import { OutputDirs } from "../resolvers/resolve-output-directories.js";
+import type { OutputDirs } from "../resolvers/resolve-output-directories.js";
 import {
   toCamelCase,
   toKebabCase,

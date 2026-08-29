@@ -1,4 +1,4 @@
-import ts from "typescript";
+import type ts from "typescript";
 import { FieldType } from "twenty-sdk/define";
 import type { IRField } from "../types.js";
 import { resolveBaseTypes } from "./resolve-base-types.js";

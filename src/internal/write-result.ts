@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { isEntityIncludes } from "./utils/is-entity-includes.js";
 import { getCliOptions } from "./create-cli.js";
 import { resolveOutputDirectories } from "./resolvers/resolve-output-directories.js";
-import { Result } from "./generators/generate-result.js";
+import type { Result } from "./generators/generate-result.js";
 import { markedTerm } from "./marked-term.js";
 import dedent from "ts-dedent";
 
@@ -47,19 +47,19 @@ export function resultOutput(result: Result): string {
   let res = "";
 
   if (isEntityIncludes(opts.entities, "object")) {
-    result.objects.forEach(({ file, content }) => {
+    result.objects.forEach(({ content, file }) => {
       res += `\n/* ${file} */\n${content}\n`;
     });
   }
 
   if (isEntityIncludes(opts.entities, "view")) {
-    result.views.forEach(({ file, content }) => {
+    result.views.forEach(({ content, file }) => {
       res += `\n/* ${file} */\n${content}\n`;
     });
   }
 
   if (isEntityIncludes(opts.entities, "navItem")) {
-    result.navMenuItems.forEach(({ file, content }) => {
+    result.navMenuItems.forEach(({ content, file }) => {
       res += `\n/* ${file} */\n${content}\n`;
     });
   }

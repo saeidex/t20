@@ -8,7 +8,7 @@ import { styleText } from "node:util";
 import { logErrorAndExit } from "./utils/log-error-and-exit.js";
 import dedent from "ts-dedent";
 import { renderTitle } from "./utils/render-title.js";
-import { ObjectsMap } from "./types.js";
+import type { ObjectsMap } from "./types.js";
 import { getCliOptions } from "./create-cli.js";
 import { isEntityIncludes } from "./utils/is-entity-includes.js";
 
@@ -102,8 +102,7 @@ export type ObjectName = {
 export async function objectNamePrompts(
   selectedObject: string,
   singularName?: string,
-  pluralName?: string,
-  isUserSelected: boolean = false
+  pluralName?: string
 ): Promise<ObjectName> {
   let objectNameSingular;
   let objectNamePlural;

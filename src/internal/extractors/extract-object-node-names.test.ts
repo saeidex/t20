@@ -5,7 +5,7 @@ import { parseTypeScriptAST } from "../parse-typescript-ast.js";
 const TEST_FILE = "src/__tests__/types.d.ts";
 
 test("Extract object node names", () => {
-  const { sourceFile, checker } = parseTypeScriptAST(TEST_FILE);
+  const { checker, sourceFile } = parseTypeScriptAST(TEST_FILE);
   const objectNodeNames = extractObjectNodeNames(
     sourceFile,
     checker

@@ -1,7 +1,7 @@
 import { generateTwentyObject } from "./generate-twenty-object.js";
 import { generateTwentyView } from "./generate-twenty-view.js";
 import { generateTwentyNavMenuItem } from "./generate-twenty-nav-menu-item.js";
-import { ObjectsMap } from "../types.js";
+import type { ObjectsMap } from "../types.js";
 
 export type Result = {
   objects: Array<Record<string, string>>;

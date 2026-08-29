@@ -1,6 +1,6 @@
 import { createCLI } from "../create-cli.js";
 
-const { viewsBasePosition, navMenuItemsBasePosition } =
+const { navMenuItemsBasePosition, viewsBasePosition } =
   createCLI();
 
 type positionStore = {
@@ -17,7 +17,7 @@ function getValueAndIncrement(store: positionStore): number {
 export const viewsPositionStore: positionStore = {
   position: viewsBasePosition,
 
-  getPositionAndIncrement: function () {
+  getPositionAndIncrement () {
     return getValueAndIncrement(this);
   },
 };
@@ -25,7 +25,7 @@ export const viewsPositionStore: positionStore = {
 export const navMenuItemsPositionStore: positionStore = {
   position: navMenuItemsBasePosition,
 
-  getPositionAndIncrement: function () {
+  getPositionAndIncrement () {
     return getValueAndIncrement(this);
   },
 };

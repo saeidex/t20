@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { resolveContext } from "./resolve-context-deprecated.js";
-import { CliOptions } from "../create-cli.js";
-import { ObjectName } from "../user-prompts.js";
+import type { CliOptions } from "../create-cli.js";
+import type { ObjectName } from "../user-prompts.js";
 
 test("multiple objects", () => {
   const input = {

@@ -27,7 +27,7 @@ async function main() {
 
   const opts = createCLI();
   let sourcePath = await sourcePathPrompt(opts.input);
-  const { sourceFile, checker } = parseTypeScriptAST(sourcePath);
+  const { checker, sourceFile } = parseTypeScriptAST(sourcePath);
   const nodeNames = extractObjectNodeNames(sourceFile, checker);
   const selectedObjects = await selectedObjectsPrompt(nodeNames);
 
