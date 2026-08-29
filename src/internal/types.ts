@@ -73,6 +73,14 @@ export type ResultEntity = {
   uidVarName: string;
 };
 
+export type Results = {
+  object: ResultEntity;
+  view: ResultEntity & {
+    hasLabelField: boolean;
+  };
+  navMenuItem: ResultEntity;
+};
+
 export type ObjectMapEntry = {
   objectNodeName: string;
   objectSingularName: string;
@@ -82,11 +90,7 @@ export type ObjectMapEntry = {
   isExtracted: boolean;
   isGenerated: boolean;
   isUserSelected: boolean;
-  results: {
-    object: ResultEntity;
-    view: ResultEntity;
-    navMenuItem: ResultEntity;
-  };
+  results: Results;
 };
 
 export type ObjectsMap = Map<string, ObjectMapEntry>;

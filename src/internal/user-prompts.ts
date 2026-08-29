@@ -164,8 +164,11 @@ export function finalPrompt(objectsMap: ObjectsMap) {
     }
 
     if (isEntityIncludes(opts.entities, "view")) {
+      const sidenote = entry.results.view.hasLabelField
+        ? ""
+        : styleText("red", `(label field missing)`);
       views += dedent`
-      ${mark} ${entry.results.view.filePath}\n
+      ${mark} ${entry.results.view.filePath}${sidenote}\n
     `;
     } else {
       views = "";

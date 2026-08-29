@@ -14,6 +14,7 @@
 - [x] (object) RELATION
 - [x] Object type Support (RELATION)
 - [x] Array of Object type support (RELATION)
+- [ ] (prompts) Skip related objects generation
 
 # Maybe in Near Future
 
@@ -21,9 +22,9 @@
 
 # Refactor
 
+- [ ] (prompts) show selected objects and additional auto selected objects based on relation
 - [x] (entity) remove constant entity
 - [ ] (relation) related object with field, e.g. Products["id"]
-- [ ] (relation) fix relation type
 - [x] Retain the original enum structure instead of hardcoded SELECT Options. Example:
   ```diff
   - {

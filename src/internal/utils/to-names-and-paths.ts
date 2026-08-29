@@ -7,22 +7,16 @@ import {
   toViewFileName,
   toViewName,
 } from "./to-names.js";
-import type { ResultEntity } from "../types.js";
+import type { Results } from "../types.js";
 import { toUidVarName } from "./to-uid-var-name.js";
 import { resolveOutputDirectories } from "../resolvers/resolve-output-directories.js";
 import { getCliOptions } from "../create-cli.js";
-
-type NamesAndPathsResults = {
-  object: ResultEntity;
-  view: ResultEntity;
-  navMenuItem: ResultEntity;
-};
 
 export function toNamesAndPaths(
   objectNodeName: string,
   objectNameSingular?: string,
   objectNamePlural?: string
-): NamesAndPathsResults {
+): Results {
   const opts = getCliOptions();
   const dirs = resolveOutputDirectories(opts);
 
@@ -59,6 +53,7 @@ export function toNamesAndPaths(
       fileName: viewFileName,
       filePath: viewFilePath,
       uidVarName: toUidVarName(viewName, "VIEW"),
+      hasLabelField: false,
     },
     navMenuItem: {
       name: navMenuItemName,

@@ -20,11 +20,7 @@ export function generateTwentyView(
   );
 
   const { fieldMetadataUidsImportStatement, viewFields } =
-    generateTwentyViewFields(
-      entry.results.object.filePath,
-      entry.results.view.filePath,
-      entry.fields
-    );
+    generateTwentyViewFields(entry);
 
   const viewPositionStore = tempStore().viewsPositionStore;
 

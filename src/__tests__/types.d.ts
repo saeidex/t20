@@ -113,7 +113,7 @@ interface Product {
   permissions: Array<"read" | "write" | "delete">;
   scores: Array<number>;
   ratings: Array<number>;
-  address: Address; // relation candidate — not implemented yet, falls to TEXT
+  address: Address;
 }
 
 // type alias form — same resolver pipeline applies
@@ -121,4 +121,35 @@ type Category = {
   name: string;
   slug: string;
   itemCount: number;
+};
+
+// Relationships example 1
+
+type Child = {
+  id: string;
+  parent: Parent; // many to one
+};
+
+type Parent = {
+  id: string;
+  childs: Array<Child>; // one to many
+};
+
+// Relationships example 2
+
+// work as a juncton table
+type Company = {
+  id: string;
+  peoples: Array<People>; // one to many
+  projects: Array<Project>; // one to many
+};
+
+type People = {
+  id: string;
+  company: Company; // many to one
+};
+
+type Project = {
+  id: string;
+  company: Company; // many to one
 };
