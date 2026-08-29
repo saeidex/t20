@@ -1,5 +1,15 @@
 # @saeidex/t20
 
+## 0.7.0
+
+### Minor Changes
+
+- e16920e: add: relations
+
+### Patch Changes
+
+- remove: constants entity
+
 ## 0.6.0
 
 ### Minor Changes
