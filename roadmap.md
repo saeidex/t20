@@ -25,7 +25,7 @@
 
 - [x] (prompts) show selected objects and additional auto selected objects based on relation
 - [x] (entity) remove constant entity
-- [ ] (relation) related object with field, e.g. Products["id"]
+- [x] (relation) related object with field, e.g. Products["id"]
 - [x] Retain the original enum structure instead of hardcoded SELECT Options. Example:
   ```diff
   - {
