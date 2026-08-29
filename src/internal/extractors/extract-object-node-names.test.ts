@@ -24,7 +24,10 @@ test("Extract object node names", () => {
     "People",
     "Product",
     "Project",
+    "School",
     "SelectFields",
+    "Student",
+    "Teacher",
     "multiSelectFields",
   ];
 

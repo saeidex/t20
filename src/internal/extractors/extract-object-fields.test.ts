@@ -424,7 +424,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
   it('MANY_TO_ONE :: Entity["id"]', () => {
     const { checker, sourceFile } = compile(`
       interface Parent { id: string; }
-      interface Child { parent: Parent["id"]; }
+      interface Child { parentId: Parent["id"]; }
     `);
     const fields = extractObjectFields(
       sourceFile,
@@ -433,7 +433,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       new Set(["Parent", "Child"])
     );
     expect(fields[0]).toEqual({
-      name: "parent",
+      name: "parentId",
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",

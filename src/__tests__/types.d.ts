@@ -153,3 +153,22 @@ type Project = {
   id: string;
   company: Company; // many to one
 };
+
+// Relationships example 3
+
+// work as a juncton table
+type School = {
+  id: string;
+  teachers: Array<Teacher["id"]>; // one to many
+  students: Array<Student["id"]>; // one to many
+};
+
+type Teacher = {
+  id: string;
+  school: School["id"]; // many to one
+};
+
+type Student = {
+  id: string;
+  school: School["id"]; // many to one
+};
