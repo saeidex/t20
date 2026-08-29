@@ -2,16 +2,15 @@ import { dedent } from "ts-dedent";
 import { FieldType } from "twenty-sdk/define";
 import { toTitleCase } from "../utils/case-transformation.js";
 import type { ObjectsMap } from "../types.js";
-import { toUidVarName } from "../utils/to-uid-var-name.js";
 import { generateTwentyObjectFields } from "./generate-twenty-object-fields.js";
-import { toImportStatement } from "../utils/to-import-statement.js";
+import { toUidVarStatement } from "../utils/to-uid-var-statement.js";
 
 export function generateTwentyObject(
   objectNodeName: string,
   objectsMap: ObjectsMap
 ): string {
-  const objectEntry = objectsMap.get(objectNodeName);
-  if (!objectEntry) {
+  const entry = objectsMap.get(objectNodeName);
+  if (!entry) {
     throw new Error(
       `Object with node name "${objectNodeName}" not found in objectsMap.`
     );
@@ -21,41 +20,40 @@ export function generateTwentyObject(
     fieldObjects,
     fieldUidVarDeclarations,
     relationImportStatements,
-  } = generateTwentyObjectFields(objectEntry, objectsMap);
+  } = generateTwentyObjectFields(entry, objectsMap);
 
-  const objectUidVarName = toUidVarName(
-    objectNodeName,
-    "OBJECT"
-  );
-  const objectUidImportStatement = toImportStatement(
-    objectEntry.results.constant.filePath,
-    objectEntry.results.object.filePath,
-    objectUidVarName
-  );
+  const objectUidVar = entry.results.object.uidVarName;
 
-  const hasRelations = objectEntry.fields.some(
+  const varDeclarationStatement =
+    toUidVarStatement(objectUidVar);
+
+  const hasRelations = entry.fields.some(
     (f) => f.kind === FieldType.RELATION
   );
 
+  const importContent = hasRelations
+    ? dedent`{
+        defineObject,
+        FieldType,
+        RelationType,
+        OnDeleteAction,
+      }\n`
+    : "{ defineObject, FieldType }";
+
   const output = dedent`
-    import { defineObject, FieldType${
-      hasRelations ? ", RelationType, OnDeleteAction" : ""
-    } } from "twenty-sdk/define";
-    ${objectUidImportStatement}
+    import ${importContent} from "twenty-sdk/define";
     ${relationImportStatements}
+
+    ${varDeclarationStatement}
 
     ${fieldUidVarDeclarations}
 
     export default defineObject({
-      universalIdentifier: ${objectUidVarName},
-      nameSingular: "${objectEntry.objectSingularName}",
-      namePlural: "${objectEntry.objectPluralName}",
-      labelSingular: "${toTitleCase(
-        objectEntry.objectSingularName
-      )}",
-      labelPlural: "${toTitleCase(
-        objectEntry.objectPluralName
-      )}",
+      universalIdentifier: ${objectUidVar},
+      nameSingular: "${entry.objectSingularName}",
+      namePlural: "${entry.objectPluralName}",
+      labelSingular: "${toTitleCase(entry.objectSingularName)}",
+      labelPlural: "${toTitleCase(entry.objectPluralName)}",
       icon: "IconBox",
       fields: [
         ${fieldObjects}

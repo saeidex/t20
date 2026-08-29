@@ -147,7 +147,6 @@ export async function objectNamePrompts(
 export function finalPrompt(objectsMap: ObjectsMap) {
   const opts = getCliOptions();
 
-  let constants = toTitle("constants");
   let objects = toTitle("objects");
   let views = toTitle("views");
   let navMenuItems = toTitle("nav menu items");
@@ -156,14 +155,6 @@ export function finalPrompt(objectsMap: ObjectsMap) {
     const mark = entry.isGenerated
       ? styleText("green", "✓")
       : styleText("red", "✗");
-
-    if (isEntityIncludes(opts.entities, "constant")) {
-      constants += dedent`
-      ${mark} ${entry.results.constant.filePath}\n
-    `;
-    } else {
-      constants = "";
-    }
 
     if (isEntityIncludes(opts.entities, "object")) {
       objects += dedent`
@@ -190,10 +181,7 @@ export function finalPrompt(objectsMap: ObjectsMap) {
     }
   }
 
-  prompts.note(
-    constants + objects + views + navMenuItems,
-    "Output files"
-  );
+  prompts.note(objects + views + navMenuItems, "Output files");
 }
 
 const toTitle = (title: string) =>

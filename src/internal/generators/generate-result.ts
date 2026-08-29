@@ -1,12 +1,10 @@
 import { generateTwentyObject } from "./generate-twenty-object.js";
 import { generateTwentyView } from "./generate-twenty-view.js";
 import { generateTwentyNavMenuItem } from "./generate-twenty-nav-menu-item.js";
-import { generateTwentyConstants } from "./generate-twenty-constants.js";
 import { ObjectsMap } from "../types.js";
 
 export type Result = {
   objects: Array<Record<string, string>>;
-  constants: Array<Record<string, string>>;
   views: Array<Record<string, string>>;
   navMenuItems: Array<Record<string, string>>;
 };
@@ -14,7 +12,6 @@ export type Result = {
 export function generateResult(objectsMap: ObjectsMap): Result {
   const result: Result = {
     objects: [],
-    constants: [],
     views: [],
     navMenuItems: [],
   };
@@ -26,13 +23,9 @@ export function generateResult(objectsMap: ObjectsMap): Result {
     );
     const twentyView = generateTwentyView(entry);
     const twentyNavMenuItem = generateTwentyNavMenuItem(entry);
-    const twentyConstants = generateTwentyConstants(entry);
 
     result.objects.push({
       [entry.results.object.filePath]: twentyObject,
-    });
-    result.constants.push({
-      [entry.results.constant.filePath]: twentyConstants,
     });
     result.views.push({
       [entry.results.view.filePath]: twentyView,

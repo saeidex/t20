@@ -7,7 +7,6 @@ test("multiple objects", () => {
   const input = {
     opts: {
       output: "src",
-      constantsDir: "constants",
       objectsDir: "objects",
       viewsDir: "views",
       navMenuItemsDir: "navigation-menu-items",
@@ -27,7 +26,6 @@ test("multiple objects", () => {
   };
   const expectedOutput = {
     names: {
-      constants: ["product", "brand"],
       objects: [
         {
           objectName: "product",
@@ -46,10 +44,6 @@ test("multiple objects", () => {
       navMenuItems: ["product", "brand"],
     },
     paths: {
-      constants: [
-        "src/constants/product.constant.ts",
-        "src/constants/brand.constant.ts",
-      ],
       objects: [
         "src/objects/product.object.ts",
         "src/objects/brand.object.ts",

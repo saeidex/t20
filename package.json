@@ -27,6 +27,7 @@
     "dev": "vitest",
     "lint": "oxlint -c .oxlintrc.json .",
     "lint:fix": "oxlint --fix -c .oxlintrc.json .",
+    "dev:run": "bun run clean build && node dist/bin.cjs --skip-review -o dist -i src/__tests__/types.d.ts",
     "typecheck": "tsgo -p tsconfig.src.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

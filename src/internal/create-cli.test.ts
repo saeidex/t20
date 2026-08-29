@@ -27,7 +27,7 @@ describe("createCLI", () => {
 
     expect(consoleError).toHaveBeenCalledWith(
       expect.stringContaining(
-        "Option -e requires one or more entity names. Allowed values: constant, object, view, navItem."
+        "Option -e requires one or more entity names. Allowed values: object, view, navItem."
       )
     );
   });
@@ -51,7 +51,7 @@ describe("createCLI", () => {
 
     expect(consoleError).toHaveBeenCalledWith(
       expect.stringContaining(
-        "Invalid entity name(s): somethingNotExistInTheEntityType. Allowed values: constant, object, view, navItem."
+        "Invalid entity name(s): somethingNotExistInTheEntityType. Allowed values: object, view, navItem."
       )
     );
   });

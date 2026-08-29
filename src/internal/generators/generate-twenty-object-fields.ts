@@ -50,13 +50,10 @@ const serializeRelation = (
 ): string => {
   return [
     `,`,
-    `  relationTargetObjectMetadataUniversalIdentifier: ${
-      relationRef!.targetObjectUidVarName
-    },`,
-    `  relationTargetFieldMetadataUniversalIdentifier: ${toUidVarName(
-      "refId",
-      "FIELD"
-    )},`,
+    `  relationTargetObjectMetadataUniversalIdentifier:`,
+    `    ${relationRef!.targetObjectUidVarName},`,
+    `  relationTargetFieldMetadataUniversalIdentifier:`,
+    `    ${toUidVarName("refId", "FIELD")},`,
     `  universalSettings: {`,
     `    relationType: RelationType.${relation.type},`,
     `    onDelete: OnDeleteAction.${relation.onDelete},`,
@@ -89,15 +86,9 @@ export function generateTwentyObjectFields(
           extra = serializeRelation(field.relation, relationRef);
           relationImports.add(
             toImportStatement(
-              relationRef.targetContantFilePath,
-              objectEntry.results.object.filePath,
-              relationRef.targetObjectUidVarName
-            )
-          );
-          relationImports.add(
-            toImportStatement(
               relationRef.targetObjectFilePath,
               objectEntry.results.object.filePath,
+              relationRef.targetObjectUidVarName,
               `${toUidVarName("id", "FIELD")} as ${toUidVarName(
                 "refId",
                 "FIELD"

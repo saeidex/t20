@@ -40,19 +40,6 @@ export function writeResultOnFiles(result: Result): void {
       });
     });
   }
-
-  if (isEntityIncludes(opts.entities, "constant")) {
-    result.constants.forEach((item) => {
-      Object.entries(item).forEach(([file, content]) => {
-        if (fs.existsSync(file)) {
-          fs.appendFileSync(file, "\n\n" + content, "utf-8");
-        } else {
-          fs.mkdirSync(dirs.constants, { recursive: true });
-          fs.writeFileSync(file, content, "utf-8");
-        }
-      });
-    });
-  }
 }
 
 export function resultOutput(result: Result): string {
@@ -74,17 +61,6 @@ export function resultOutput(result: Result): string {
   if (isEntityIncludes(opts.entities, "navItem")) {
     result.navMenuItems.forEach(({ file, content }) => {
       res += `\n/* ${file} */\n${content}\n`;
-    });
-  }
-
-  if (isEntityIncludes(opts.entities, "constant")) {
-    result.constants.forEach(({ file, content }) => {
-      if (fs.existsSync(file)) {
-        const existingContent = fs.readFileSync(file).toString();
-        res += existingContent + "\n\n" + content;
-      } else {
-        res += `\n/* ${file} */\n${content}\n`;
-      }
     });
   }
 

@@ -52,7 +52,6 @@ export type IRField = {
 
 export type RelationRecord = {
   parentObjectNodeName: string;
-  targetContantFilePath: string;
   relatedObjectNodeName: string;
   columnNodeName: string;
   relationType: RelationType;
@@ -62,7 +61,7 @@ export type ResultEntity = {
   name: string;
   fileName: string;
   filePath: string;
-  uidVarName?: string;
+  uidVarName: string;
 };
 
 export type ObjectMapEntry = {
@@ -75,7 +74,6 @@ export type ObjectMapEntry = {
   isGenerated: boolean;
   isUserSelected: boolean;
   results: {
-    constant: ResultEntity;
     object: ResultEntity;
     view: ResultEntity;
     navMenuItem: ResultEntity;

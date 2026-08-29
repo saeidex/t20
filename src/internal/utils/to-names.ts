@@ -40,16 +40,11 @@ function toNavMenuItemFileName(objectName: string): string {
   )}.navigation-menu-item.ts`;
 }
 
-function toConstantFileName(objectName: string): string {
-  return `${toKebabCase(singular(objectName))}.constant.ts`;
-}
-
 const fileNameTransformers: {
   [key in keyof Omit<OutputDirs, "root">]: (
     name: string
   ) => string;
 } = {
-  constants: toConstantFileName,
   objects: toObjectFileName,
   views: toViewFileName,
   navMenuItems: toNavMenuItemFileName,
@@ -64,7 +59,6 @@ export {
 
   // file name transformers
   fileNameTransformers,
-  toConstantFileName,
   toObjectFileName,
   toViewFileName,
   toNavMenuItemFileName,

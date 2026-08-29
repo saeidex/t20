@@ -4,37 +4,43 @@ import { generateTwentyViewFields } from "./generate-twenty-view-fields.js";
 import type { ObjectMapEntry } from "../types.js";
 import { toImportStatement } from "../utils/to-import-statement.js";
 import { tempStore } from "../utils/temp-store.js";
+import { toUidVarStatement } from "../utils/to-uid-var-statement.js";
 
 export function generateTwentyView(
-  objectEntry: ObjectMapEntry
+  entry: ObjectMapEntry
 ): string {
-  const viewUidImportStatement = toImportStatement(
-    objectEntry.results.constant.filePath,
-    objectEntry.results.view.filePath,
-    objectEntry.results.object.uidVarName!,
-    objectEntry.results.view.uidVarName!
+  const uidVarsImportStatement = toImportStatement(
+    entry.results.object.filePath,
+    entry.results.view.filePath,
+    entry.results.object.uidVarName
+  );
+
+  const uidVarDeclarationStatement = toUidVarStatement(
+    entry.results.view.uidVarName
   );
 
   const { fieldMetadataUidsImportStatement, viewFields } =
     generateTwentyViewFields(
-      objectEntry.results.object.filePath,
-      objectEntry.results.view.filePath,
-      objectEntry.fields
+      entry.results.object.filePath,
+      entry.results.view.filePath,
+      entry.fields
     );
 
   const viewPositionStore = tempStore().viewsPositionStore;
 
   const output = dedent`import { defineView, ViewKey } from "twenty-sdk/define";
-                ${viewUidImportStatement}
+                ${uidVarsImportStatement}
                 ${fieldMetadataUidsImportStatement}
+
+                ${uidVarDeclarationStatement}
 
                 export default defineView({
                   universalIdentifier: ${
-                    objectEntry.results.view.uidVarName
+                    entry.results.view.uidVarName
                   },
-                  name: "${objectEntry.results.view.name}",
+                  name: "${entry.results.view.name}",
                   objectUniversalIdentifier: ${
-                    objectEntry.results.object.uidVarName
+                    entry.results.object.uidVarName
                   },
                   icon: "IconList",
                   key: ViewKey.INDEX,

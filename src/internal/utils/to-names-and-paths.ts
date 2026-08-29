@@ -1,5 +1,4 @@
 import {
-  toConstantFileName,
   toNavMenuItemFileName,
   toNavMenuItemName,
   toObjectFileName,
@@ -14,7 +13,6 @@ import { resolveOutputDirectories } from "../resolvers/resolve-output-directorie
 import { getCliOptions } from "../create-cli.js";
 
 type NamesAndPathsResults = {
-  constant: ResultEntity;
   object: ResultEntity;
   view: ResultEntity;
   navMenuItem: ResultEntity;
@@ -40,16 +38,12 @@ export function toNamesAndPaths(
   const navMenuItemName = toNavMenuItemName(objectPluralName);
 
   const objectFileName = toObjectFileName(objectSingularName);
-  const constantFileName = toConstantFileName(
-    objectSingularName
-  );
   const viewFileName = toViewFileName(objectSingularName);
   const navMenuItemFileName = toNavMenuItemFileName(
     objectSingularName
   );
 
   const objectFilePath = `${dirs.objects}/${objectFileName}`;
-  const constantFilePath = `${dirs.constants}/${constantFileName}`;
   const viewFilePath = `${dirs.views}/${viewFileName}`;
   const navMenuItemFilePath = `${dirs.navMenuItems}/${navMenuItemFileName}`;
 
@@ -59,11 +53,6 @@ export function toNamesAndPaths(
       fileName: objectFileName,
       filePath: objectFilePath,
       uidVarName: toUidVarName(objectSingularName, "OBJECT"),
-    },
-    constant: {
-      name: "",
-      fileName: constantFileName,
-      filePath: constantFilePath,
     },
     view: {
       name: viewName,

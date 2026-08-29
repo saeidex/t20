@@ -1,10 +1,8 @@
-// src/internal/resolvers/resolve-relation-refs.ts
 import { FieldType, RelationType } from "twenty-sdk/define";
 import type { IRField, ObjectsMap } from "../types.js";
 import { toUidVarName } from "../utils/to-uid-var-name.js";
 
 export type RelationRef = {
-  targetContantFilePath: string;
   targetObjectUidVarName: string;
   targetObjectFilePath: string;
   inverseFieldUidVarName: string;
@@ -17,7 +15,6 @@ const inverseType = (type: RelationType): RelationType =>
     ? RelationType.ONE_TO_MANY
     : RelationType.MANY_TO_ONE;
 
-// find target object's UID + its inverse field's UID, for cross-file import
 export function resolveRelationRef(
   objectsMap: ObjectsMap,
   objectName: string,
@@ -40,14 +37,14 @@ export function resolveRelationRef(
       f.relation?.type === wantType &&
       f.relation.targetObjectName === objectName
   );
-  if (!inverseField) return undefined; // run resolveInverseRelations first
+
+  if (!inverseField) return undefined;
 
   return {
     targetObjectUidVarName: toUidVarName(
       targetEntry.objectNodeName,
       "OBJECT"
     ),
-    targetContantFilePath: targetEntry.results.constant.filePath,
     targetObjectFilePath: targetEntry.results.object.filePath,
     targetObjectName: targetEntry.objectNodeName,
     targetObjectFileName: targetEntry.results.object.fileName,

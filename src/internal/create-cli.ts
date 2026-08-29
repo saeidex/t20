@@ -4,10 +4,9 @@ import packageJson from "../../package.json" with { type: "json" };
 import { logErrorAndExit } from "./utils/log-error-and-exit.js";
 import { stringToInt } from "./utils/string-to-int.js";
 
-export type Entity = "constant" | "object" | "view" | "navItem";
+export type Entity = "object" | "view" | "navItem";
 
 const VALID_ENTITIES = new Set<Entity>([
-  "constant",
   "object",
   "view",
   "navItem",
@@ -18,7 +17,6 @@ export type CliOptions = {
   output: string;
   skipReview: boolean;
   entities: Array<Entity>;
-  constantsDir: string;
   objectsDir: string;
   viewsDir: string;
   navMenuItemsDir: string;
@@ -31,7 +29,6 @@ export type CliOptions = {
 
 
 const DEFAULT_ROOT_DIR = "src";
-const DEFAULT_CONSTANTS_DIR = "constants";
 const DEFAULT_OBJECTS_DIR = "objects";
 const DEFAULT_VIEWS_DIR = "views";
 const DEFAULT_NAV_MENU_ITEMS_DIR = "navigation-menu-items";
@@ -84,8 +81,7 @@ export function createCLI(argv = process.argv) {
     .option("-i, --input <path>", "*.ts/*.d.ts file")
     .option("-o, --output <dir>", "output root directory", DEFAULT_ROOT_DIR)
     .option("-s, --skip-review", "skip review names after selection", false)
-    .option("-e, --entities [entities...]", `can specify single or multiple entities among: ${styleText("yellow", "(constant | object | view | navItem)")}`)
-    .option("--constants-dir <dir>", "output constants directory", DEFAULT_CONSTANTS_DIR)
+    .option("-e, --entities [entities...]", `can specify single or multiple entities among: ${styleText("yellow", "(object | view | navItem)")}`)
     .option("--objects-dir <dir>", "output object directory", DEFAULT_OBJECTS_DIR)
     .option("--views-dir <dir>", "output views directory", DEFAULT_VIEWS_DIR)
     .option("--nav-menu-items-dir <dir>", "output navigation menu items directory", DEFAULT_NAV_MENU_ITEMS_DIR)

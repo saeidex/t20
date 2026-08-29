@@ -4,22 +4,27 @@ import { NavigationMenuItemType } from "twenty-sdk/define";
 import { toImportStatement } from "../utils/to-import-statement.js";
 import { tempStore } from "../utils/temp-store.js";
 import { ObjectMapEntry } from "../types.js";
+import { toUidVarStatement } from "../utils/to-uid-var-statement.js";
 
 export function generateTwentyNavMenuItem(
   entry: ObjectMapEntry
 ): string {
-  const constantImportStatement = toImportStatement(
-    entry.results.constant.filePath,
+  const objectUidImportStatement = toImportStatement(
+    entry.results.object.filePath,
     entry.results.navMenuItem.filePath,
-    entry.results.navMenuItem.uidVarName!,
-    entry.results.object.uidVarName!
+    entry.results.object.uidVarName
+  );
+
+  const uidVarDeclarationStatement = toUidVarStatement(
+    entry.results.navMenuItem.uidVarName
   );
 
   const navMenuItemsPositionStore =
     tempStore().navMenuItemsPositionStore;
 
   const output = dedent`import { defineNavigationMenuItem, NavigationMenuItemType } from "twenty-sdk/define";
-                ${constantImportStatement}
+                ${objectUidImportStatement}
+                ${uidVarDeclarationStatement}
 
                 export default defineNavigationMenuItem({
                   universalIdentifier: ${

@@ -3,7 +3,6 @@ import { CliOptions } from "../create-cli.js";
 
 export type OutputDirs = {
   root: string;
-  constants: string;
   objects: string;
   views: string;
   navMenuItems: string;
@@ -19,14 +18,12 @@ export function resolveOutputDirectories(
 
   const getDir = (dir: string): string => root + `/${dir}`;
 
-  const constants = getDir(opts.constantsDir);
   const objects = getDir(opts.objectsDir);
   const views = getDir(opts.viewsDir);
   const navMenuItems = getDir(opts.navMenuItemsDir);
 
   return {
     root,
-    constants,
     objects,
     views,
     navMenuItems,

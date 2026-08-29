@@ -33,15 +33,11 @@ export function resolveContext(
   cliOptions: CliOptions,
   objectNames: Map<string, ObjectName>
 ): Context {
-  const singularNames = Array.from(objectNames.values()).map(
-    (name) => name.singular
-  );
   const pluralNames = Array.from(objectNames.values()).map(
     (name) => name.plural
   );
 
   const names = {
-    constants: singularNames,
     objects: Array.from(objectNames.values()).map((name) => {
       return {
         ...name,
@@ -80,7 +76,6 @@ export function resolveContext(
 
 const getInitialPaths = () => {
   return {
-    constants: [],
     objects: [],
     views: [],
     navMenuItems: [],
