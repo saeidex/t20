@@ -154,10 +154,13 @@ export function finalPrompt(objectsMap: ObjectsMap) {
     const mark = entry.isGenerated
       ? styleText("green", "✓")
       : styleText("red", "✗");
+    const related = entry.isUserSelected
+      ? ""
+      : styleText("blue", "(related)");
 
     if (isEntityIncludes(opts.entities, "object")) {
       objects += dedent`
-      ${mark} ${entry.results.object.filePath}\n
+      ${mark} ${entry.results.object.filePath}${related}\n
     `;
     } else {
       objects = "";

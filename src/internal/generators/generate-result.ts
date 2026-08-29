@@ -2,6 +2,7 @@ import { generateTwentyObject } from "./generate-twenty-object.js";
 import { generateTwentyView } from "./generate-twenty-view.js";
 import { generateTwentyNavMenuItem } from "./generate-twenty-nav-menu-item.js";
 import type { ObjectsMap } from "../types.js";
+import { getCliOptions } from "../create-cli.js";
 
 export type Result = {
   objects: Array<Record<string, string>>;
@@ -10,6 +11,8 @@ export type Result = {
 };
 
 export function generateResult(objectsMap: ObjectsMap): Result {
+  const opts = getCliOptions();
+
   const result: Result = {
     objects: [],
     views: [],
@@ -17,6 +20,9 @@ export function generateResult(objectsMap: ObjectsMap): Result {
   };
 
   for (const [objectNodeName, entry] of objectsMap.entries()) {
+    if (opts.skipRelatedEntities && !entry.isUserSelected)
+      continue;
+
     const twentyObject = generateTwentyObject(
       objectNodeName,
       objectsMap
