@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.7.1
+
+### Patch Changes
+
+- retain enums
+
 ## 0.7.0
 
 ### Minor Changes

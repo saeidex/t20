@@ -2,6 +2,7 @@
  * snake_case
  * kebab-case
  * camelCase
+ * PascalCase
  * Title case
  */
 
@@ -30,6 +31,11 @@ export const toCamelCase = (value: string) => {
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .toLowerCase()
     .replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase());
+};
+
+export const toPascalCase = (value: string) => {
+  const camel = toCamelCase(value);
+  return camel.charAt(0).toUpperCase() + camel.slice(1);
 };
 
 export const toTitleCase = (

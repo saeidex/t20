@@ -1,7 +1,13 @@
 import ts from "typescript";
-import { FieldType } from "twenty-sdk/define";
+
 import type { IRField } from "../types.js";
+
+import { FieldType } from "twenty-sdk/define";
 import { createFieldOptions } from "./create-field-options.js";
+import {
+  toPascalCase,
+  toSnakeCase,
+} from "../utils/case-transformation.js";
 
 export function resolveSelectTypes(
   name: string,
@@ -13,22 +19,32 @@ export function resolveSelectTypes(
     const enumDecl = declarations.find(ts.isEnumDeclaration);
 
     if (enumDecl) {
-      const options = createFieldOptions(
-        enumDecl.members.map((member) => {
-          const initializer = member.initializer;
+      const enumMembers = enumDecl.members.map((member) => {
+        const memberName = member.name.getText();
+        const initializer = member.initializer;
+        const value =
+          initializer && ts.isStringLiteral(initializer)
+            ? initializer.text
+            : initializer && ts.isNumericLiteral(initializer)
+            ? initializer.text
+            : memberName;
+        return {
+          memberName: toSnakeCase(memberName).toUpperCase(),
+          value,
+        };
+      });
 
-          if (initializer) {
-            if (ts.isStringLiteral(initializer))
-              return initializer.text;
-            if (ts.isNumericLiteral(initializer))
-              return initializer.text;
-          }
-
-          return member.name.getText();
-        })
-      );
-
-      return { name, kind: FieldType.SELECT, options };
+      return {
+        name,
+        kind: FieldType.SELECT,
+        options: createFieldOptions(
+          enumMembers.map((m) => m.value)
+        ),
+        enumMeta: {
+          enumName: enumDecl.name.text,
+          members: enumMembers,
+        },
+      };
     }
   }
 
@@ -39,14 +55,21 @@ export function resolveSelectTypes(
     );
 
     if (literalMembers.length === type.types.length) {
+      const values = literalMembers.map((t) =>
+        String((t as ts.LiteralType).value)
+      );
+
       return {
         name,
         kind: FieldType.SELECT,
-        options: createFieldOptions(
-          literalMembers.map((t) =>
-            String((t as ts.LiteralType).value)
-          )
-        ),
+        options: createFieldOptions(values),
+        enumMeta: {
+          enumName: toPascalCase(name),
+          members: values.map((v) => ({
+            memberName: toSnakeCase(v).toUpperCase(),
+            value: v,
+          })),
+        },
       };
     }
   }

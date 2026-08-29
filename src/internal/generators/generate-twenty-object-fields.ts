@@ -5,6 +5,7 @@ import type {
   FieldOption,
   ObjectsMap,
   ObjectMapEntry,
+  IREnumMeta,
 } from "../types.js";
 import {
   toCamelCase,
@@ -21,24 +22,30 @@ const indent = (lines: Array<string>, spaces: number) =>
     .join("\n");
 
 const serializeOptions = (
-  opts: Array<FieldOption> = []
+  opts: Array<FieldOption> = [],
+  enumMeta?: IREnumMeta
 ): string => {
   if (!opts.length) return "";
 
   const items = opts
-    .map((o) =>
-      indent(
+    .map((o, i) => {
+      const member = enumMeta?.members[i];
+      const valueExpr = member
+        ? `${enumMeta!.enumName}.${member.memberName}`
+        : `"${o.value}"`;
+
+      return indent(
         [
           `{`,
-          `  value: "${o.value}",`,
+          `  value: ${valueExpr},`,
           `  label: "${o.label}",`,
           `  position: ${o.position},`,
           `  color: "${o.color}",`,
           `},`,
         ],
         4
-      )
-    )
+      );
+    })
     .join("\n");
 
   return `,\n  options: [\n${items}\n  ]`;
@@ -104,7 +111,7 @@ export function generateTwentyObjectFields(
           );
         }
       } else {
-        extra = serializeOptions(field.options);
+        extra = serializeOptions(field.options, field.enumMeta);
       }
 
       return indent(

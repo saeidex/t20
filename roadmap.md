@@ -24,7 +24,7 @@
 - [x] (entity) remove constant entity
 - [ ] (relation) related object with field, e.g. Products["id"]
 - [ ] (relation) fix relation type
-- [ ] Retain the original enum structure instead of hardcoded SELECT Options. Example:
+- [x] Retain the original enum structure instead of hardcoded SELECT Options. Example:
   ```diff
   - {
   -   universalIdentifier: TAX_STATUS_FIELD_UNIVERSAL_IDENTIFIER,

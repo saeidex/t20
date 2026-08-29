@@ -1,7 +1,13 @@
 import ts from "typescript";
-import { FieldType } from "twenty-sdk/define";
+
 import type { IRField } from "../types.js";
+
+import { FieldType } from "twenty-sdk/define";
 import { createFieldOptions } from "./create-field-options.js";
+import {
+  toPascalCase,
+  toSnakeCase,
+} from "../utils/case-transformation.js";
 
 export function resolveMultiSelectType(
   checker: ts.TypeChecker,
@@ -16,7 +22,7 @@ export function resolveMultiSelectType(
   const elementType = typeArgs[0];
   if (!elementType) return undefined;
 
-  // string[] or Array<string> — no predefined options
+  // string[] or Array<string>
   if (elementType.flags & ts.TypeFlags.String) {
     return { name, kind: FieldType.MULTI_SELECT, options: [] };
   }
@@ -30,44 +36,56 @@ export function resolveMultiSelectType(
     const enumDecl = declarations.find(ts.isEnumDeclaration);
 
     if (enumDecl) {
-      const options = createFieldOptions(
-        enumDecl.members.map((member) => {
-          const initializer = member.initializer;
-
-          if (initializer) {
-            if (ts.isStringLiteral(initializer))
-              return initializer.text;
-
-            if (ts.isNumericLiteral(initializer))
-              return initializer.text;
-          }
-
-          return member.name.getText();
-        })
-      );
+      const enumMembers = enumDecl.members.map((member) => {
+        const memberName = member.name.getText();
+        const initializer = member.initializer;
+        const value =
+          initializer && ts.isStringLiteral(initializer)
+            ? initializer.text
+            : initializer && ts.isNumericLiteral(initializer)
+            ? initializer.text
+            : memberName;
+        return {
+          memberName: toSnakeCase(memberName).toUpperCase(),
+          value,
+        };
+      });
 
       return {
         name,
         kind: FieldType.MULTI_SELECT,
-        options,
+        options: createFieldOptions(
+          enumMembers.map((m) => m.value)
+        ),
+        enumMeta: {
+          enumName: enumDecl.name.text,
+          members: enumMembers,
+        },
       };
     }
   }
 
-  // ("a"|"b")[] or Array<"a"|"b"> — literal union, derive options
+  // ("a"|"b")[] or Array<"a"|"b"> — literal union, synthesize enum
   if (elementType.isUnion()) {
     const literalMembers = elementType.types.filter(
       (t) => t.isStringLiteral() || t.isNumberLiteral()
     );
     if (literalMembers.length === elementType.types.length) {
+      const values = literalMembers.map((t) =>
+        String((t as ts.LiteralType).value)
+      );
+
       return {
         name,
         kind: FieldType.MULTI_SELECT,
-        options: createFieldOptions(
-          literalMembers.map((t) =>
-            String((t as ts.LiteralType).value)
-          )
-        ),
+        options: createFieldOptions(values),
+        enumMeta: {
+          enumName: toPascalCase(name),
+          members: values.map((v) => ({
+            memberName: toSnakeCase(v).toUpperCase(),
+            value: v,
+          })),
+        },
       };
     }
   }

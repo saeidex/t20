@@ -39,13 +39,22 @@ type IRFieldRelation = {
   type: RelationType;
   onDelete: OnDeleteAction;
   targetObjectName: string;
+};
 
-  // TODO: add targetFieldName
+type IREnumMember = {
+  memberName: string;
+  value: string;
+};
+
+export type IREnumMeta = {
+  enumName: string;
+  members: Array<IREnumMember>;
 };
 
 export type IRField = {
   name: string;
   kind: FieldType;
+  enumMeta?: IREnumMeta;
   options?: Array<FieldOption>;
   relation?: IRFieldRelation;
 };

@@ -1,11 +1,8 @@
 import * as prompts from "@clack/prompts";
 
 import type { ObjectsMap } from "./types.js";
-import type {
-  ObjectName} from "./user-prompts.js";
-import {
-  objectNamePrompts,
-} from "./user-prompts.js";
+import type { ObjectName } from "./user-prompts.js";
+import { objectNamePrompts } from "./user-prompts.js";
 import { handlePromptCancel } from "./utils/handle-prompt-cancel.js";
 import { toNamesAndPaths } from "./utils/to-names-and-paths.js";
 
@@ -31,8 +28,7 @@ export async function reviewObjectNames(objectsMap: ObjectsMap) {
       const name = await objectNamePrompts(
         obj.objectNodeName,
         obj.objectSingularName,
-        obj.objectPluralName,
-        true
+        obj.objectPluralName
       );
       objectNames.set(obj.objectNodeName, name);
     }

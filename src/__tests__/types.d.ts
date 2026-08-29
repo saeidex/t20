@@ -90,6 +90,7 @@ type multiSelectFields = {
 };
 
 interface Address {
+  id: string;
   street: string;
   city: string;
 }
