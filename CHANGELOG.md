@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.2
+
+### Patch Changes
+
+- fix: skip review related entities options
+
 ## 0.8.1
 
 ### Patch Changes

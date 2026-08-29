@@ -22,7 +22,7 @@ export async function reviewObjectNames(objectsMap: ObjectsMap) {
     }
   }
 
-  if (opts.skipRelatedEntities) {
+  if (!opts.skipRelatedEntities) {
     for (const obj of objectsMap.values()) {
       if (!obj.isUserSelected) {
         const note = prompts.note("Auto Selected", "Relations");
