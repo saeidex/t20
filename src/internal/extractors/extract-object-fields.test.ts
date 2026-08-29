@@ -126,6 +126,19 @@ describe("extractObjectFields", () => {
     );
     expect(fields).toEqual([
       {
+        enumMeta: {
+          enumName: "Priority",
+          members: [
+            {
+              memberName: "LOW",
+              value: "low",
+            },
+            {
+              memberName: "HIGH",
+              value: "high",
+            },
+          ],
+        },
         name: "status",
         kind: "SELECT",
         options: [
@@ -174,6 +187,23 @@ describe("extractObjectFields", () => {
     );
     expect(fields).toEqual([
       {
+        enumMeta: {
+          enumName: "Role",
+          members: [
+            {
+              memberName: "ADMIN",
+              value: "admin",
+            },
+            {
+              memberName: "USER",
+              value: "user",
+            },
+            {
+              memberName: "GUEST",
+              value: "guest",
+            },
+          ],
+        },
         name: "role",
         kind: "SELECT",
         options: [
@@ -241,6 +271,19 @@ describe("extractObjectFields", () => {
       {
         name: "roles",
         kind: "MULTI_SELECT",
+        enumMeta: {
+          enumName: "Roles",
+          members: [
+            {
+              memberName: "ADMIN",
+              value: "admin",
+            },
+            {
+              memberName: "USER",
+              value: "user",
+            },
+          ],
+        },
         options: [
           {
             value: "admin",
@@ -273,6 +316,19 @@ describe("extractObjectFields", () => {
       {
         name: "roles",
         kind: "MULTI_SELECT",
+        enumMeta: {
+          enumName: "Role",
+          members: [
+            {
+              memberName: "ADMIN",
+              value: "admin",
+            },
+            {
+              memberName: "USER",
+              value: "user",
+            },
+          ],
+        },
         options: [
           {
             value: "admin",
