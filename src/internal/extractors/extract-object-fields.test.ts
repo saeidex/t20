@@ -419,3 +419,465 @@ describe("extractObjectFields", () => {
     ]);
   });
 });
+
+describe("Relation :: indexed-access foreign key pattern", () => {
+  it('MANY_TO_ONE :: Entity["id"]', () => {
+    const { checker, sourceFile } = compile(`
+      interface Parent { id: string; }
+      interface Child { parent: Parent["id"]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Child",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields[0]).toEqual({
+      name: "parent",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "MANY_TO_ONE",
+        targetObjectName: "Parent",
+      },
+    });
+  });
+
+  it('ONE_TO_MANY :: Array<Entity["id"]>', () => {
+    const { checker, sourceFile } = compile(`
+      interface Child { id: string; }
+      interface Parent { childs: Array<Child["id"]>; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Parent",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields[0]).toEqual({
+      name: "childs",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "ONE_TO_MANY",
+        targetObjectName: "Child",
+      },
+    });
+  });
+
+  it('ONE_TO_MANY :: Entity["id"][]', () => {
+    const { checker, sourceFile } = compile(`
+      interface Child { id: string; }
+      interface Parent { childs: Child["id"][]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Parent",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields[0]).toEqual({
+      name: "childs",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "ONE_TO_MANY",
+        targetObjectName: "Child",
+      },
+    });
+  });
+
+  it('ONE_TO_MANY :: ReadonlyArray<Entity["id"]>', () => {
+    const { checker, sourceFile } = compile(`
+      interface Child { id: string; }
+      interface Parent { childs: ReadonlyArray<Child["id"]>; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Parent",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields[0]).toEqual({
+      name: "childs",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "ONE_TO_MANY",
+        targetObjectName: "Child",
+      },
+    });
+  });
+
+  it('ONE_TO_MANY :: readonly Entity["id"][]', () => {
+    const { checker, sourceFile } = compile(`
+      interface Child { id: string; }
+      interface Parent { childs: readonly Child["id"][]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Parent",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields[0]).toEqual({
+      name: "childs",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "ONE_TO_MANY",
+        targetObjectName: "Child",
+      },
+    });
+  });
+
+  it('MANY_TO_ONE :: nullable indexed-access (Entity["id"] | null)', () => {
+    const { checker, sourceFile } = compile(`
+      interface Parent { id: string; }
+      interface Child { parent: Parent["id"] | null; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Child",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields[0]).toEqual({
+      name: "parent",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "MANY_TO_ONE",
+        targetObjectName: "Parent",
+      },
+    });
+  });
+
+  it('MANY_TO_ONE :: optional prop (parent?: Parent["id"])', () => {
+    const { checker, sourceFile } = compile(`
+      interface Parent { id: string; }
+      interface Child { parent?: Parent["id"]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Child",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields[0]).toEqual({
+      name: "parent",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "MANY_TO_ONE",
+        targetObjectName: "Parent",
+      },
+    });
+  });
+
+  it("self-referential relation (tree structure)", () => {
+    const { checker, sourceFile } = compile(`
+      interface Category {
+        id: string;
+        parentCategory: Category["id"];
+        subCategories: Array<Category["id"]>;
+      }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Category",
+      new Set(["Category"])
+    );
+    expect(
+      fields.find((f) => f.name === "parentCategory")
+    ).toEqual({
+      name: "parentCategory",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "MANY_TO_ONE",
+        targetObjectName: "Category",
+      },
+    });
+    expect(
+      fields.find((f) => f.name === "subCategories")
+    ).toEqual({
+      name: "subCategories",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "ONE_TO_MANY",
+        targetObjectName: "Category",
+      },
+    });
+  });
+
+  it("type alias declarations support indexed-access relations", () => {
+    const { checker, sourceFile } = compile(`
+      type Parent = { id: string; };
+      type Child = { id: string; parent: Parent["id"]; siblings: Array<Child["id"]>; };
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Child",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields.find((f) => f.name === "parent")).toEqual({
+      name: "parent",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "MANY_TO_ONE",
+        targetObjectName: "Parent",
+      },
+    });
+    expect(fields.find((f) => f.name === "siblings")).toEqual({
+      name: "siblings",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "ONE_TO_MANY",
+        targetObjectName: "Child",
+      },
+    });
+  });
+
+  it("indexed access on non-'id' property still treated as relation", () => {
+    const { checker, sourceFile } = compile(`
+      interface Parent { uuid: string; }
+      interface Child { parent: Parent["uuid"]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Child",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields[0]).toEqual({
+      name: "parent",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "MANY_TO_ONE",
+        targetObjectName: "Parent",
+      },
+    });
+  });
+
+  it("knownObjectNames excludes indexed target -> falls through, not relation", () => {
+    const { checker, sourceFile } = compile(`
+      interface Parent { id: string; }
+      interface Child { parent: Parent["id"]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Child",
+      new Set(["Child"]) // Parent excluded
+    );
+    expect(fields[0]).toEqual({ name: "parent", kind: "TEXT" });
+  });
+
+  it("knownObjectNames undefined -> accepts any indexed target", () => {
+    const { checker, sourceFile } = compile(`
+      interface Parent { id: string; }
+      interface Child { parent: Parent["id"]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Child"
+    );
+    expect(fields[0]).toEqual({
+      name: "parent",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "MANY_TO_ONE",
+        targetObjectName: "Parent",
+      },
+    });
+  });
+
+  it("qualified (namespaced) object type is not treated as relation", () => {
+    const { checker, sourceFile } = compile(`
+      namespace NS { export interface Entity { id: string; } }
+      interface Foo { ref: NS.Entity["id"]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Foo",
+      new Set(["Entity"])
+    );
+    expect(fields).toEqual([{ name: "ref", kind: "TEXT" }]);
+  });
+
+  it("indexed-access wins over Id-suffix naming heuristic", () => {
+    const { checker, sourceFile } = compile(`
+      interface Parent { id: string; }
+      interface Child { id: string; parentId: Parent["id"]; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Child",
+      new Set(["Parent", "Child"])
+    );
+    expect(fields.find((f) => f.name === "parentId")).toEqual({
+      name: "parentId",
+      kind: "RELATION",
+      relation: {
+        onDelete: "SET_NULL",
+        type: "MANY_TO_ONE",
+        targetObjectName: "Parent",
+      },
+    });
+  });
+
+  it("regression :: plain id: string still resolves as UUID, not relation", () => {
+    const { checker, sourceFile } = compile(`
+      interface Product { id: string; name: string; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "id", kind: "UUID" },
+      { name: "name", kind: "TEXT" },
+    ]);
+  });
+
+  it("old direct-entity pattern and new indexed-access pattern coexist", () => {
+    const { checker, sourceFile } = compile(`
+      interface Address { street: string; }
+      interface Category { id: string; }
+      interface Product {
+        address: Array<Address>;
+        category: Category["id"];
+      }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product",
+      new Set(["Address", "Category", "Product"])
+    );
+    expect(fields).toEqual([
+      {
+        name: "address",
+        kind: "RELATION",
+        relation: {
+          onDelete: "SET_NULL",
+          type: "ONE_TO_MANY",
+          targetObjectName: "Address",
+        },
+      },
+      {
+        name: "category",
+        kind: "RELATION",
+        relation: {
+          onDelete: "SET_NULL",
+          type: "MANY_TO_ONE",
+          targetObjectName: "Category",
+        },
+      },
+    ]);
+  });
+
+  it("kitchen sink :: relation + scalar + enum + multiselect together", () => {
+    const { checker, sourceFile } = compile(`
+      enum Status { Active = "active", Inactive = "inactive" }
+      interface Category { id: string; }
+      interface Product {
+        id: string;
+        name: string;
+        price: number;
+        active: boolean;
+        createdAt: Date;
+        status: Status;
+        tags: string[];
+        category: Category["id"];
+      }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product",
+      new Set(["Category", "Product"])
+    );
+    expect(fields.map((f) => [f.name, f.kind])).toEqual([
+      ["id", "UUID"],
+      ["name", "TEXT"],
+      ["price", "NUMBER"],
+      ["active", "BOOLEAN"],
+      ["createdAt", "DATE_TIME"],
+      ["status", "SELECT"],
+      ["tags", "MULTI_SELECT"],
+      ["category", "RELATION"],
+    ]);
+  });
+});
+
+it('MANY_TO_ONE :: explicit union with undefined (Entity["id"] | undefined)', () => {
+  const { checker, sourceFile } = compile(`
+    interface Parent { id: string; }
+    interface Child { parent: Parent["id"] | undefined; }
+  `);
+  const fields = extractObjectFields(
+    sourceFile,
+    checker,
+    "Child",
+    new Set(["Parent", "Child"])
+  );
+  expect(fields[0]).toEqual({
+    name: "parent",
+    kind: "RELATION",
+    relation: {
+      onDelete: "SET_NULL",
+      type: "MANY_TO_ONE",
+      targetObjectName: "Parent",
+    },
+  });
+});
+
+it('ONE_TO_MANY :: readonly + nullable combined (readonly Entity["id"][] | null)', () => {
+  const { checker, sourceFile } = compile(`
+    interface Child { id: string; }
+    interface Parent { childs: readonly Child["id"][] | null; }
+  `);
+  const fields = extractObjectFields(
+    sourceFile,
+    checker,
+    "Parent",
+    new Set(["Parent", "Child"])
+  );
+  expect(fields[0]).toEqual({
+    name: "childs",
+    kind: "RELATION",
+    relation: {
+      onDelete: "SET_NULL",
+      type: "ONE_TO_MANY",
+      targetObjectName: "Child",
+    },
+  });
+});
+
+it("KNOWN GAP :: nullable enum union falls through to TEXT instead of SELECT", () => {
+  const { checker, sourceFile } = compile(`
+    enum Priority { Low = "low", High = "high" }
+    interface Product { status: Priority | null; }
+  `);
+  const fields = extractObjectFields(
+    sourceFile,
+    checker,
+    "Product"
+  );
+  // TODO: should be SELECT with options — resolveSelectTypes doesn't strip
+  // nullable unions the way resolveIndexedRelationType now does.
+  expect(fields[0]).toEqual({ name: "status", kind: "TEXT" });
+});

@@ -8,6 +8,7 @@ import { resolveMultiSelectType } from "./resolve-multi-select-types.js";
 import { resolveArrayType } from "./resolve-array-types.js";
 import { resolveSelectTypes } from "./resolve-select-types.js";
 import { resolveRelationType } from "./resolve-relation-types.js";
+import { resolveIndexedRelationType } from "./resolve-indexed-relation-types.js";
 
 export function resolveField(
   checker: ts.TypeChecker,
@@ -18,6 +19,11 @@ export function resolveField(
 ): IRField {
   return (
     resolveBaseTypes(name, type) ??
+    resolveIndexedRelationType(
+      name,
+      typeNode,
+      knownObjectNames
+    ) ??
     resolveDateSuffixAndUUIDTypes(checker, name) ??
     resolveSelectTypes(name, type) ??
     resolveMultiSelectType(checker, name, type) ??

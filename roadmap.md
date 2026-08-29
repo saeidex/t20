@@ -18,7 +18,8 @@
 
 # Maybe in Near Future
 
-- [ ] Show Relation info in Select prompt
+- [ ] (relation) add morph relation support (e.g. polymorphic relation)
+- [ ] Show Relation info in Select prompt (NEVER)
 
 # Refactor
 

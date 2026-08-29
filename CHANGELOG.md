@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.0
+
+### Minor Changes
+
+- add indexed relations, options to skip related entities and more simplified error for label field missing
+
 ## 0.7.1
 
 ### Patch Changes
