@@ -30,7 +30,7 @@ export async function sourcePathPrompt(
 ): Promise<string> {
   if (filePath) {
     if (
-      !filePath.endsWith(".ts") ||
+      !filePath.endsWith(".ts") &&
       !filePath.endsWith(".d.ts")
     ) {
       logErrorAndExit(

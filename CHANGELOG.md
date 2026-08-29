@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.1
+
+### Patch Changes
+
+- fix: .ts file input on cli
+
 ## 0.8.0
 
 ### Minor Changes
