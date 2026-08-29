@@ -7,7 +7,7 @@ import { toUidVarName } from "../utils/to-uid-var-name.js";
 import { fieldUidVarNames } from "../utils/fields.js";
 import { FieldType } from "twenty-sdk/define";
 import { toImportStatement } from "../utils/to-import-statement.js";
-import { styleText } from "node:util";
+// import { styleText } from "node:util";
 
 const fieldSeperator = ",\n";
 
