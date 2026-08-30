@@ -47,7 +47,7 @@ export function resolveMultiSelectType(
             : memberName;
         return {
           memberName: toSnakeCase(memberName).toUpperCase(),
-          value,
+          value: toSnakeCase(value).toUpperCase(),
         };
       });
 
@@ -83,7 +83,7 @@ export function resolveMultiSelectType(
           enumName: toPascalCase(name),
           members: values.map((v) => ({
             memberName: toSnakeCase(v).toUpperCase(),
-            value: v,
+            value: toSnakeCase(v).toUpperCase(),
           })),
         },
       };

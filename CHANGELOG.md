@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.9
+
+### Patch Changes
+
+- fix: relation target field resolution and enum value casing in Twenty schema generation
+
 ## 0.8.8
 
 ### Patch Changes

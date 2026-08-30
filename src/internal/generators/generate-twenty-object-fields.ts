@@ -59,16 +59,17 @@ const serializeRelation = (
 ): string => {
   const settingsLines = [
     `    relationType: RelationType.${relation.type},`,
-    `    onDelete: OnDeleteAction.${relation.onDelete},`,
   ];
 
-  if (
-    relation.type === RelationType.MANY_TO_ONE &&
-    joinColumnName
-  ) {
+  if (relation.type === RelationType.MANY_TO_ONE) {
     settingsLines.push(
-      `    joinColumnName: "${joinColumnName}",`
+      `    onDelete: OnDeleteAction.${relation.onDelete},`
     );
+    if (joinColumnName) {
+      settingsLines.push(
+        `    joinColumnName: "${joinColumnName}",`
+      );
+    }
   }
 
   return [
@@ -105,9 +106,8 @@ export function generateTwentyObjectFields(
         );
 
         if (relationRef) {
-          const targetFieldName = field.relation.targetFieldName;
           const targetFieldUid = toUidVarName(
-            `${relationRef.targetObjectName}_${targetFieldName}`,
+            `${objectEntry.objectNodeName}_${field.name}`,
             "RELATION_FIELD"
           );
           const joinColumnName =
@@ -127,10 +127,7 @@ export function generateTwentyObjectFields(
               relationRef.targetObjectFilePath,
               objectEntry.results.object.filePath,
               relationRef.targetObjectUidVarName,
-              `${toUidVarName(
-                targetFieldName,
-                "FIELD"
-              )} as ${targetFieldUid}`
+              `${relationRef.inverseFieldUidVarName} as ${targetFieldUid}`
             )
           );
         } else {

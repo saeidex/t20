@@ -30,7 +30,7 @@ export function resolveSelectTypes(
             : memberName;
         return {
           memberName: toSnakeCase(memberName).toUpperCase(),
-          value,
+          value: toSnakeCase(value).toUpperCase(),
         };
       });
 
@@ -67,7 +67,7 @@ export function resolveSelectTypes(
           enumName: toPascalCase(name),
           members: values.map((v) => ({
             memberName: toSnakeCase(v).toUpperCase(),
-            value: v,
+            value: toSnakeCase(v).toUpperCase(),
           })),
         },
       };
