@@ -3,7 +3,8 @@ import { logErrorAndExit } from "../utils/log-error-and-exit.js";
 
 export function extractObjectNodeNames(
   sourceFile: ts.SourceFile,
-  checker: ts.TypeChecker
+  checker: ts.TypeChecker,
+  exportOnly: boolean = false
 ): Array<string> {
   const names: Array<string> = [];
 
@@ -12,6 +13,8 @@ export function extractObjectNodeNames(
       ts.isTypeAliasDeclaration(node) ||
       ts.isInterfaceDeclaration(node)
     ) {
+      if (exportOnly && !isExported(node)) return;
+
       const type = checker.getTypeAtLocation(node.name);
 
       if (isTrueObject(type, checker)) {
@@ -27,6 +30,16 @@ export function extractObjectNodeNames(
   }
 
   return names.sort();
+}
+
+function isExported(
+  node: ts.InterfaceDeclaration | ts.TypeAliasDeclaration
+): boolean {
+  return (
+    (ts.getCombinedModifierFlags(node) &
+      ts.ModifierFlags.Export) !==
+    0
+  );
 }
 
 function isTrueObject(

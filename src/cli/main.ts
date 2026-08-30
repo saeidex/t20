@@ -26,16 +26,25 @@ async function main() {
   introPrompt();
 
   const opts = createCLI();
-  let sourcePath = await sourcePathPrompt(opts.input);
+  const sourcePath = await sourcePathPrompt(opts.input);
   const { checker, sourceFile } = parseTypeScriptAST(sourcePath);
-  const nodeNames = extractObjectNodeNames(sourceFile, checker);
+
+  const allNodeNames = extractObjectNodeNames(
+    sourceFile,
+    checker
+  );
+
+  const nodeNames = opts.exportOnly
+    ? extractObjectNodeNames(sourceFile, checker, true)
+    : allNodeNames;
+
   const selectedObjects = await selectedObjectsPrompt(nodeNames);
 
   const objectsMap = extractObjectsMap(
     sourceFile,
     checker,
     selectedObjects,
-    new Set(nodeNames)
+    new Set(allNodeNames)
   );
 
   resolveInverseRelations(objectsMap);

@@ -15,6 +15,7 @@ const VALID_ENTITIES = new Set<Entity>([
 export type CliOptions = {
   input: string;
   output: string;
+  exportOnly: boolean;
   skipReview: boolean;
   skipRelatedEntities: boolean;
   entities: Array<Entity>;
@@ -81,6 +82,7 @@ export function createCLI(argv = process.argv) {
     .name("Generate twenty fields from types(Object/Interface)")
     .option("-i, --input <path>", "*.ts/*.d.ts file")
     .option("-o, --output <dir>", "output root directory", DEFAULT_ROOT_DIR)
+    .option("--export-only", "only extract exported interfaces/types", false)
     .option("-s, --skip-review", "skip review names after selection", false)
     .option("--skip-related-entities", "skip generating related entities (views, navItems)", false)
     .option("-e, --entities [entities...]", `can specify single or multiple entities among: ${styleText("yellow", "(object | view | navItem)")}`)

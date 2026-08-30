@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.12
+
+### Patch Changes
+
+- add: --export-only option
+
 ## 0.8.11
 
 ### Patch Changes
