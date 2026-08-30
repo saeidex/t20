@@ -53,14 +53,15 @@ const serializeOptions = (
 
 const serializeRelation = (
   relation: NonNullable<IRField["relation"]>,
-  relationRef: ReturnType<typeof resolveRelationRef> & {}
+  relationRef: ReturnType<typeof resolveRelationRef> & {},
+  targetFieldUid: string
 ): string => {
   return [
     `,`,
     `  relationTargetObjectMetadataUniversalIdentifier:`,
     `    ${relationRef!.targetObjectUidVarName},`,
     `  relationTargetFieldMetadataUniversalIdentifier:`,
-    `    ${toUidVarName("refId", "FIELD")},`,
+    `    ${targetFieldUid},`,
     `  universalSettings: {`,
     `    relationType: RelationType.${relation.type},`,
     `    onDelete: OnDeleteAction.${relation.onDelete},`,
@@ -90,16 +91,26 @@ export function generateTwentyObjectFields(
         );
 
         if (relationRef) {
-          extra = serializeRelation(field.relation, relationRef);
+          const targetFieldUid = toUidVarName(
+            relationRef.targetObjectName + "_id",
+            "FIELD"
+          );
+
+          extra = serializeRelation(
+            field.relation,
+            relationRef,
+            targetFieldUid
+          );
+
           relationImports.add(
             toImportStatement(
               relationRef.targetObjectFilePath,
               objectEntry.results.object.filePath,
               relationRef.targetObjectUidVarName,
-              `${toUidVarName("id", "FIELD")} as ${toUidVarName(
-                "refId",
+              `${toUidVarName(
+                "id",
                 "FIELD"
-              )}`
+              )} as ${targetFieldUid}`
             )
           );
         } else {

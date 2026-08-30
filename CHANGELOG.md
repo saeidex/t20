@@ -1,5 +1,17 @@
 # @saeidex/t20
 
+## 0.8.6
+
+### Patch Changes
+
+- fix relation field ref uid name
+
+## 0.8.5
+
+### Patch Changes
+
+- refactor: object note prompt
+
 ## 0.8.4
 
 ### Patch Changes
