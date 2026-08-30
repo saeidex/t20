@@ -28,8 +28,8 @@ export function toResultsMap(
   const objectSingularName =
     objectNameSingular ?? toObjectNameSingular(objectPluralName);
 
-  const viewName = toViewName(objectPluralName);
-  const navMenuItemName = toNavMenuItemName(objectPluralName);
+  const viewName = toViewName(objectSingularName);
+  const navMenuItemName = toNavMenuItemName(objectSingularName);
 
   const objectFileName = toObjectFileName(objectSingularName);
   const viewFileName = toViewFileName(objectSingularName);

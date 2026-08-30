@@ -6,37 +6,37 @@ import {
   toTitleCase,
 } from "./case-transformation.js";
 
-function toObjectNameSingular(objectNamePlural: string): string {
-  return `${toCamelCase(singular(objectNamePlural))}`;
+function toObjectNameSingular(objectName: string): string {
+  return `${toCamelCase(singular(objectName))}`;
 }
 
-function toObjectNamePlural(objectNameSingular: string): string {
-  return `${toCamelCase(plural(objectNameSingular))}`;
+function toObjectNamePlural(objectName: string): string {
+  return `${toCamelCase(plural(objectName))}`;
 }
 
 function toObjectFileName(objectNameSingular: string): string {
-  return `${toKebabCase(
-    singular(objectNameSingular)
-  )}.object.ts`;
+  return `${toKebabCase(objectNameSingular)}.object.ts`;
 }
 
-function toViewName(objectName: string): string {
-  const name = toTitleCase(singular(objectName)).toLowerCase();
+function toViewName(objectNameSingular: string): string {
+  const name = toTitleCase(objectNameSingular).toLowerCase();
   if (name.includes("item")) return `All ${name}s`;
   return `All ${name} items`;
 }
 
 function toViewFileName(objectNameSingular: string): string {
-  return `${toKebabCase(singular(objectNameSingular))}.view.ts`;
+  return `${toKebabCase(objectNameSingular)}.view.ts`;
 }
 
-function toNavMenuItemName(objectName: string): string {
-  return `${toKebabCase(singular(objectName))}`;
+function toNavMenuItemName(objectNameSingular: string): string {
+  return `${toKebabCase(objectNameSingular)}`;
 }
 
-function toNavMenuItemFileName(objectName: string): string {
+function toNavMenuItemFileName(
+  objectNameSingular: string
+): string {
   return `${toKebabCase(
-    singular(objectName)
+    objectNameSingular
   )}.navigation-menu-item.ts`;
 }
 

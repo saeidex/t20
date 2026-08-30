@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.7
+
+### Patch Changes
+
+- fix: object name consistency on filename
+
 ## 0.8.6
 
 ### Patch Changes
