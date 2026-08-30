@@ -1,4 +1,4 @@
-import { FieldType } from "twenty-sdk/define";
+import { FieldType, RelationType } from "twenty-sdk/define";
 import { styleText } from "node:util";
 import type {
   IRField,
@@ -54,8 +54,23 @@ const serializeOptions = (
 const serializeRelation = (
   relation: NonNullable<IRField["relation"]>,
   relationRef: ReturnType<typeof resolveRelationRef> & {},
-  targetFieldUid: string
+  targetFieldUid: string,
+  joinColumnName?: string
 ): string => {
+  const settingsLines = [
+    `    relationType: RelationType.${relation.type},`,
+    `    onDelete: OnDeleteAction.${relation.onDelete},`,
+  ];
+
+  if (
+    relation.type === RelationType.MANY_TO_ONE &&
+    joinColumnName
+  ) {
+    settingsLines.push(
+      `    joinColumnName: "${joinColumnName}",`
+    );
+  }
+
   return [
     `,`,
     `  relationTargetObjectMetadataUniversalIdentifier:`,
@@ -63,8 +78,7 @@ const serializeRelation = (
     `  relationTargetFieldMetadataUniversalIdentifier:`,
     `    ${targetFieldUid},`,
     `  universalSettings: {`,
-    `    relationType: RelationType.${relation.type},`,
-    `    onDelete: OnDeleteAction.${relation.onDelete},`,
+    ...settingsLines,
     `  }`,
   ].join("\n");
 };
@@ -91,15 +105,21 @@ export function generateTwentyObjectFields(
         );
 
         if (relationRef) {
+          const targetFieldName = field.relation.targetFieldName;
           const targetFieldUid = toUidVarName(
-            relationRef.targetObjectName + "_id",
-            "FIELD"
+            `${relationRef.targetObjectName}_${targetFieldName}`,
+            "RELATION_FIELD"
           );
+          const joinColumnName =
+            field.relation.type === RelationType.MANY_TO_ONE
+              ? `${toCamelCase(field.name)}Id`
+              : undefined;
 
           extra = serializeRelation(
             field.relation,
             relationRef,
-            targetFieldUid
+            targetFieldUid,
+            joinColumnName
           );
 
           relationImports.add(
@@ -108,7 +128,7 @@ export function generateTwentyObjectFields(
               objectEntry.results.object.filePath,
               relationRef.targetObjectUidVarName,
               `${toUidVarName(
-                "id",
+                targetFieldName,
                 "FIELD"
               )} as ${targetFieldUid}`
             )

@@ -39,6 +39,7 @@ type IRFieldRelation = {
   type: RelationType;
   onDelete: OnDeleteAction;
   targetObjectName: string;
+  targetFieldName: string;
 };
 
 type IREnumMember = {

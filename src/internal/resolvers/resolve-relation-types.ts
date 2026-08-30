@@ -49,7 +49,8 @@ export function resolveRelationType(
           relation: {
             type: RelationType.ONE_TO_MANY,
             targetObjectName: target,
-            onDelete: OnDeleteAction.SET_NULL,
+            onDelete: OnDeleteAction.CASCADE,
+            targetFieldName: "id",
           },
         };
       }
@@ -65,7 +66,8 @@ export function resolveRelationType(
       relation: {
         type: RelationType.MANY_TO_ONE,
         targetObjectName: target,
-        onDelete: OnDeleteAction.SET_NULL,
+        onDelete: OnDeleteAction.CASCADE,
+        targetFieldName: "id",
       },
     };
   }

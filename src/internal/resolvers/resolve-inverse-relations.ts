@@ -46,8 +46,9 @@ export function resolveInverseRelations(
         kind: FieldType.RELATION,
         relation: {
           type: wantType,
-          onDelete: OnDeleteAction.SET_NULL,
+          onDelete: OnDeleteAction.CASCADE,
           targetObjectName: objectName,
+          targetFieldName: "id",
         },
       });
     }

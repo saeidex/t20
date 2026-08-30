@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.8
+
+### Patch Changes
+
+- fix: refererce field name collisions and joinColumnName
+
 ## 0.8.7
 
 ### Patch Changes

@@ -1,12 +1,23 @@
 import { toSnakeCase } from "./case-transformation.js";
 
-type EntityType = "OBJECT" | "FIELD" | "VIEW" | "NAV_MENU_ITEM";
+type EntityType =
+  | "OBJECT"
+  | "FIELD"
+  | "VIEW"
+  | "NAV_MENU_ITEM"
+  | "RELATION_FIELD"
+  | "CUSTOM";
 
-export const toUidVarName = (
+export function toUidVarName(
   name: string,
   entityType: EntityType
-): string => {
-  return `${toSnakeCase(
-    name
-  ).toUpperCase()}_${entityType}_UNIVERSAL_IDENTIFIER`;
-};
+): string {
+  name = `${toSnakeCase(name).toUpperCase()}`;
+
+  if (entityType === "CUSTOM") return name;
+
+  if (entityType === "RELATION_FIELD")
+    return `REF_${name}_FIELD_UNIVERSAL_IDENTIFIER`;
+
+  return `${name}_${entityType}_UNIVERSAL_IDENTIFIER`;
+}

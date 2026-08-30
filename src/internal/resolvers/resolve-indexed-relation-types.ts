@@ -62,10 +62,15 @@ function unwrapArrayTypeNode(
   return undefined;
 }
 
-function indexedEntityName(
+type IndexedEntityInfo = {
+  targetName: string;
+  fieldName: string;
+};
+
+function indexedEntityInfo(
   typeNode: ts.TypeNode,
   knownObjectNames?: Set<string>
-): string | undefined {
+): IndexedEntityInfo | undefined {
   const node = normalize(typeNode);
   if (!ts.isIndexedAccessTypeNode(node)) return undefined;
 
@@ -82,7 +87,15 @@ function indexedEntityName(
     return undefined;
   }
 
-  return targetName;
+  const indexType = node.indexType;
+  if (
+    !ts.isLiteralTypeNode(indexType) ||
+    !ts.isStringLiteral(indexType.literal)
+  ) {
+    return undefined;
+  }
+
+  return { targetName, fieldName: indexType.literal.text };
 }
 
 export function resolveIndexedRelationType(
@@ -96,31 +109,30 @@ export function resolveIndexedRelationType(
 
   const arrayInner = unwrapArrayTypeNode(normalized);
   if (arrayInner) {
-    const target = indexedEntityName(
-      arrayInner,
-      knownObjectNames
-    );
-    if (target) {
+    const info = indexedEntityInfo(arrayInner, knownObjectNames);
+    if (info) {
       return {
         name,
         kind: FieldType.RELATION,
         relation: {
           type: RelationType.ONE_TO_MANY,
-          targetObjectName: target,
+          targetObjectName: info.targetName,
+          targetFieldName: info.fieldName,
           onDelete: OnDeleteAction.SET_NULL,
         },
       };
     }
   }
 
-  const target = indexedEntityName(normalized, knownObjectNames);
-  if (target) {
+  const info = indexedEntityInfo(normalized, knownObjectNames);
+  if (info) {
     return {
       name,
       kind: FieldType.RELATION,
       relation: {
         type: RelationType.MANY_TO_ONE,
-        targetObjectName: target,
+        targetObjectName: info.targetName,
+        targetFieldName: info.fieldName,
         onDelete: OnDeleteAction.SET_NULL,
       },
     };
