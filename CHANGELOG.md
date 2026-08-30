@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.10
+
+### Patch Changes
+
+- fix: typo for clickable link of entity paths
+
 ## 0.8.9
 
 ### Patch Changes

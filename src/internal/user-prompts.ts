@@ -160,7 +160,7 @@ export function finalPrompt(objectsMap: ObjectsMap) {
 
     if (isEntityIncludes(opts.entities, "object")) {
       objects += dedent`
-      ${mark} ${entry.results.object.filePath}${related}\n
+      ${mark} ${entry.results.object.filePath} ${related}\n
     `;
     } else {
       objects = "";

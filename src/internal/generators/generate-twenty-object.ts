@@ -1,9 +1,6 @@
 import { dedent } from "ts-dedent";
 import { FieldType } from "twenty-sdk/define";
-import {
-  toSnakeCase,
-  toTitleCase,
-} from "../utils/case-transformation.js";
+import { toTitleCase } from "../utils/case-transformation.js";
 import type { IRField, ObjectsMap } from "../types.js";
 import { generateTwentyObjectFields } from "./generate-twenty-object-fields.js";
 import { toUidVarStatement } from "../utils/to-uid-var-statement.js";
