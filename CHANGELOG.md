@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.11
+
+### Patch Changes
+
+- refactor: default name and id field
+
 ## 0.8.10
 
 ### Patch Changes

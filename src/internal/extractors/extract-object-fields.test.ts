@@ -1,3 +1,4 @@
+import { OnDeleteAction } from "twenty-sdk/define";
 import { compile } from "../../__tests__/utils.js";
 import { extractObjectFields } from "./extract-object-fields.js";
 import { describe, it, expect } from "vitest";
@@ -17,6 +18,8 @@ describe("extractObjectFields", () => {
       "IBaseFields"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       { name: "explicitText", kind: "TEXT" },
       { name: "explicitUuid", kind: "UUID" },
     ]);
@@ -31,7 +34,10 @@ describe("extractObjectFields", () => {
       checker,
       "Product"
     );
-    expect(fields).toEqual([{ name: "name", kind: "TEXT" }]);
+    expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
+    ]);
   });
 
   it("Base types :: id-pattern string -> UUID", () => {
@@ -48,6 +54,7 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
       { name: "id", kind: "UUID" },
       { name: "userId", kind: "TEXT" },
       { name: "categoryId", kind: "NUMBER" },
@@ -64,6 +71,8 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       { name: "createdAt", kind: "DATE_TIME" },
       { name: "updatedAt", kind: "DATE_TIME" },
     ]);
@@ -79,6 +88,8 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       { name: "category", kind: "TEXT" },
       { name: "format", kind: "TEXT" },
     ]);
@@ -94,6 +105,8 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       { name: "price", kind: "NUMBER" },
       { name: "active", kind: "BOOLEAN" },
     ]);
@@ -109,6 +122,8 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       { name: "metadata", kind: "RAW_JSON" },
       { name: "config", kind: "RAW_JSON" },
     ]);
@@ -125,17 +140,19 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       {
         enumMeta: {
           enumName: "Priority",
           members: [
             {
               memberName: "LOW",
-              value: "low",
+              value: "LOW",
             },
             {
               memberName: "HIGH",
-              value: "high",
+              value: "HIGH",
             },
           ],
         },
@@ -143,13 +160,13 @@ describe("extractObjectFields", () => {
         kind: "SELECT",
         options: [
           {
-            value: "low",
+            value: "LOW",
             label: "Low",
             position: 0,
             color: "gray",
           },
           {
-            value: "high",
+            value: "HIGH",
             label: "High",
             position: 1,
             color: "gray",
@@ -169,8 +186,8 @@ describe("extractObjectFields", () => {
       checker,
       "Product"
     );
-    expect(fields[0].kind).toBe("SELECT");
-    expect(fields[0].options).toEqual([
+    expect(fields[2].kind).toBe("SELECT");
+    expect(fields[2].options).toEqual([
       { value: "1", label: "1", position: 0, color: "gray" },
       { value: "2", label: "2", position: 1, color: "gray" },
     ]);
@@ -186,21 +203,23 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       {
         enumMeta: {
           enumName: "Role",
           members: [
             {
               memberName: "ADMIN",
-              value: "admin",
+              value: "ADMIN",
             },
             {
               memberName: "USER",
-              value: "user",
+              value: "USER",
             },
             {
               memberName: "GUEST",
-              value: "guest",
+              value: "GUEST",
             },
           ],
         },
@@ -208,20 +227,68 @@ describe("extractObjectFields", () => {
         kind: "SELECT",
         options: [
           {
-            value: "admin",
+            value: "ADMIN",
             label: "Admin",
             position: 0,
             color: "gray",
           },
           {
-            value: "user",
+            value: "USER",
             label: "User",
             position: 1,
             color: "gray",
           },
           {
-            value: "guest",
+            value: "GUEST",
             label: "Guest",
+            position: 2,
+            color: "gray",
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("Select types :: real enum keeps UPPER_SNAKE memberName/value", () => {
+    const { checker, sourceFile } = compile(`
+      enum Role { ADMIN = "ADMIN", SUPER_ADMIN = "SUPER_ADMIN", USER = "USER" }
+      interface Product { role: Role; }
+    `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+    expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
+      {
+        enumMeta: {
+          enumName: "Role",
+          members: [
+            { memberName: "ADMIN", value: "ADMIN" },
+            { memberName: "SUPER_ADMIN", value: "SUPER_ADMIN" },
+            { memberName: "USER", value: "USER" },
+          ],
+        },
+        name: "role",
+        kind: "SELECT",
+        options: [
+          {
+            value: "ADMIN",
+            label: "Admin",
+            position: 0,
+            color: "gray",
+          },
+          {
+            value: "SUPER_ADMIN",
+            label: "Super admin",
+            position: 1,
+            color: "gray",
+          },
+          {
+            value: "USER",
+            label: "User",
             position: 2,
             color: "gray",
           },
@@ -240,6 +307,8 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       { name: "tags", kind: "MULTI_SELECT", options: [] },
     ]);
   });
@@ -254,6 +323,8 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       { name: "tags", kind: "MULTI_SELECT", options: [] },
     ]);
   });
@@ -268,6 +339,8 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       {
         name: "roles",
         kind: "MULTI_SELECT",
@@ -276,23 +349,23 @@ describe("extractObjectFields", () => {
           members: [
             {
               memberName: "ADMIN",
-              value: "admin",
+              value: "ADMIN",
             },
             {
               memberName: "USER",
-              value: "user",
+              value: "USER",
             },
           ],
         },
         options: [
           {
-            value: "admin",
+            value: "ADMIN",
             label: "Admin",
             position: 0,
             color: "gray",
           },
           {
-            value: "user",
+            value: "USER",
             label: "User",
             position: 1,
             color: "gray",
@@ -313,6 +386,8 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       {
         name: "roles",
         kind: "MULTI_SELECT",
@@ -321,23 +396,23 @@ describe("extractObjectFields", () => {
           members: [
             {
               memberName: "ADMIN",
-              value: "admin",
+              value: "ADMIN",
             },
             {
               memberName: "USER",
-              value: "user",
+              value: "USER",
             },
           ],
         },
         options: [
           {
-            value: "admin",
+            value: "ADMIN",
             label: "Admin",
             position: 0,
             color: "gray",
           },
           {
-            value: "user",
+            value: "USER",
             label: "User",
             position: 1,
             color: "gray",
@@ -356,7 +431,11 @@ describe("extractObjectFields", () => {
       checker,
       "Product"
     );
-    expect(fields).toEqual([{ name: "scores", kind: "ARRAY" }]);
+    expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
+      { name: "scores", kind: "ARRAY" },
+    ]);
   });
 
   it("Array types :: Array<number> as ARRAY", () => {
@@ -368,7 +447,11 @@ describe("extractObjectFields", () => {
       checker,
       "Product"
     );
-    expect(fields).toEqual([{ name: "scores", kind: "ARRAY" }]);
+    expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
+      { name: "scores", kind: "ARRAY" },
+    ]);
   });
 
   it("Relation :: object and interface fields", () => {
@@ -383,12 +466,15 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       {
         name: "address",
         kind: "RELATION",
         relation: {
-          onDelete: "SET_NULL",
+          onDelete: OnDeleteAction.CASCADE,
           type: "ONE_TO_MANY",
+          targetFieldName: "id",
           targetObjectName: "Address",
         },
       },
@@ -396,8 +482,9 @@ describe("extractObjectFields", () => {
         name: "category",
         kind: "RELATION",
         relation: {
-          onDelete: "SET_NULL",
+          onDelete: OnDeleteAction.CASCADE,
           type: "ONE_TO_MANY",
+          targetFieldName: "id",
           targetObjectName: "Category",
         },
       },
@@ -415,6 +502,7 @@ describe("extractObjectFields", () => {
     );
     expect(fields).toEqual([
       { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       { name: "price", kind: "NUMBER" },
     ]);
   });
@@ -432,13 +520,14 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Parent", "Child"])
     );
-    expect(fields[0]).toEqual({
+    expect(fields[2]).toEqual({
       name: "parentId",
       kind: "RELATION",
       relation: {
-        onDelete: "SET_NULL",
-        type: "MANY_TO_ONE",
+        onDelete: OnDeleteAction.SET_NULL,
+        targetFieldName: "id",
         targetObjectName: "Parent",
+        type: "MANY_TO_ONE",
       },
     });
   });
@@ -454,11 +543,12 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Parent",
       new Set(["Parent", "Child"])
     );
-    expect(fields[0]).toEqual({
+    expect(fields[2]).toEqual({
       name: "childs",
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "id",
         type: "ONE_TO_MANY",
         targetObjectName: "Child",
       },
@@ -476,11 +566,12 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Parent",
       new Set(["Parent", "Child"])
     );
-    expect(fields[0]).toEqual({
+    expect(fields[2]).toEqual({
       name: "childs",
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "id",
         type: "ONE_TO_MANY",
         targetObjectName: "Child",
       },
@@ -498,11 +589,12 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Parent",
       new Set(["Parent", "Child"])
     );
-    expect(fields[0]).toEqual({
+    expect(fields[2]).toEqual({
       name: "childs",
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "id",
         type: "ONE_TO_MANY",
         targetObjectName: "Child",
       },
@@ -520,11 +612,12 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Parent",
       new Set(["Parent", "Child"])
     );
-    expect(fields[0]).toEqual({
+    expect(fields[2]).toEqual({
       name: "childs",
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "id",
         type: "ONE_TO_MANY",
         targetObjectName: "Child",
       },
@@ -542,11 +635,12 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Parent", "Child"])
     );
-    expect(fields[0]).toEqual({
+    expect(fields[2]).toEqual({
       name: "parent",
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "id",
         type: "MANY_TO_ONE",
         targetObjectName: "Parent",
       },
@@ -564,11 +658,12 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Parent", "Child"])
     );
-    expect(fields[0]).toEqual({
+    expect(fields[2]).toEqual({
       name: "parent",
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "id",
         type: "MANY_TO_ONE",
         targetObjectName: "Parent",
       },
@@ -595,7 +690,8 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       name: "parentCategory",
       kind: "RELATION",
       relation: {
-        onDelete: "SET_NULL",
+        onDelete: OnDeleteAction.SET_NULL,
+        targetFieldName: "id",
         type: "MANY_TO_ONE",
         targetObjectName: "Category",
       },
@@ -608,6 +704,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       relation: {
         onDelete: "SET_NULL",
         type: "ONE_TO_MANY",
+        targetFieldName: "id",
         targetObjectName: "Category",
       },
     });
@@ -629,6 +726,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "id",
         type: "MANY_TO_ONE",
         targetObjectName: "Parent",
       },
@@ -638,6 +736,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "id",
         type: "ONE_TO_MANY",
         targetObjectName: "Child",
       },
@@ -655,11 +754,12 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Parent", "Child"])
     );
-    expect(fields[0]).toEqual({
+    expect(fields[2]).toEqual({
       name: "parent",
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "uuid",
         type: "MANY_TO_ONE",
         targetObjectName: "Parent",
       },
@@ -677,7 +777,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Child"]) // Parent excluded
     );
-    expect(fields[0]).toEqual({ name: "parent", kind: "TEXT" });
+    expect(fields[2]).toEqual({ name: "parent", kind: "TEXT" });
   });
 
   it("knownObjectNames undefined -> accepts any indexed target", () => {
@@ -690,11 +790,12 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       checker,
       "Child"
     );
-    expect(fields[0]).toEqual({
+    expect(fields[2]).toEqual({
       name: "parent",
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
+        targetFieldName: "id",
         type: "MANY_TO_ONE",
         targetObjectName: "Parent",
       },
@@ -712,7 +813,11 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Foo",
       new Set(["Entity"])
     );
-    expect(fields).toEqual([{ name: "ref", kind: "TEXT" }]);
+    expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
+      { name: "ref", kind: "TEXT" },
+    ]);
   });
 
   it("indexed-access wins over Id-suffix naming heuristic", () => {
@@ -731,8 +836,9 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       kind: "RELATION",
       relation: {
         onDelete: "SET_NULL",
-        type: "MANY_TO_ONE",
+        targetFieldName: "id",
         targetObjectName: "Parent",
+        type: "MANY_TO_ONE",
       },
     });
   });
@@ -747,8 +853,8 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "id", kind: "UUID" },
       { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
     ]);
   });
 
@@ -768,13 +874,16 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       new Set(["Address", "Category", "Product"])
     );
     expect(fields).toEqual([
+      { name: "name", kind: "TEXT" },
+      { name: "id", kind: "UUID" },
       {
         name: "address",
         kind: "RELATION",
         relation: {
-          onDelete: "SET_NULL",
-          type: "ONE_TO_MANY",
+          onDelete: OnDeleteAction.CASCADE,
+          targetFieldName: "id",
           targetObjectName: "Address",
+          type: "ONE_TO_MANY",
         },
       },
       {
@@ -782,8 +891,9 @@ describe("Relation :: indexed-access foreign key pattern", () => {
         kind: "RELATION",
         relation: {
           onDelete: "SET_NULL",
-          type: "MANY_TO_ONE",
+          targetFieldName: "id",
           targetObjectName: "Category",
+          type: "MANY_TO_ONE",
         },
       },
     ]);
@@ -811,8 +921,8 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       new Set(["Category", "Product"])
     );
     expect(fields.map((f) => [f.name, f.kind])).toEqual([
-      ["id", "UUID"],
       ["name", "TEXT"],
+      ["id", "UUID"],
       ["price", "NUMBER"],
       ["active", "BOOLEAN"],
       ["createdAt", "DATE_TIME"],
@@ -834,13 +944,14 @@ it('MANY_TO_ONE :: explicit union with undefined (Entity["id"] | undefined)', ()
     "Child",
     new Set(["Parent", "Child"])
   );
-  expect(fields[0]).toEqual({
+  expect(fields[2]).toEqual({
     name: "parent",
     kind: "RELATION",
     relation: {
       onDelete: "SET_NULL",
-      type: "MANY_TO_ONE",
+      targetFieldName: "id",
       targetObjectName: "Parent",
+      type: "MANY_TO_ONE",
     },
   });
 });
@@ -856,13 +967,14 @@ it('ONE_TO_MANY :: readonly + nullable combined (readonly Entity["id"][] | null)
     "Parent",
     new Set(["Parent", "Child"])
   );
-  expect(fields[0]).toEqual({
+  expect(fields[2]).toEqual({
     name: "childs",
     kind: "RELATION",
     relation: {
       onDelete: "SET_NULL",
-      type: "ONE_TO_MANY",
+      targetFieldName: "id",
       targetObjectName: "Child",
+      type: "ONE_TO_MANY",
     },
   });
 });
@@ -879,5 +991,5 @@ it("KNOWN GAP :: nullable enum union falls through to TEXT instead of SELECT", (
   );
   // TODO: should be SELECT with options — resolveSelectTypes doesn't strip
   // nullable unions the way resolveIndexedRelationType now does.
-  expect(fields[0]).toEqual({ name: "status", kind: "TEXT" });
+  expect(fields[2]).toEqual({ name: "status", kind: "TEXT" });
 });

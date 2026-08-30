@@ -1,6 +1,7 @@
 import ts from "typescript";
 import type { IRField } from "../types.js";
 import { resolveField } from "../resolvers/resolve-field.js";
+import { FieldType } from "twenty-sdk/define";
 
 export function extractObjectFields(
   sourceFile: ts.SourceFile,
@@ -8,7 +9,16 @@ export function extractObjectFields(
   objectName: string,
   knownObjectNames?: Set<string>
 ): Array<IRField> {
-  const fields: Array<IRField> = [];
+  const fields: Array<IRField> = [
+    {
+      name: "name",
+      kind: FieldType.TEXT,
+    },
+    {
+      name: "id",
+      kind: FieldType.UUID,
+    },
+  ];
 
   function visit(node: ts.Node) {
     if (
@@ -20,51 +30,64 @@ export function extractObjectFields(
         node.members.forEach((member) => {
           if (ts.isPropertySignature(member) && member.name) {
             const name = member.name.getText();
-            const type = checker.getTypeAtLocation(member);
-            fields.push(
-              resolveField(
-                checker,
-                name,
-                type,
-                member.type,
-                knownObjectNames
-              )
-            );
+
+            if (name !== "id" && name !== "name") {
+              const type = checker.getTypeAtLocation(member);
+
+              fields.push(
+                resolveField(
+                  checker,
+                  name,
+                  type,
+                  member.type,
+                  knownObjectNames
+                )
+              );
+            }
           }
         });
       } else if (ts.isTypeAliasDeclaration(node)) {
         const type = checker.getTypeAtLocation(node.name);
+
         type.getProperties().forEach((property) => {
           const name = property.getName();
-          const declaration =
-            property.valueDeclaration ??
-            property.declarations?.[0];
-          if (declaration) {
-            const propType = checker.getTypeOfSymbolAtLocation(
-              property,
-              declaration
-            );
-            const typeNode =
-              ts.isPropertySignature(declaration) ||
-              ts.isPropertyDeclaration(declaration)
-                ? declaration.type
-                : undefined;
-            fields.push(
-              resolveField(
-                checker,
-                name,
-                propType,
-                typeNode,
-                knownObjectNames
-              )
-            );
+
+          if (name !== "id" && name !== "name") {
+            const declaration =
+              property.valueDeclaration ??
+              property.declarations?.[0];
+
+            if (declaration) {
+              const propType = checker.getTypeOfSymbolAtLocation(
+                property,
+                declaration
+              );
+
+              const typeNode =
+                ts.isPropertySignature(declaration) ||
+                ts.isPropertyDeclaration(declaration)
+                  ? declaration.type
+                  : undefined;
+
+              fields.push(
+                resolveField(
+                  checker,
+                  name,
+                  propType,
+                  typeNode,
+                  knownObjectNames
+                )
+              );
+            }
           }
         });
       }
     }
+
     ts.forEachChild(node, visit);
   }
 
   visit(sourceFile);
+
   return fields;
 }

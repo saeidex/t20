@@ -6,11 +6,8 @@ import {
   toViewName,
 } from "../utils/to-names.js";
 import type { CliOptions } from "../create-cli.js";
-import type {
-  OutputDirs} from "./resolve-output-directories.js";
-import {
-  resolveOutputDirectories,
-} from "./resolve-output-directories.js";
+import type { OutputDirs } from "./resolve-output-directories.js";
+import { resolveOutputDirectories } from "./resolve-output-directories.js";
 
 export type Context = {
   names: {
@@ -34,8 +31,8 @@ export function resolveContext(
   cliOptions: CliOptions,
   objectNames: Map<string, ObjectName>
 ): Context {
-  const pluralNames = Array.from(objectNames.values()).map(
-    (name) => name.plural
+  const singularNames = Array.from(objectNames.values()).map(
+    (name) => name.singular
   );
 
   const names = {
@@ -45,8 +42,8 @@ export function resolveContext(
         output: name.singular,
       };
     }),
-    views: pluralNames.map((name) => toViewName(name)),
-    navMenuItems: pluralNames.map((name) =>
+    views: singularNames.map((name) => toViewName(name)),
+    navMenuItems: singularNames.map((name) =>
       toNavMenuItemName(name)
     ),
   } as const satisfies Context["names"];

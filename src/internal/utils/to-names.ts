@@ -20,6 +20,7 @@ function toObjectFileName(objectNameSingular: string): string {
 
 function toViewName(objectNameSingular: string): string {
   const name = toTitleCase(objectNameSingular).toLowerCase();
+  if (name.includes("items")) return `All ${name}`;
   if (name.includes("item")) return `All ${name}s`;
   return `All ${name} items`;
 }

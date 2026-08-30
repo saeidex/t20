@@ -58,7 +58,7 @@ export function resolveMultiSelectType(
           enumMembers.map((m) => m.value)
         ),
         enumMeta: {
-          enumName: enumDecl.name.text,
+          enumName: toPascalCase(enumDecl.name.text),
           members: enumMembers,
         },
       };
@@ -75,16 +75,18 @@ export function resolveMultiSelectType(
         String((t as ts.LiteralType).value)
       );
 
+      const members = values.map((v) => ({
+        memberName: toSnakeCase(v).toUpperCase(),
+        value: toSnakeCase(v).toUpperCase(),
+      }));
+
       return {
         name,
         kind: FieldType.MULTI_SELECT,
-        options: createFieldOptions(values),
+        options: createFieldOptions(members.map((m) => m.value)),
         enumMeta: {
           enumName: toPascalCase(name),
-          members: values.map((v) => ({
-            memberName: toSnakeCase(v).toUpperCase(),
-            value: toSnakeCase(v).toUpperCase(),
-          })),
+          members,
         },
       };
     }

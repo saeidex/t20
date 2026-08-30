@@ -159,28 +159,19 @@ export function finalPrompt(objectsMap: ObjectsMap) {
       : styleText("blue", "(related)");
 
     if (isEntityIncludes(opts.entities, "object")) {
-      objects += dedent`
-      ${mark} ${entry.results.object.filePath} ${related}\n
-    `;
+      objects += dedent`${mark} ${entry.results.object.filePath} ${related}\n\n`;
     } else {
       objects = "";
     }
 
     if (isEntityIncludes(opts.entities, "view")) {
-      const sidenote = entry.results.view.hasLabelField
-        ? ""
-        : styleText("red", `(label field missing)`);
-      views += dedent`
-      ${mark} ${entry.results.view.filePath}${sidenote}\n
-    `;
+      views += dedent`${mark} ${entry.results.view.filePath}\n\n`;
     } else {
       views = "";
     }
 
     if (isEntityIncludes(opts.entities, "navItem")) {
-      navMenuItems += dedent`
-      ${mark} ${entry.results.navMenuItem.filePath}\n
-    `;
+      navMenuItems += dedent`${mark} ${entry.results.navMenuItem.filePath}\n\n`;
     } else {
       navMenuItems = "";
     }

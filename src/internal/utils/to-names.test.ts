@@ -10,13 +10,13 @@ test("toViewName", () => {
 });
 
 test("toViewFileName", () => {
-  expect(toViewFileName("allOrderItems")).toBe(
+  expect(toViewFileName("allOrderItem")).toBe(
     "all-order-item.view.ts"
   );
 });
 
 test("toObjectFileName", () => {
-  expect(toObjectFileName("orderItems")).toBe(
+  expect(toObjectFileName("orderItem")).toBe(
     "order-item.object.ts"
   );
 });

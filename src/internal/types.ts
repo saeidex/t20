@@ -76,9 +76,7 @@ export type ResultEntity = {
 
 export type Results = {
   object: ResultEntity;
-  view: ResultEntity & {
-    hasLabelField: boolean;
-  };
+  view: ResultEntity;
   navMenuItem: ResultEntity;
 };
 

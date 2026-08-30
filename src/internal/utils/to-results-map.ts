@@ -53,7 +53,6 @@ export function toResultsMap(
       fileName: viewFileName,
       filePath: viewFilePath,
       uidVarName: toUidVarName(viewName, "VIEW"),
-      hasLabelField: false,
     },
     navMenuItem: {
       name: navMenuItemName,
