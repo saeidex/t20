@@ -1,6 +1,6 @@
 {
   "name": "@saeidex/t20",
-  "version": "0.8.14",
+  "version": "0.8.15",
   "type": "module",
   "license": "GPL-3.0-only",
   "description": "A scaffolding CLI tool for Twenty CRM",

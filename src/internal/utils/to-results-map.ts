@@ -46,9 +46,12 @@ export function toResultsMap(
     objectSingularName,
     "OBJECT"
   );
-  const viewUidVarName = toUidVarName(viewName, "VIEW");
+  const viewUidVarName = toUidVarName(
+    objectSingularName,
+    "VIEW"
+  );
   const navMenuItemUidVarName = toUidVarName(
-    navMenuItemName,
+    objectSingularName,
     "NAV_MENU_ITEM"
   );
 

@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.15
+
+### Patch Changes
+
+- refactor: view's uid var name
+
 ## 0.8.14
 
 ### Patch Changes
