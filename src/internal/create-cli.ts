@@ -113,8 +113,6 @@ export function createCLI(argv = process.argv) {
     process.exit(1); // unreachable (added for type safety)
   }
 
-  console.log(opts)
-
   return opts;
 }
 

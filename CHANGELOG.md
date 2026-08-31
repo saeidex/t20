@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.14
+
+### Patch Changes
+
+- remove: console log
+
 ## 0.8.13
 
 ### Patch Changes
