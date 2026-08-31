@@ -18,11 +18,8 @@ function toObjectFileName(objectNameSingular: string): string {
   return `${toKebabCase(objectNameSingular)}.object.ts`;
 }
 
-function toViewName(objectNameSingular: string): string {
-  const name = toTitleCase(objectNameSingular).toLowerCase();
-  if (name.includes("items")) return `All ${name}`;
-  if (name.includes("item")) return `All ${name}s`;
-  return `All ${name} items`;
+function toViewName(objectNamePlural: string): string {
+  return `All ${toTitleCase(objectNamePlural, true)}`;
 }
 
 function toViewFileName(objectNameSingular: string): string {
