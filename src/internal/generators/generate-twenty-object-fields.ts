@@ -15,6 +15,7 @@ import { toUidVarName } from "../utils/to-uid-var-name.js";
 import { fieldUidVarStatements } from "../utils/fields.js";
 import { toImportStatement } from "../utils/to-import-statement.js";
 import { resolveRelationRef } from "../resolvers/resolve-relation-refs.js";
+import { getCliOptions } from "../create-cli.js";
 
 const indent = (lines: Array<string>, spaces: number) =>
   lines
@@ -93,6 +94,10 @@ export function generateTwentyObjectFields(
   relationImportStatements: string;
 } {
   const relationImports = new Set<string>();
+  const cliSeed = getCliOptions().seed;
+  const fieldSeed = cliSeed
+    ? `${cliSeed}:${objectEntry.objectNodeName}`
+    : undefined;
 
   const fieldObjects = objectEntry.fields
     .map((field) => {
@@ -161,7 +166,8 @@ export function generateTwentyObjectFields(
 
   return {
     fieldUidVarDeclarations: fieldUidVarStatements(
-      objectEntry.fields
+      objectEntry.fields,
+      fieldSeed
     ).join("\n"),
     fieldObjects,
     relationImportStatements: [...relationImports].join("\n"),

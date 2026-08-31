@@ -3,7 +3,6 @@ import { FieldType } from "twenty-sdk/define";
 import { toTitleCase } from "../utils/case-transformation.js";
 import type { IRField, ObjectsMap } from "../types.js";
 import { generateTwentyObjectFields } from "./generate-twenty-object-fields.js";
-import { toUidVarStatement } from "../utils/to-uid-var-statement.js";
 
 export function generateTwentyObject(
   objectNodeName: string,
@@ -24,8 +23,8 @@ export function generateTwentyObject(
 
   const objectUidVar = entry.results.object.uidVarName;
 
-  const varDeclarationStatement =
-    toUidVarStatement(objectUidVar);
+  const objectUidVarStatement =
+    entry.results.object.uidVarStatement;
 
   const hasRelations = entry.fields.some(
     (f) => f.kind === FieldType.RELATION
@@ -48,7 +47,7 @@ export function generateTwentyObject(
     import ${importContent} from "twenty-sdk/define";
     ${relationImportStatements}
     ${enumDeclarations}
-    ${varDeclarationStatement}
+    ${objectUidVarStatement}
 
     ${fieldUidVarDeclarations}
 

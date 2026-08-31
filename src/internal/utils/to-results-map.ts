@@ -11,6 +11,7 @@ import type { Results } from "../types.js";
 import { toUidVarName } from "./to-uid-var-name.js";
 import { resolveOutputDirectories } from "../resolvers/resolve-output-directories.js";
 import { getCliOptions } from "../create-cli.js";
+import { toUidVarStatement } from "./to-uid-var-statement.js";
 
 export function toResultsMap(
   objectNodeName: string,
@@ -41,24 +42,46 @@ export function toResultsMap(
   const viewFilePath = `${dirs.views}/${viewFileName}`;
   const navMenuItemFilePath = `${dirs.navMenuItems}/${navMenuItemFileName}`;
 
+  const objectUidVarName = toUidVarName(
+    objectSingularName,
+    "OBJECT"
+  );
+  const viewUidVarName = toUidVarName(viewName, "VIEW");
+  const navMenuItemUidVarName = toUidVarName(
+    navMenuItemName,
+    "NAV_MENU_ITEM"
+  );
+
   return {
     object: {
       name: objectNodeName,
       fileName: objectFileName,
       filePath: objectFilePath,
-      uidVarName: toUidVarName(objectSingularName, "OBJECT"),
+      uidVarName: objectUidVarName,
+      uidVarStatement: toUidVarStatement(
+        opts.seed,
+        objectUidVarName
+      ),
     },
     view: {
       name: viewName,
       fileName: viewFileName,
       filePath: viewFilePath,
-      uidVarName: toUidVarName(viewName, "VIEW"),
+      uidVarName: viewUidVarName,
+      uidVarStatement: toUidVarStatement(
+        opts.seed,
+        viewUidVarName
+      ),
     },
     navMenuItem: {
       name: navMenuItemName,
       fileName: navMenuItemFileName,
       filePath: navMenuItemFilePath,
-      uidVarName: toUidVarName(navMenuItemName, "NAV_MENU_ITEM"),
+      uidVarName: navMenuItemUidVarName,
+      uidVarStatement: toUidVarStatement(
+        opts.seed,
+        navMenuItemUidVarName
+      ),
     },
   };
 }

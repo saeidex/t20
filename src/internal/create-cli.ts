@@ -27,6 +27,7 @@ export type CliOptions = {
   print: boolean;
   dryRun: boolean;
   clipboard: boolean;
+  seed?: string;
 };
 
 
@@ -83,7 +84,7 @@ export function createCLI(argv = process.argv) {
     .option("-i, --input <path>", "*.ts/*.d.ts file")
     .option("-o, --output <dir>", "output root directory", DEFAULT_ROOT_DIR)
     .option("--export-only", "only extract exported interfaces/types", false)
-    .option("-s, --skip-review", "skip review names after selection", false)
+    .option("--skip-review", "skip review names after selection", false)
     .option("--skip-related-entities", "skip generating related entities (views, navItems)", false)
     .option("-e, --entities [entities...]", `can specify single or multiple entities among: ${styleText("yellow", "(object | view | navItem)")}`)
     .option("--objects-dir <dir>", "output object directory", DEFAULT_OBJECTS_DIR)
@@ -94,6 +95,7 @@ export function createCLI(argv = process.argv) {
     .option("-p, --print", "print to console", false)
     .option("-d, --dry-run", "print outputs to console, do not write on disk", false)
     .option("-c, --clipboard", "copy object to clipboard", false)
+    .option("--seed <string>", "seed for deterministic UIDs — stable across re-runs, distinct per workspace")
     .version(packageJson.version, "-v, --version")
     .helpOption()
     .action((parsedOpts: CliOptions) => {
@@ -110,6 +112,8 @@ export function createCLI(argv = process.argv) {
     logErrorAndExit("CLI options were not parsed.");
     process.exit(1); // unreachable (added for type safety)
   }
+
+  console.log(opts)
 
   return opts;
 }

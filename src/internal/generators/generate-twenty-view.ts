@@ -4,7 +4,6 @@ import { generateTwentyViewFields } from "./generate-twenty-view-fields.js";
 import type { ObjectMapEntry } from "../types.js";
 import { toImportStatement } from "../utils/to-import-statement.js";
 import { tempStore } from "../utils/temp-store.js";
-import { toUidVarStatement } from "../utils/to-uid-var-statement.js";
 
 export function generateTwentyView(
   entry: ObjectMapEntry
@@ -15,9 +14,7 @@ export function generateTwentyView(
     entry.results.object.uidVarName
   );
 
-  const uidVarDeclarationStatement = toUidVarStatement(
-    entry.results.view.uidVarName
-  );
+  const viewUidVarStatement = entry.results.view.uidVarStatement;
 
   const { fieldMetadataUidsImportStatement, viewFields } =
     generateTwentyViewFields(entry);
@@ -28,7 +25,7 @@ export function generateTwentyView(
                 ${uidVarsImportStatement}
                 ${fieldMetadataUidsImportStatement}
 
-                ${uidVarDeclarationStatement}
+                ${viewUidVarStatement}
 
                 export default defineView({
                   universalIdentifier: ${

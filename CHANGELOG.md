@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.13
+
+### Patch Changes
+
+- add: --seed option for deterministic uuid values
+
 ## 0.8.12
 
 ### Patch Changes

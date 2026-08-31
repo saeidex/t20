@@ -4,7 +4,6 @@ import { NavigationMenuItemType } from "twenty-sdk/define";
 import { toImportStatement } from "../utils/to-import-statement.js";
 import { tempStore } from "../utils/temp-store.js";
 import type { ObjectMapEntry } from "../types.js";
-import { toUidVarStatement } from "../utils/to-uid-var-statement.js";
 
 export function generateTwentyNavMenuItem(
   entry: ObjectMapEntry
@@ -15,16 +14,15 @@ export function generateTwentyNavMenuItem(
     entry.results.object.uidVarName
   );
 
-  const uidVarDeclarationStatement = toUidVarStatement(
-    entry.results.navMenuItem.uidVarName
-  );
+  const navMenuItemUidVarStatement =
+    entry.results.navMenuItem.uidVarStatement;
 
   const navMenuItemsPositionStore =
     tempStore().navMenuItemsPositionStore;
 
   const output = dedent`import { defineNavigationMenuItem, NavigationMenuItemType } from "twenty-sdk/define";
                 ${objectUidImportStatement}
-                ${uidVarDeclarationStatement}
+                ${navMenuItemUidVarStatement}
 
                 export default defineNavigationMenuItem({
                   universalIdentifier: ${

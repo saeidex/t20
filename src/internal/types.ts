@@ -72,6 +72,7 @@ export type ResultEntity = {
   fileName: string;
   filePath: string;
   uidVarName: string;
+  uidVarStatement: string;
 };
 
 export type Results = {
