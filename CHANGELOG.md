@@ -1,5 +1,13 @@
 # @saeidex/t20
 
+## 0.8.16
+
+### Patch Changes
+
+- 94b9a3c: refactor: view name
+- 4dfa343: fix: resolve context
+- add: junction objects supports
+
 ## 0.8.15
 
 ### Patch Changes

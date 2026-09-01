@@ -56,7 +56,8 @@ const serializeRelation = (
   relation: NonNullable<IRField["relation"]>,
   relationRef: ReturnType<typeof resolveRelationRef> & {},
   targetFieldUid: string,
-  joinColumnName?: string
+  joinColumnName?: string,
+  junctionFieldUid?: string
 ): string => {
   const settingsLines = [
     `    relationType: RelationType.${relation.type},`,
@@ -71,6 +72,15 @@ const serializeRelation = (
         `    joinColumnName: "${joinColumnName}",`
       );
     }
+  }
+
+  if (
+    relation.type === RelationType.ONE_TO_MANY &&
+    junctionFieldUid
+  ) {
+    settingsLines.push(
+      `    junctionTargetFieldUniversalIdentifier: ${junctionFieldUid},`
+    );
   }
 
   return [
@@ -120,19 +130,35 @@ export function generateTwentyObjectFields(
               ? `${toCamelCase(field.name)}Id`
               : undefined;
 
+          const importVars = [
+            relationRef.targetObjectUidVarName,
+            `${relationRef.inverseFieldUidVarName} as ${targetFieldUid}`,
+          ];
+
+          let junctionFieldUid: string | undefined;
+          if (relationRef.junctionTargetFieldUidVarName) {
+            junctionFieldUid = toUidVarName(
+              `${objectEntry.objectNodeName}_${field.name}_junction_target`,
+              "RELATION_FIELD"
+            );
+            importVars.push(
+              `${relationRef.junctionTargetFieldUidVarName} as ${junctionFieldUid}`
+            );
+          }
+
           extra = serializeRelation(
             field.relation,
             relationRef,
             targetFieldUid,
-            joinColumnName
+            joinColumnName,
+            junctionFieldUid
           );
 
           relationImports.add(
             toImportStatement(
               relationRef.targetObjectFilePath,
               objectEntry.results.object.filePath,
-              relationRef.targetObjectUidVarName,
-              `${relationRef.inverseFieldUidVarName} as ${targetFieldUid}`
+              ...importVars
             )
           );
         } else {

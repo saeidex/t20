@@ -20,7 +20,11 @@ export function generateResult(objectsMap: ObjectsMap): Result {
   };
 
   for (const [objectNodeName, entry] of objectsMap.entries()) {
-    if (opts.skipRelatedEntities && !entry.isUserSelected)
+    if (
+      opts.skipRelatedEntities &&
+      !entry.isUserSelected &&
+      !entry.isJunction
+    )
       continue;
 
     const twentyObject = generateTwentyObject(

@@ -8,6 +8,7 @@ export type RelationRef = {
   inverseFieldUidVarName: string;
   targetObjectName: string;
   targetObjectFileName: string;
+  junctionTargetFieldUidVarName: string | undefined;
 };
 
 const inverseType = (type: RelationType): RelationType =>
@@ -30,15 +31,26 @@ export function resolveRelationRef(
   if (!targetEntry) return undefined;
 
   const wantType = inverseType(field.relation.type);
+  const relation = field.relation;
 
-  const inverseField = targetEntry.fields.find(
-    (f) =>
-      f.kind === FieldType.RELATION &&
-      f.relation?.type === wantType &&
-      f.relation.targetObjectName === objectName
-  );
+  const inverseField = relation.inverseFieldName
+    ? targetEntry.fields.find(
+        (f) => f.name === relation.inverseFieldName
+      )
+    : targetEntry.fields.find(
+        (f) =>
+          f.kind === FieldType.RELATION &&
+          f.relation?.type === wantType &&
+          f.relation.targetObjectName === objectName
+      );
 
   if (!inverseField) return undefined;
+
+  const junctionTargetField = relation.junctionTargetFieldName
+    ? targetEntry.fields.find(
+        (f) => f.name === relation.junctionTargetFieldName
+      )
+    : undefined;
 
   return {
     targetObjectUidVarName: toUidVarName(
@@ -52,5 +64,8 @@ export function resolveRelationRef(
       inverseField.name,
       "FIELD"
     ),
+    junctionTargetFieldUidVarName: junctionTargetField
+      ? toUidVarName(junctionTargetField.name, "FIELD")
+      : undefined,
   };
 }

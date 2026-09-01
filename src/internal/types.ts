@@ -40,6 +40,8 @@ type IRFieldRelation = {
   onDelete: OnDeleteAction;
   targetObjectName: string;
   targetFieldName: string;
+  inverseFieldName?: string;
+  junctionTargetFieldName?: string;
 };
 
 type IREnumMember = {
@@ -90,6 +92,7 @@ export type ObjectMapEntry = {
   isExtracted: boolean;
   isGenerated: boolean;
   isUserSelected: boolean;
+  isJunction?: boolean;
   results: Results;
 };
 

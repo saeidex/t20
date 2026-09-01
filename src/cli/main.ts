@@ -3,22 +3,24 @@ import clipboard from "copy-paste";
 
 import { createCLI } from "../internal/create-cli.js";
 import { extractObjectNodeNames } from "../internal/extractors/extract-object-node-names.js";
+import { extractObjectsMap } from "../internal/extractors/extract-objects-map.js";
+import { generateResult } from "../internal/generators/generate-result.js";
+import { parseTypeScriptAST } from "../internal/parse-typescript-ast.js";
+import { detectManyToManyPairs } from "../internal/resolvers/detect-many-to-many.js";
+import { resolveInverseRelations } from "../internal/resolvers/resolve-inverse-relations.js";
+import { synthesizeManyToManyJunctions } from "../internal/resolvers/synthesize-many-to-many.js";
+import { reviewObjectNames } from "../internal/review-object-names.js";
 import {
   finalPrompt,
   introPrompt,
   selectedObjectsPrompt,
   sourcePathPrompt,
 } from "../internal/user-prompts.js";
-import { parseTypeScriptAST } from "../internal/parse-typescript-ast.js";
-import { generateResult } from "../internal/generators/generate-result.js";
 import {
   markedResultOutput,
   resultOutput,
   writeResultOnFiles,
 } from "../internal/write-result.js";
-import { extractObjectsMap } from "../internal/extractors/extract-objects-map.js";
-import { resolveInverseRelations } from "../internal/resolvers/resolve-inverse-relations.js";
-import { reviewObjectNames } from "../internal/review-object-names.js";
 
 const WAIT_BEFORE_PRINT_IN_MS = 500;
 
@@ -44,6 +46,13 @@ async function main() {
     sourceFile,
     checker,
     selectedObjects,
+    new Set(allNodeNames)
+  );
+
+  const m2mPairs = detectManyToManyPairs(objectsMap);
+  synthesizeManyToManyJunctions(
+    objectsMap,
+    m2mPairs,
     new Set(allNodeNames)
   );
 

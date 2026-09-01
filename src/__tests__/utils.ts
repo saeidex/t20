@@ -1,4 +1,10 @@
+import {
+  FieldType,
+  OnDeleteAction,
+  RelationType,
+} from "twenty-sdk/define";
 import ts from "typescript";
+import { ObjectsMap } from "../internal/types.js";
 
 /**
  * Compile in-memory source string to get a real ts.Program + checker,
@@ -39,4 +45,40 @@ export function compile(source: string | TemplateStringsArray) {
   const checker = program.getTypeChecker();
   const sourceFile = program.getSourceFile(fileName)!;
   return { checker, sourceFile };
+}
+
+export const oneToMany = (targetObjectName: string) => ({
+  kind: FieldType.RELATION as const,
+  relation: {
+    type: RelationType.ONE_TO_MANY,
+    targetObjectName,
+    targetFieldName: "id",
+    onDelete: OnDeleteAction.SET_NULL,
+  },
+});
+
+export function buildMap(
+  entries: Record<
+    string,
+    Array<{
+      name: string;
+      field: ReturnType<typeof oneToMany> | { kind: string };
+    }>
+  >
+): ObjectsMap {
+  const map = new Map();
+  for (const [name, fields] of Object.entries(entries)) {
+    map.set(name, {
+      objectNodeName: name,
+      objectSingularName: name,
+      objectPluralName: name,
+      fields: fields.map((f) => ({ name: f.name, ...f.field })),
+      relations: [],
+      isExtracted: true,
+      isGenerated: false,
+      isUserSelected: true,
+      results: {} as never,
+    });
+  }
+  return map as ObjectsMap;
 }

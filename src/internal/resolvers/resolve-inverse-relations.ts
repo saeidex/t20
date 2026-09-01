@@ -1,10 +1,10 @@
-import {
-  FieldType,
-  OnDeleteAction,
-  RelationType,
-} from "twenty-sdk/define";
 import { plural, singular } from "pluralize";
-import type { ObjectsMap } from "../types.js";
+import {
+    FieldType,
+    OnDeleteAction,
+    RelationType,
+} from "twenty-sdk/define";
+import type { IRFieldRelation, ObjectsMap } from "../types.js";
 import { toCamelCase } from "../utils/case-transformation.js";
 
 const inverseType = (type: RelationType): RelationType =>
@@ -28,12 +28,25 @@ export function resolveInverseRelations(
 
       const wantType = inverseType(field.relation.type);
 
-      const hasInverse = targetEntry.fields.some(
+      // Find candidate inverse fields
+      const candidates = targetEntry.fields.filter(
         (f) =>
           f.kind === FieldType.RELATION &&
           f.relation?.type === wantType &&
           f.relation.targetObjectName === objectName
       );
+
+      let hasInverse: boolean;
+      if (field.relation.relationKey && candidates.length > 0) {
+        // Use relationKey to disambiguate
+        hasInverse = candidates.some(
+          (f) => f.relation?.relationKey === field.relation?.relationKey
+        );
+      } else {
+        // Fallback: check if any candidate exists
+        hasInverse = candidates.length > 0;
+      }
+
       if (hasInverse) continue;
 
       const inverseName =
@@ -41,15 +54,21 @@ export function resolveInverseRelations(
           ? toCamelCase(plural(objectName))
           : toCamelCase(singular(objectName));
 
+      const inverseRelation: IRFieldRelation = {
+        type: wantType,
+        onDelete: OnDeleteAction.CASCADE,
+        targetObjectName: objectName,
+        targetFieldName: "id",
+      };
+
+      if (field.relation.relationKey) {
+        inverseRelation.relationKey = field.relation.relationKey;
+      }
+
       targetEntry.fields.push({
         name: inverseName,
         kind: FieldType.RELATION,
-        relation: {
-          type: wantType,
-          onDelete: OnDeleteAction.CASCADE,
-          targetObjectName: objectName,
-          targetFieldName: "id",
-        },
+        relation: inverseRelation,
       });
     }
   }
