@@ -1,7 +1,6 @@
 import type { ObjectMapEntry } from "../types.js";
-
+import { FieldType } from "twenty-sdk/define";
 import dedent from "ts-dedent";
-
 import { v4 } from "uuid";
 import { deriveUuid } from "../utils/derive-uuid.js";
 import { getCliOptions } from "../create-cli.js";
@@ -17,16 +16,23 @@ export function generateTwentyViewFields(
   fieldMetadataUidsImportStatement: string;
   viewFields: string;
 } {
+  const viewableFields = entry.fields.filter(
+    (field) =>
+      field.name !== "id" &&
+      field.kind !== FieldType.RELATION &&
+      field.kind !== FieldType.MORPH_RELATION
+  );
+
   const fieldMetadataUidsImportStatement = toImportStatement(
     entry.results.object.filePath,
     entry.results.view.filePath,
-    ...fieldUidVarNames(entry.fields)
+    ...fieldUidVarNames(viewableFields)
   );
 
   let viewFields: string = "";
   const seed = getCliOptions().seed;
 
-  entry.fields.forEach((field, position) => {
+  viewableFields.forEach((field, position) => {
     const fieldUidVarName = toUidVarName(field.name, "FIELD");
     const viewFieldUid = seed
       ? deriveUuid(
@@ -43,10 +49,7 @@ export function generateTwentyViewFields(
 
   viewFields = viewFields.trimEnd();
 
-  return {
-    fieldMetadataUidsImportStatement,
-    viewFields,
-  };
+  return { fieldMetadataUidsImportStatement, viewFields };
 }
 
 function getFieldString(
