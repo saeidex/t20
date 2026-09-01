@@ -7,6 +7,7 @@
 - 94b9a3c: refactor: view name
 - 4dfa343: fix: resolve context
 - add: junction objects supports
+- refactor: default skip reviews and --skip-review option change to --review-names
 
 ## 0.8.15
 

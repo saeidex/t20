@@ -58,7 +58,7 @@ async function main() {
 
   resolveInverseRelations(objectsMap);
 
-  if (!opts.skipReview) {
+  if (opts.reviewNames) {
     await reviewObjectNames(objectsMap);
   }
 
