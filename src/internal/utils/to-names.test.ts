@@ -6,7 +6,7 @@ import {
 } from "./to-names.js";
 
 test("toViewName", () => {
-  expect(toViewName("orderItems")).toBe("All order items");
+  expect(toViewName("orderItems")).toBe("All Order Items");
 });
 
 test("toViewFileName", () => {

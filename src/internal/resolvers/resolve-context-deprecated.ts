@@ -31,21 +31,20 @@ export function resolveContext(
   cliOptions: CliOptions,
   objectNames: Map<string, ObjectName>
 ): Context {
-  const singularNames = Array.from(objectNames.values()).map(
-    (name) => name.singular
-  );
+  let ctxObjectNames: Context["names"]["objects"] = [];
+  let viewNames: Array<string> = [];
+  let navMenuItemNames: Array<string> = [];
+
+  objectNames.forEach((name) => {
+    ctxObjectNames.push({ ...name, output: name.singular });
+    viewNames.push(toViewName(name.plural));
+    navMenuItemNames.push(toNavMenuItemName(name.singular));
+  });
 
   const names = {
-    objects: Array.from(objectNames.values()).map((name) => {
-      return {
-        ...name,
-        output: name.singular,
-      };
-    }),
-    views: singularNames.map((name) => toViewName(name)),
-    navMenuItems: singularNames.map((name) =>
-      toNavMenuItemName(name)
-    ),
+    objects: ctxObjectNames,
+    views: viewNames,
+    navMenuItems: navMenuItemNames,
   } as const satisfies Context["names"];
 
   const dirs = resolveOutputDirectories(cliOptions);

@@ -40,7 +40,7 @@ test("multiple objects", () => {
           output: "brand",
         },
       ],
-      views: ["All product items", "All brand items"],
+      views: ["All Products", "All Brands"],
       navMenuItems: ["product", "brand"],
     },
     paths: {
