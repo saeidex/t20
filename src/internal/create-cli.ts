@@ -17,6 +17,7 @@ export type CliOptions = {
   output: string;
   exportOnly: boolean;
   reviewNames: boolean;
+  pluralFileNames: string
   skipRelatedEntities: boolean;
   entities: Array<Entity>;
   objectsDir: string;
@@ -85,6 +86,7 @@ export function createCLI(argv = process.argv) {
     .option("-o, --output <dir>", "output root directory", DEFAULT_ROOT_DIR)
     .option("--export-only", "only extract exported interfaces/types", false)
     .option("--review-names", "review names after selection", false)
+    .option("--plural-file-names <string>", "plural file names to generate", false)
     .option("--skip-related-entities", "skip generating related entities (views, navItems)", false)
     .option("-e, --entities [entities...]", `can specify single or multiple entities among: ${styleText("yellow", "(object | view | navItem)")}`)
     .option("--objects-dir <dir>", "output object directory", DEFAULT_OBJECTS_DIR)

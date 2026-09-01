@@ -16,6 +16,7 @@
 - [x] Array of Object type support (RELATION)
 - [x] (prompts) add an option to skip related objects generation
 - [x] (prompts) add --export-only option to narrow down select options
+- [x] (prompts) add --plural-file-names for entities
 
 # Maybe in Near Future
 

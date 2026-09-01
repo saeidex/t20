@@ -8,6 +8,7 @@
 - 4dfa343: fix: resolve context
 - add: junction objects supports
 - refactor: default skip reviews and --skip-review option change to --review-names
+- add: --plural-file-names option
 
 ## 0.8.15
 

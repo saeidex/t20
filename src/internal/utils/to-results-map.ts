@@ -32,11 +32,18 @@ export function toResultsMap(
   const viewName = toViewName(objectPluralName);
   const navMenuItemName = toNavMenuItemName(objectSingularName);
 
-  const objectFileName = toObjectFileName(objectSingularName);
-  const viewFileName = toViewFileName(objectSingularName);
-  const navMenuItemFileName = toNavMenuItemFileName(
+  let objectFileName = toObjectFileName(objectSingularName);
+  let viewFileName = toViewFileName(objectSingularName);
+  let navMenuItemFileName = toNavMenuItemFileName(
     objectSingularName
   );
+
+  if (opts.pluralFileNames) {
+    objectFileName = toObjectFileName(objectPluralName);
+    viewFileName = toViewFileName(objectPluralName);
+    navMenuItemFileName =
+      toNavMenuItemFileName(objectPluralName);
+  }
 
   const objectFilePath = `${dirs.objects}/${objectFileName}`;
   const viewFilePath = `${dirs.views}/${viewFileName}`;
