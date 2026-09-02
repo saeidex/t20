@@ -1,21 +1,21 @@
 import { singular } from "pluralize";
 import {
-    FieldType,
-    OnDeleteAction,
-    RelationType,
+  FieldType,
+  OnDeleteAction,
+  RelationType,
 } from "twenty-sdk/define";
 import type {
-    IRField,
-    ObjectsMap,
-    RelationRecord,
+  IRField,
+  ObjectsMap,
+  RelationRecord,
 } from "../types.js";
 import {
-    toCamelCase,
-    toPascalCase,
+  toCamelCase,
+  toPascalCase,
 } from "../utils/case-transformation.js";
 import {
-    toObjectNamePlural,
-    toObjectNameSingular,
+  toObjectNamePlural,
+  toObjectNameSingular,
 } from "../utils/to-names.js";
 import { toResultsMap } from "../utils/to-results-map.js";
 import type { ManyToManyPair } from "./detect-many-to-many.js";
@@ -114,9 +114,9 @@ export function synthesizeManyToManyJunctions(
       ? toCamelCase(singular(pair.fieldB))
       : toCamelCase(singular(pair.objectB));
 
+    const junctionPlural = toObjectNamePlural(junctionNodeName);
     const junctionSingular =
-      toObjectNameSingular(junctionNodeName);
-    const junctionPlural = toObjectNamePlural(junctionSingular);
+      toObjectNameSingular(junctionPlural);
 
     const fields: Array<IRField> = [
       { name: "name", kind: FieldType.TEXT },

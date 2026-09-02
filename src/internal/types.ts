@@ -35,7 +35,7 @@ export type FieldRelation = {
   };
 };
 
-type IRFieldRelation = {
+export type IRFieldRelation = {
   type: RelationType;
   onDelete: OnDeleteAction;
   targetObjectName: string;

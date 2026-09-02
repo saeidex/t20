@@ -4,7 +4,7 @@ import {
   RelationType,
 } from "twenty-sdk/define";
 import ts from "typescript";
-import { ObjectsMap } from "../internal/types.js";
+import type { ObjectsMap } from "../internal/types.js";
 
 /**
  * Compile in-memory source string to get a real ts.Program + checker,

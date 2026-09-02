@@ -1,16 +1,29 @@
 import { plural, singular } from "pluralize";
 import {
-    FieldType,
-    OnDeleteAction,
-    RelationType,
+  FieldType,
+  OnDeleteAction,
+  RelationType,
 } from "twenty-sdk/define";
-import type { IRFieldRelation, ObjectsMap } from "../types.js";
+import type {
+  IRField,
+  IRFieldRelation,
+  ObjectsMap,
+} from "../types.js";
 import { toCamelCase } from "../utils/case-transformation.js";
 
 const inverseType = (type: RelationType): RelationType =>
   type === RelationType.MANY_TO_ONE
     ? RelationType.ONE_TO_MANY
     : RelationType.MANY_TO_ONE;
+
+const isInverseCandidate = (
+  field: IRField,
+  wantType: RelationType,
+  objectName: string
+): boolean =>
+  field.kind === FieldType.RELATION &&
+  field.relation?.type === wantType &&
+  field.relation.targetObjectName === objectName;
 
 // mutate objectsMap: inject missing reverse-side relation field on target object
 export function resolveInverseRelations(
@@ -21,32 +34,49 @@ export function resolveInverseRelations(
       if (field.kind !== FieldType.RELATION || !field.relation)
         continue;
 
+      const relation = field.relation;
       const targetEntry = objectsMap.get(
-        field.relation.targetObjectName
+        relation.targetObjectName
       );
       if (!targetEntry) continue; // target not in map, unresolved
 
-      const wantType = inverseType(field.relation.type);
+      const wantType = inverseType(relation.type);
 
-      // Find candidate inverse fields
-      const candidates = targetEntry.fields.filter(
-        (f) =>
-          f.kind === FieldType.RELATION &&
-          f.relation?.type === wantType &&
-          f.relation.targetObjectName === objectName
-      );
-
-      let hasInverse: boolean;
-      if (field.relation.relationKey && candidates.length > 0) {
-        // Use relationKey to disambiguate
-        hasInverse = candidates.some(
-          (f) => f.relation?.relationKey === field.relation?.relationKey
+      // Named pairing — relation already knows which field on the target
+      // it's paired with (e.g. junction fields set this explicitly).
+      if (relation.inverseFieldName) {
+        const named = targetEntry.fields.find(
+          (f) => f.name === relation.inverseFieldName
         );
-      } else {
-        // Fallback: check if any candidate exists
-        hasInverse = candidates.length > 0;
+
+        if (
+          named &&
+          isInverseCandidate(named, wantType, objectName)
+        ) {
+          continue; // already exists
+        }
+
+        targetEntry.fields.push({
+          name: relation.inverseFieldName,
+          kind: FieldType.RELATION,
+          relation: {
+            type: wantType,
+            onDelete: OnDeleteAction.CASCADE,
+            targetObjectName: objectName,
+            targetFieldName: "id",
+            inverseFieldName: field.name,
+          },
+        });
+        continue;
       }
 
+      // Unnamed pairing — any candidate not already claimed by a named
+      // pairing satisfies this relation.
+      const hasInverse = targetEntry.fields.some(
+        (f) =>
+          isInverseCandidate(f, wantType, objectName) &&
+          !f.relation?.inverseFieldName
+      );
       if (hasInverse) continue;
 
       const inverseName =
@@ -60,10 +90,6 @@ export function resolveInverseRelations(
         targetObjectName: objectName,
         targetFieldName: "id",
       };
-
-      if (field.relation.relationKey) {
-        inverseRelation.relationKey = field.relation.relationKey;
-      }
 
       targetEntry.fields.push({
         name: inverseName,
