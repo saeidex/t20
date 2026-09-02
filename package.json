@@ -52,7 +52,7 @@
     "marked-terminal": "^7.3.0",
     "pluralize": "^8.0.0",
     "ts-dedent": "^2.3.0",
-    "twenty-sdk": "2.13.0",
+    "twenty-sdk": "^2.37.0",
     "uuid": "^14.0.1",
     "valibot": "^1.4.2"
   },
