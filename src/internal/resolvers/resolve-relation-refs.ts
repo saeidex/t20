@@ -53,10 +53,8 @@ export function resolveRelationRef(
     : undefined;
 
   return {
-    targetObjectUidVarName: toUidVarName(
-      targetEntry.objectNodeName,
-      "OBJECT"
-    ),
+    targetObjectUidVarName:
+      targetEntry.results.object.uidVarName,
     targetObjectFilePath: targetEntry.results.object.filePath,
     targetObjectName: targetEntry.objectNodeName,
     targetObjectFileName: targetEntry.results.object.fileName,

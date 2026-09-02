@@ -1,5 +1,12 @@
 # @saeidex/t20
 
+## 0.8.17
+
+### Patch Changes
+
+- 3aededa: fix: inverse relations resolver
+- object names pluralize irregularly by recomputing it
+
 ## 0.8.16
 
 ### Patch Changes
