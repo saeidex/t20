@@ -10,10 +10,10 @@ export function extractObjectFields(
   knownObjectNames?: Set<string>
 ): Array<IRField> {
   const fields: Array<IRField> = [
-    {
-      name: "name",
-      kind: FieldType.TEXT,
-    },
+    // {
+    //   name: "name",
+    //   kind: FieldType.TEXT,
+    // },
     {
       name: "id",
       kind: FieldType.UUID,
