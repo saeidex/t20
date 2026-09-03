@@ -1,7 +1,6 @@
 import ts from "typescript";
 import type { IRField } from "../types.js";
 import { resolveField } from "../resolvers/resolve-field.js";
-import { FieldType } from "twenty-sdk/define";
 
 export function extractObjectFields(
   sourceFile: ts.SourceFile,
@@ -9,16 +8,7 @@ export function extractObjectFields(
   objectName: string,
   knownObjectNames?: Set<string>
 ): Array<IRField> {
-  const fields: Array<IRField> = [
-    // {
-    //   name: "name",
-    //   kind: FieldType.TEXT,
-    // },
-    {
-      name: "id",
-      kind: FieldType.UUID,
-    },
-  ];
+  const fields: Array<IRField> = [];
 
   function visit(node: ts.Node) {
     if (

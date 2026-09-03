@@ -1,5 +1,11 @@
 # @saeidex/t20
 
+## 0.8.19
+
+### Patch Changes
+
+- fix: remove 'id' field auto generation
+
 ## 0.8.18
 
 ### Patch Changes
