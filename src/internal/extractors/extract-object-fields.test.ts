@@ -4,6 +4,60 @@ import { extractObjectFields } from "./extract-object-fields.js";
 import { describe, it, expect } from "vitest";
 
 describe("extractObjectFields", () => {
+  it("Skip :: id and name fields", () => {
+    const { checker, sourceFile } = compile(`
+    interface Product {
+      id: string;
+      name: string;
+      description: string;
+    }
+  `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product"
+    );
+
+    expect(fields).toEqual([
+      { name: "description", kind: "TEXT" },
+    ]);
+  });
+
+  it("Skip :: id and name fields on relations", () => {
+    const { checker, sourceFile } = compile(`
+    interface Product {
+      id: string;
+      name: string;
+      category: Category;
+    }
+
+    interface Category {
+      id: string;
+      name: string;
+      products: Array<Product>;
+    }
+  `);
+    const fields = extractObjectFields(
+      sourceFile,
+      checker,
+      "Product",
+      new Set(["Product", "Category"])
+    );
+
+    expect(fields).toEqual([
+      {
+        name: "category",
+        kind: "RELATION",
+        relation: {
+          onDelete: OnDeleteAction.CASCADE,
+          type: "MANY_TO_ONE",
+          targetFieldName: "id",
+          targetObjectName: "Category",
+        },
+      },
+    ]);
+  });
+
   it("Base types :: explicit FieldType literal", () => {
     const { checker, sourceFile } = compile(`
       enum FieldType { TEXT = "TEXT", UUID = "UUID" }
@@ -18,8 +72,6 @@ describe("extractObjectFields", () => {
       "IBaseFields"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       { name: "explicitText", kind: "TEXT" },
       { name: "explicitUuid", kind: "UUID" },
     ]);
@@ -34,10 +86,7 @@ describe("extractObjectFields", () => {
       checker,
       "Product"
     );
-    expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
-    ]);
+    expect(fields).toEqual([]);
   });
 
   it("Base types :: id-pattern string -> UUID", () => {
@@ -54,8 +103,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       { name: "userId", kind: "TEXT" },
       { name: "categoryId", kind: "NUMBER" },
     ]);
@@ -71,8 +118,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       { name: "createdAt", kind: "DATE_TIME" },
       { name: "updatedAt", kind: "DATE_TIME" },
     ]);
@@ -88,8 +133,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       { name: "category", kind: "TEXT" },
       { name: "format", kind: "TEXT" },
     ]);
@@ -105,8 +148,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       { name: "price", kind: "NUMBER" },
       { name: "active", kind: "BOOLEAN" },
     ]);
@@ -122,8 +163,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       { name: "metadata", kind: "RAW_JSON" },
       { name: "config", kind: "RAW_JSON" },
     ]);
@@ -140,8 +179,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       {
         enumMeta: {
           enumName: "Priority",
@@ -186,8 +223,8 @@ describe("extractObjectFields", () => {
       checker,
       "Product"
     );
-    expect(fields[2].kind).toBe("SELECT");
-    expect(fields[2].options).toEqual([
+    expect(fields[0].kind).toBe("SELECT");
+    expect(fields[0].options).toEqual([
       { value: "1", label: "1", position: 0, color: "gray" },
       { value: "2", label: "2", position: 1, color: "gray" },
     ]);
@@ -203,8 +240,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       {
         enumMeta: {
           enumName: "Role",
@@ -260,8 +295,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       {
         enumMeta: {
           enumName: "Role",
@@ -307,8 +340,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       { name: "tags", kind: "MULTI_SELECT", options: [] },
     ]);
   });
@@ -323,8 +354,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       { name: "tags", kind: "MULTI_SELECT", options: [] },
     ]);
   });
@@ -339,8 +368,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       {
         name: "roles",
         kind: "MULTI_SELECT",
@@ -386,8 +413,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       {
         name: "roles",
         kind: "MULTI_SELECT",
@@ -431,11 +456,7 @@ describe("extractObjectFields", () => {
       checker,
       "Product"
     );
-    expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
-      { name: "scores", kind: "ARRAY" },
-    ]);
+    expect(fields).toEqual([{ name: "scores", kind: "ARRAY" }]);
   });
 
   it("Array types :: Array<number> as ARRAY", () => {
@@ -447,11 +468,7 @@ describe("extractObjectFields", () => {
       checker,
       "Product"
     );
-    expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
-      { name: "scores", kind: "ARRAY" },
-    ]);
+    expect(fields).toEqual([{ name: "scores", kind: "ARRAY" }]);
   });
 
   it("Relation :: object and interface fields", () => {
@@ -466,8 +483,6 @@ describe("extractObjectFields", () => {
       "Product"
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       {
         name: "address",
         kind: "RELATION",
@@ -500,11 +515,7 @@ describe("extractObjectFields", () => {
       checker,
       "Product"
     );
-    expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
-      { name: "price", kind: "NUMBER" },
-    ]);
+    expect(fields).toEqual([{ name: "price", kind: "NUMBER" }]);
   });
 });
 
@@ -520,7 +531,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Parent", "Child"])
     );
-    expect(fields[2]).toEqual({
+    expect(fields[0]).toEqual({
       name: "parentId",
       kind: "RELATION",
       relation: {
@@ -543,7 +554,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Parent",
       new Set(["Parent", "Child"])
     );
-    expect(fields[2]).toEqual({
+    expect(fields[0]).toEqual({
       name: "childs",
       kind: "RELATION",
       relation: {
@@ -566,7 +577,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Parent",
       new Set(["Parent", "Child"])
     );
-    expect(fields[2]).toEqual({
+    expect(fields[0]).toEqual({
       name: "childs",
       kind: "RELATION",
       relation: {
@@ -589,7 +600,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Parent",
       new Set(["Parent", "Child"])
     );
-    expect(fields[2]).toEqual({
+    expect(fields[0]).toEqual({
       name: "childs",
       kind: "RELATION",
       relation: {
@@ -612,7 +623,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Parent",
       new Set(["Parent", "Child"])
     );
-    expect(fields[2]).toEqual({
+    expect(fields[0]).toEqual({
       name: "childs",
       kind: "RELATION",
       relation: {
@@ -635,7 +646,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Parent", "Child"])
     );
-    expect(fields[2]).toEqual({
+    expect(fields[0]).toEqual({
       name: "parent",
       kind: "RELATION",
       relation: {
@@ -658,7 +669,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Parent", "Child"])
     );
-    expect(fields[2]).toEqual({
+    expect(fields[0]).toEqual({
       name: "parent",
       kind: "RELATION",
       relation: {
@@ -754,7 +765,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Parent", "Child"])
     );
-    expect(fields[2]).toEqual({
+    expect(fields[0]).toEqual({
       name: "parent",
       kind: "RELATION",
       relation: {
@@ -777,7 +788,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Child",
       new Set(["Child"]) // Parent excluded
     );
-    expect(fields[2]).toEqual({ name: "parent", kind: "TEXT" });
+    expect(fields[0]).toEqual({ name: "parent", kind: "TEXT" });
   });
 
   it("knownObjectNames undefined -> accepts any indexed target", () => {
@@ -790,7 +801,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       checker,
       "Child"
     );
-    expect(fields[2]).toEqual({
+    expect(fields[0]).toEqual({
       name: "parent",
       kind: "RELATION",
       relation: {
@@ -813,11 +824,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       "Foo",
       new Set(["Entity"])
     );
-    expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
-      { name: "ref", kind: "TEXT" },
-    ]);
+    expect(fields).toEqual([{ name: "ref", kind: "TEXT" }]);
   });
 
   it("indexed-access wins over Id-suffix naming heuristic", () => {
@@ -852,10 +859,7 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       checker,
       "Product"
     );
-    expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
-    ]);
+    expect(fields).toEqual([]);
   });
 
   it("old direct-entity pattern and new indexed-access pattern coexist", () => {
@@ -874,8 +878,6 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       new Set(["Address", "Category", "Product"])
     );
     expect(fields).toEqual([
-      { name: "name", kind: "TEXT" },
-      { name: "id", kind: "UUID" },
       {
         name: "address",
         kind: "RELATION",
@@ -921,8 +923,6 @@ describe("Relation :: indexed-access foreign key pattern", () => {
       new Set(["Category", "Product"])
     );
     expect(fields.map((f) => [f.name, f.kind])).toEqual([
-      ["name", "TEXT"],
-      ["id", "UUID"],
       ["price", "NUMBER"],
       ["active", "BOOLEAN"],
       ["createdAt", "DATE_TIME"],
@@ -944,7 +944,7 @@ it('MANY_TO_ONE :: explicit union with undefined (Entity["id"] | undefined)', ()
     "Child",
     new Set(["Parent", "Child"])
   );
-  expect(fields[2]).toEqual({
+  expect(fields[0]).toEqual({
     name: "parent",
     kind: "RELATION",
     relation: {
@@ -967,7 +967,7 @@ it('ONE_TO_MANY :: readonly + nullable combined (readonly Entity["id"][] | null)
     "Parent",
     new Set(["Parent", "Child"])
   );
-  expect(fields[2]).toEqual({
+  expect(fields[0]).toEqual({
     name: "childs",
     kind: "RELATION",
     relation: {
@@ -991,5 +991,5 @@ it("KNOWN GAP :: nullable enum union falls through to TEXT instead of SELECT", (
   );
   // TODO: should be SELECT with options — resolveSelectTypes doesn't strip
   // nullable unions the way resolveIndexedRelationType now does.
-  expect(fields[2]).toEqual({ name: "status", kind: "TEXT" });
+  expect(fields[0]).toEqual({ name: "status", kind: "TEXT" });
 });
