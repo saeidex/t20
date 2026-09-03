@@ -8,10 +8,10 @@ import type { ObjectMapEntry } from "../types.js";
 export function generateTwentyNavMenuItem(
   entry: ObjectMapEntry
 ): string {
-  const objectUidImportStatement = toImportStatement(
-    entry.results.object.filePath,
+  const viewUidImportStatement = toImportStatement(
+    entry.results.view.filePath,
     entry.results.navMenuItem.filePath,
-    entry.results.object.uidVarName
+    entry.results.view.uidVarName
   );
 
   const navMenuItemUidVarStatement =
@@ -21,7 +21,7 @@ export function generateTwentyNavMenuItem(
     tempStore().navMenuItemsPositionStore;
 
   const output = dedent`import { defineNavigationMenuItem, NavigationMenuItemType } from "twenty-sdk/define";
-                ${objectUidImportStatement}
+                ${viewUidImportStatement}
                 ${navMenuItemUidVarStatement}
 
                 export default defineNavigationMenuItem({
@@ -31,11 +31,12 @@ export function generateTwentyNavMenuItem(
                   name: "${entry.results.navMenuItem.name}",
                   icon: "IconList",
                   position: ${navMenuItemsPositionStore.getPositionAndIncrement()},
+                  color: "Gold",
                   type: NavigationMenuItemType.${
-                    NavigationMenuItemType.OBJECT
+                    NavigationMenuItemType.VIEW
                   },
-                  targetObjectUniversalIdentifier: ${
-                    entry.results.object.uidVarName
+                  viewUniversalIdentifier: ${
+                    entry.results.view.uidVarName
                   },
                 });
          `;
