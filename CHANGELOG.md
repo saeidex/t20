@@ -1,5 +1,12 @@
 # @saeidex/t20
 
+## 0.8.18
+
+### Patch Changes
+
+- fix: nav item gen
+- remove: default 'name' field from objects
+
 ## 0.8.17
 
 ### Patch Changes
