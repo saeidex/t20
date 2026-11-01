@@ -1,6 +1,6 @@
 # t20 — Agent Skill
 
-[![skills.sh](https://skills.sh/b/saeidex/t20)](https://skills.sh/saeidex/t20)
+[![skills.sh](https://skills.sh/b/saeidex/t20)](https://skills.sh/p/X6DH7SyUCQV0kUeE)
 
 > Teach your AI coding agent how to scaffold [Twenty CRM](https://github.com/twentyhq/twenty) objects, fields, views, and navigation-menu items from TypeScript type definitions using the [`@saeidex/t20`](https://www.npmjs.com/package/@saeidex/t20) CLI.
 
@@ -21,14 +21,7 @@ This skill gives your agent deep, accurate knowledge of the `t20` CLI (v0.8.19) 
 Add this skill to your project with the `skills` CLI:
 
 ```bash
-# Install just the t20 skill
-npx skills add saeidex/t20 --skill t20
-```
-
-Or install all skills in this repo:
-
-```bash
-npx skills add saeidex/t20
+npx skills add https://skills.sh/p/X6DH7SyUCQV0kUeE
 ```
 
 ### Supported Agents
