@@ -1,0 +1,13 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Twenty CRM",
+      "description": "Scaffold Twenty CRM objects, fields, views, and navigation menus directly from TypeScript definitions.",
+      "skills": [
+        "t20"
+      ]
+    }
+  ]
+}
